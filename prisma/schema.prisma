@@ -1,0 +1,409 @@
+// Prisma Schema for Allo Maison - Firewood E-Commerce Platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model SiteSetting {
+  id                        String   @id @default("default-settings")
+  siteName                  String   @default("Allo Maison")
+  slogan                    String   @default("Votre spécialiste du bois de chauffage de qualité supérieure")
+  logoUrl                   String   @default("/logo.svg")
+  faviconUrl                String   @default("/favicon.ico")
+  emailLogoUrl              String   @default("/email-logo.png")
+  primaryColor              String   @default("#14532d") // Forest 900
+  secondaryColor            String   @default("#7c4a2d") // Wood 700
+  accentColor               String   @default("#ea580c") // Warm ember
+  fontFamily                String   @default("Inter, system-ui, sans-serif")
+  
+  // Company contact details
+  companyName               String   @default("Allo Maison Distribution SAS")
+  companySiret              String   @default("892 341 982 00019")
+  companyVatNumber          String   @default("FR 34 892341982")
+  companyAddress            String   @default("14 Rue des Scieries, 88200 Remiremont, France")
+  companyPhone              String   @default("+33 (0)3 29 00 12 34")
+  companyEmail              String   @default("contact@allomaison-bois.fr")
+  supportHours              String   @default("Du Lundi au Vendredi de 8h00 à 19h00, Samedi de 8h30 à 13h00")
+  
+  // Bank details for wire transfers
+  bankName                  String   @default("BNP Paribas France")
+  bankBeneficiary           String   @default("ALLO MAISON DISTRIBUTION SAS")
+  bankIban                  String   @default("FR76 3000 4012 3400 0123 4567 890")
+  bankBic                   String   @default("BNPAFRPP")
+  bankTransferDeadlineDays  Int      @default(5)
+  bankInstructions          String   @default("Veuillez indiquer impérativement votre référence de commande dans le libellé de votre virement bancaire pour un traitement sous 24h ouvrées.")
+  
+  // Countries and markets (JSON strings)
+  supportedCountries        String   @default("[\"FR\",\"DE\",\"BE\",\"CH\"]")
+  supportedCurrencies       String   @default("[\"EUR\",\"CHF\"]")
+  defaultCurrency           String   @default("EUR")
+  activeLanguages           String   @default("[\"fr\",\"de\",\"nl\"]")
+  
+  // Legal text defaults
+  cgvText                   String   @default("Conditions Générales de Vente d'Allo Maison...")
+  privacyPolicyText         String   @default("Politique de protection des données personnelles RGPD...")
+  cookiePolicyText          String   @default("Politique de gestion des cookies...")
+  legalMentionsText         String   @default("Mentions légales et informations éditeur...")
+  deliveryPolicyText        String   @default("Modalités de transport et conditions d'accès camion...")
+  
+  // SEO
+  seoTitle                  String   @default("Allo Maison | Bois de chauffage sec, étuvé et certifié livré chez vous")
+  seoDescription            String   @default("Achetez votre bois de chauffage de haute performance : chêne, hêtre, charme séché en étuve <20%. Livraison par camion avec hayon et transpalette tout terrain.")
+  socialLinks               String   @default("{\"facebook\":\"https://facebook.com/allomaison\",\"instagram\":\"https://instagram.com/allomaison\"}")
+  
+  // Free shipping threshold
+  freeShippingThreshold     Float    @default(650.0)
+  
+  // Email engine settings
+  emailProvider             String   @default("log") // "log", "smtp", "resend"
+  smtpHost                  String   @default("smtp.example.com")
+  smtpPort                  Int      @default(587)
+  smtpUser                  String   @default("contact@allomaison-bois.fr")
+  smtpPassword              String   @default("secret")
+  smtpFrom                  String   @default("Allo Maison Bois <contact@allomaison-bois.fr>")
+  adminNotificationEmail    String   @default("commandes@allomaison-bois.fr")
+  
+  isPublished               Boolean  @default(true)
+  updatedAt                 DateTime @updatedAt
+  createdAt                 DateTime @default(now())
+}
+
+model User {
+  id            String    @id @default(uuid())
+  email         String    @unique
+  passwordHash  String
+  firstName     String
+  lastName      String
+  phone         String?
+  role          String    @default("CUSTOMER") // CUSTOMER, SUPER_ADMIN, COMMERCIAL_ADMIN, ORDER_MANAGER, LOGISTICS_MANAGER, ACCOUNTANT, CONTENT_MANAGER
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  orders        Order[]
+  addresses     Address[]
+  auditLogs     AuditLog[]
+}
+
+model Address {
+  id            String    @id @default(uuid())
+  userId        String?
+  type          String    @default("SHIPPING") // SHIPPING, BILLING
+  firstName     String
+  lastName      String
+  company       String?
+  street        String
+  additional    String?
+  postalCode    String
+  city          String
+  country       String    @default("FR")
+  phone         String
+  isDefault     Boolean   @default(false)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  user          User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Category {
+  id            String    @id @default(uuid())
+  slug          String    @unique
+  name          String
+  description   String
+  imageUrl      String?
+  displayOrder  Int       @default(0)
+  isActive      Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  products      Product[]
+}
+
+model Product {
+  id                    String    @id @default(uuid())
+  reference             String    @unique // e.g. "BOIS-CHENE-33-PAL2"
+  slug                  String    @unique
+  name                  String
+  shortDescription      String
+  description           String
+  images                String    // JSON array of image URLs
+  species               String    // e.g. "Chêne & Hêtre"
+  woodType              String    // "Bois dur (Groupe 1)", "Bois tendre"
+  humidityRate          String    // e.g. "< 20% (Bois sec prêt à brûler)"
+  calorificValue        String    // e.g. "4.2 kWh/kg (env. 2000 kWh/stère)"
+  logLength             String    // e.g. "33 cm", "25 cm", "50 cm"
+  unit                  String    // "Palette 2 stères", "Sac 15 kg", "Stère", "Mètre cube"
+  priceHT               Float
+  priceTTC              Float
+  vatRate               Float     @default(5.5) // 5.5% in France for firewood
+  promoPrice            Float?
+  promoStartDate        DateTime?
+  promoEndDate          DateTime?
+  stock                 Int       @default(50)
+  reservedStock         Int       @default(0)
+  weightKg              Float     @default(900.0)
+  volumeM3              Float     @default(1.8)
+  dimensions            String    @default("100 x 120 x 160 cm")
+  packaging             String    // "Palette filmée et houssée", "Sacs empilés"
+  isPreorderAllowed     Boolean   @default(false)
+  allowedCountries      String    @default("[\"FR\",\"DE\",\"BE\",\"CH\"]") // JSON array
+  leadTimeDays          Int       @default(4)
+  seoTitle              String?
+  seoDescription        String?
+  isActive              Boolean   @default(true)
+  categoryId            String
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  category              Category  @relation(fields: [categoryId], references: [id])
+  variants              ProductVariant[]
+  orderItems            OrderItem[]
+  reviews               CustomerReview[]
+}
+
+model ProductVariant {
+  id            String    @id @default(uuid())
+  productId     String
+  sku           String    @unique
+  title         String    // e.g. "Bûches 25 cm - Palette 2 stères"
+  logLength     String
+  packaging     String
+  priceModifier Float     @default(0.0)
+  stock         Int       @default(30)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  product       Product   @relation(fields: [productId], references: [id], onDelete: Cascade)
+}
+
+model Order {
+  id                      String    @id @default(uuid())
+  orderNumber             String    @unique // e.g. "AM-2026-1001"
+  secureToken             String    @unique // unguessable token for tracking link without login
+  userId                  String?
+  customerEmail           String
+  customerPhone           String
+  customerFirstName       String
+  customerLastName        String
+  
+  // Immutability snapshots
+  siteSnapshot            String    // JSON snapshot of company & bank details at purchase
+  shippingAddress         String    // JSON
+  billingAddress          String    // JSON
+  
+  // Financials calculated server-side
+  subtotalHT              Float
+  subtotalTTC             Float
+  vatTotal                Float
+  shippingFee             Float
+  discountTotal           Float     @default(0.0)
+  totalAmount             Float
+  currency                String    @default("EUR")
+  
+  paymentMethod           String    @default("BANK_TRANSFER")
+  paymentStatus           String    @default("PENDING_TRANSFER") // PENDING_TRANSFER, TRANSFER_RECEIVED, PAYMENT_VERIFIED, REFUNDED, FAILED, PARTIALLY_PAID
+  fulfillmentStatus       String    @default("ORDER_CREATED") // ORDER_CREATED, VALIDATED, IN_PREPARATION, READY_FOR_SHIPPING, SHIPPED, IN_TRANSIT, OUT_FOR_DELIVERY, DELIVERY_DELAYED, DELIVERED, CANCELLED, INCIDENT
+  
+  // Heavy truck accessibility constraints
+  accessibilityInfo       String    // JSON: heavyTruckAccessible, requiresTailgate, hasTurningArea, steepSlope, accessInstructions
+  requestedDeliverySlot   String?
+  internalNotes           String?
+  customerNotes           String?
+  
+  createdAt               DateTime  @default(now())
+  updatedAt               DateTime  @updatedAt
+
+  user                    User?     @relation(fields: [userId], references: [id])
+  items                   OrderItem[]
+  paymentRecords          PaymentRecord[]
+  deliveryShipment        DeliveryShipment?
+  emailLogs               EmailLog[]
+  statusHistory           OrderStatusHistory[]
+  reviews                 CustomerReview[]
+}
+
+model OrderItem {
+  id            String    @id @default(uuid())
+  orderId       String
+  productId     String
+  productName   String
+  productRef    String
+  unitPriceHT   Float
+  unitPriceTTC  Float
+  quantity      Int
+  totalHT       Float
+  totalTTC      Float
+  snapshot      String    // JSON snapshot of wood type, length, humidity, packaging at time of order
+  createdAt     DateTime  @default(now())
+
+  order         Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product       Product   @relation(fields: [productId], references: [id])
+}
+
+model OrderStatusHistory {
+  id              String    @id @default(uuid())
+  orderId         String
+  previousStatus  String
+  newStatus       String
+  statusType      String    // "PAYMENT" or "FULFILLMENT"
+  changedBy       String    // "SYSTEM", "ADMIN", or Admin user ID
+  reason          String?
+  createdAt       DateTime  @default(now())
+
+  order           Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model PaymentRecord {
+  id                String    @id @default(uuid())
+  orderId           String
+  expectedAmount    Float
+  receivedAmount    Float
+  bankReference     String?   // Transaction ref recorded on bank statement
+  receiptDate       DateTime? // Date money was credited
+  isVerified        Boolean   @default(false)
+  verifiedByUserId  String?
+  verifiedAt        DateTime?
+  proofDocumentUrl  String?
+  notes             String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  order             Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+}
+
+model Carrier {
+  id                  String    @id @default(uuid())
+  name                String    // e.g. "Geodis Calberson", "Dachser Logistics", "Transports Schenker", "Flotte Allo Maison"
+  code                String    @unique // "GEODIS", "DACHSER", "SCHENKER", "INTERNAL"
+  trackingUrlTemplate String?   // e.g. "https://mon.geodis.com/suivi/{trackingNumber}"
+  contactPhone        String?
+  isActive            Boolean   @default(true)
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+
+  shipments           DeliveryShipment[]
+}
+
+model DeliveryShipment {
+  id                    String    @id @default(uuid())
+  orderId               String    @unique
+  carrierId             String?
+  trackingNumber        String    // e.g. "GEO-88492019"
+  carrierTrackingUrl    String?
+  shippedAt             DateTime?
+  estimatedDeliveryDate DateTime?
+  deliveredAt           DateTime?
+  currentStage          String    @default("PREPARATION") // PREPARATION, PICKED_UP, HUB_TRANSIT, OUT_FOR_DELIVERY, DELIVERED, INCIDENT, DELAYED
+  deliveryNotes         String?
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
+
+  order                 Order     @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  carrier               Carrier?  @relation(fields: [carrierId], references: [id])
+  trackingEvents        TrackingEvent[]
+}
+
+model TrackingEvent {
+  id                  String    @id @default(uuid())
+  shipmentId          String
+  status              String    // "Commande prise en charge", "Arrivée Hub Régional", "En cours de livraison", etc.
+  sourceType          String    @default("MANUAL_ADMIN") // CARRIER_API, WAREHOUSE_CONFIRMED, CALCULATED_ESTIMATE, MANUAL_ADMIN
+  location            String?   // e.g. "Entrepôt Epinal (88)", "Hub Plateforme Lyon (69)"
+  description         String
+  isCustomerVisible   Boolean   @default(true)
+  occurredAt          DateTime  @default(now())
+  createdAt           DateTime  @default(now())
+
+  shipment            DeliveryShipment @relation(fields: [shipmentId], references: [id], onDelete: Cascade)
+}
+
+model EmailLog {
+  id              String    @id @default(uuid())
+  orderId         String?
+  templateId      Int       // 1 to 9 (1: Order Confirmation, 2: Admin alert, 3: Payment verified, 4: Order validated, 5: In prep, 6: Shipped, 7: Transport update, 8: Delivered, 9: Delay/Incident)
+  recipientEmail  String
+  subject         String
+  contentHtml     String?
+  contentText     String?
+  status          String    @default("QUEUED") // QUEUED, SENT, FAILED, DELIVERED
+  idempotencyKey  String    @unique
+  errorMessage    String?
+  sentAt          DateTime?
+  retryCount      Int       @default(0)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  order           Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+}
+
+model AuditLog {
+  id            String    @id @default(uuid())
+  userId        String?
+  action        String    // "PAYMENT_VERIFIED", "BANK_DETAILS_MODIFIED", "STATUS_CHANGED", "ORDER_CANCELLED", "REFUND_RECORDED"
+  resourceType  String    // "Order", "SiteSetting", "Product", "User"
+  resourceId    String?
+  details       String    // JSON description of diff or payload
+  ipAddress     String?
+  createdAt     DateTime  @default(now())
+
+  user          User?     @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model DiscountCode {
+  id              String    @id @default(uuid())
+  code            String    @unique
+  discountPercent Float?    // e.g. 5 for 5% off
+  discountAmount  Float?    // e.g. 20 for 20€ off
+  minOrderAmount  Float     @default(0.0)
+  validFrom       DateTime  @default(now())
+  validUntil      DateTime?
+  usageLimit      Int?
+  usedCount       Int       @default(0)
+  isActive        Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+}
+
+model ShippingRate {
+  id                      String    @id @default(uuid())
+  countryCode             String    // FR, DE, BE, CH
+  postalCodePrefix        String    @default("*") // "*" for default or prefix like "75", "68", "06"
+  minWeightKg             Float     @default(0.0)
+  maxWeightKg             Float     @default(10000.0)
+  baseRate                Float     @default(49.0)
+  perUnitRate             Float     @default(15.0) // per additional pallet/stère
+  difficultAccessSurcharge Float    @default(30.0)
+  estimatedDays           Int       @default(4)
+  createdAt               DateTime  @default(now())
+}
+
+model ContactMessage {
+  id          String    @id @default(uuid())
+  name        String
+  email       String
+  phone       String?
+  subject     String
+  message     String
+  status      String    @default("NEW") // NEW, IN_PROGRESS, RESOLVED
+  createdAt   DateTime  @default(now())
+}
+
+model CustomerReview {
+  id              String    @id @default(uuid())
+  productId       String?
+  orderId         String?
+  authorName      String
+  authorCity      String?
+  rating          Int       @default(5)
+  comment         String
+  isVerifiedBuyer Boolean   @default(true)
+  isApproved      Boolean   @default(true)
+  createdAt       DateTime  @default(now())
+
+  product         Product?  @relation(fields: [productId], references: [id], onDelete: SetNull)
+  order           Order?    @relation(fields: [orderId], references: [id], onDelete: SetNull)
+}
