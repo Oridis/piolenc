@@ -5,7 +5,7 @@ import { getSiteSettings } from '@/lib/settings';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { formatPrice } from '@/lib/pricing';
-import { Sparkles, ArrowRight, Tag, Truck } from 'lucide-react';
+import { ArrowRight, Tag, Truck } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
@@ -23,50 +23,49 @@ export default async function PromotionsPage() {
     <>
       <Navbar siteName={settings.siteName} phone={settings.companyPhone} slogan={settings.slogan} />
 
-      <main className="flex-1 py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-10">
-        <div className="bg-gradient-to-r from-amber-600 via-amber-700 to-wood-900 text-white rounded-3xl p-8 sm:p-12 shadow-xl">
-          <div className="max-w-2xl space-y-3">
-            <span className="inline-flex items-center space-x-1.5 bg-amber-500/40 text-amber-100 px-3 py-1 rounded-full text-xs font-bold">
-              <Sparkles className="w-4 h-4" />
-              <span>Bons Plans &amp; Tarifs Dégressifs Hiver 2026</span>
+      <main className="flex-1 font-sans bg-ivory py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
+        <div className="bg-white rounded-xl border border-subtleBorder p-6 sm:p-10 shadow-subtle">
+          <div className="max-w-2xl space-y-2">
+            <span className="text-xs font-medium uppercase tracking-wider text-secondaryText">
+              Tarifs avantageux &amp; Volume
             </span>
-            <h1 className="text-3xl sm:text-4xl font-black tracking-tight">
-              Promotions &amp; Remises Volume Bois de Chauffage
+            <h1 className="font-poppins font-semibold text-2xl sm:text-3xl text-primaryText tracking-tight">
+              Offres et remises sur le bois de chauffage
             </h1>
-            <p className="text-sm text-amber-100 leading-relaxed">
-              Profitez de réductions immédiates sur nos palettes de bois sec étuvé et granulés de bois, avec livraison offerte dès 650€ d'achat.
+            <p className="text-xs sm:text-sm text-secondaryText leading-relaxed">
+              Consultez nos remises directes sur les palettes de bois sec étuvé et granulés de bois, avec livraison offerte dès 650 € d&apos;achat en France et Belgique.
             </p>
           </div>
         </div>
 
-        {/* Promo Codes Announcement Box */}
+        {/* Promo Codes Announcement Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white p-6 rounded-3xl border-2 border-dashed border-amber-300 shadow-sm flex items-start space-x-4">
-            <div className="p-3 bg-amber-100 text-amber-800 rounded-2xl shrink-0">
-              <Tag className="w-6 h-6" />
+          <div className="bg-white p-5 rounded-xl border border-subtleBorder shadow-subtle flex items-start space-x-3.5">
+            <div className="w-10 h-10 rounded-md bg-ivory border border-subtleBorder flex items-center justify-center text-forest shrink-0">
+              <Tag className="w-5 h-5" />
             </div>
             <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-800">
-                Code Bienvenue Première Commande
+              <span className="text-[10px] font-medium uppercase tracking-wider text-secondaryText">
+                Première commande
               </span>
-              <h3 className="text-lg font-black text-gray-900">10€ de remise immédiate</h3>
-              <p className="text-xs text-gray-600">
-                Utilisez le code <strong className="font-mono bg-amber-50 px-2 py-0.5 rounded border border-amber-200">BIENVENUE10</strong> dans votre panier dès 300€ d'achat.
+              <h3 className="font-poppins font-medium text-base text-primaryText">10 € de remise immédiate</h3>
+              <p className="text-xs text-secondaryText leading-normal">
+                Indiquez le code avantage <strong className="font-mono bg-ivory px-2 py-0.5 rounded border border-subtleBorder text-primaryText">BIENVENUE10</strong> lors de votre commande dès 300 € d&apos;achat.
               </p>
             </div>
           </div>
 
-          <div className="bg-white p-6 rounded-3xl border-2 border-dashed border-forest-300 shadow-sm flex items-start space-x-4">
-            <div className="p-3 bg-forest-100 text-forest-800 rounded-2xl shrink-0">
-              <Truck className="w-6 h-6" />
+          <div className="bg-white p-5 rounded-xl border border-subtleBorder shadow-subtle flex items-start space-x-3.5">
+            <div className="w-10 h-10 rounded-md bg-ivory border border-subtleBorder flex items-center justify-center text-forest shrink-0">
+              <Truck className="w-5 h-5" />
             </div>
             <div className="space-y-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-forest-800">
-                Livraison Poids Lourd Offerte
+              <span className="text-[10px] font-medium uppercase tracking-wider text-secondaryText">
+                Livraison spécialisée
               </span>
-              <h3 className="text-lg font-black text-gray-900">Transport gratuit dès 650€</h3>
-              <p className="text-xs text-gray-600">
-                Pour 2 palettes ou plus (France métropolitaine et Belgique), bénéficiez de la livraison avec hayon offerte.
+              <h3 className="font-poppins font-medium text-base text-primaryText">Transport offert dès 650 €</h3>
+              <p className="text-xs text-secondaryText leading-normal">
+                À partir de 2 palettes de bois ou granulés, bénéficiez de la livraison par camion porteur avec hayon sans frais additionnels.
               </p>
             </div>
           </div>
@@ -74,8 +73,8 @@ export default async function PromotionsPage() {
 
         {/* Products on Sale */}
         <div className="space-y-6">
-          <h2 className="text-xl font-black text-gray-900">
-            Palettes actuellement en promotion ({promoProducts.length})
+          <h2 className="font-poppins font-medium text-xl text-primaryText">
+            Palettes actuellement en offre spéciale ({promoProducts.length})
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -90,56 +89,61 @@ export default async function PromotionsPage() {
               return (
                 <div
                   key={prod.id}
-                  className="bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm hover:shadow-lg transition flex flex-col justify-between group"
+                  className="bg-white rounded-xl border border-subtleBorder overflow-hidden flex flex-col justify-between hover:border-forest/80 transition-colors duration-150"
                 >
                   <div>
-                    <div className="relative h-48 overflow-hidden bg-gray-100">
+                    <div className="relative h-48 overflow-hidden bg-ivory">
                       <img
                         src={parsedImages[0] || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600'}
                         alt={prod.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition duration-300"
+                        className="w-full h-full object-cover"
                       />
-                      <div className="absolute top-2.5 right-2.5 bg-amber-500 text-gray-950 text-xs font-black px-2.5 py-1 rounded-md shadow">
-                        PROMO
+                      <div className="absolute top-2.5 left-2.5 badge-neutral bg-white/90 text-[10px]">
+                        {prod.humidityRate}
+                      </div>
+                      <div className="absolute top-2.5 right-2.5 badge-warning bg-amber-100 text-amber-900 border-amber-300 text-[10px]">
+                        Offre spéciale
                       </div>
                     </div>
 
-                    <div className="p-5 space-y-2">
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-wood-700">
-                        {prod.species} • {prod.logLength}
+                    <div className="p-4 space-y-2">
+                      <span className="text-[10px] font-medium uppercase tracking-wider text-secondaryText">
+                        {prod.species} · {prod.logLength}
                       </span>
-                      <h3 className="font-extrabold text-sm text-gray-900">
-                        <Link href={`/produit/${prod.slug}`} className="hover:text-forest-800">
+                      <h3 className="font-poppins font-medium text-sm text-primaryText">
+                        <Link href={`/produit/${prod.slug}`} className="hover:text-forest transition-colors">
                           {prod.name}
                         </Link>
                       </h3>
-                      <p className="text-xs text-gray-500 line-clamp-2 leading-relaxed">
+                      <p className="text-xs text-secondaryText line-clamp-2 leading-relaxed">
                         {prod.shortDescription}
                       </p>
                     </div>
                   </div>
 
-                  <div className="p-5 pt-0 border-t border-gray-100 mt-2 space-y-3">
+                  <div className="p-4 pt-0 border-t border-subtleBorder/60 mt-2 space-y-3">
                     <div className="flex justify-between items-baseline pt-3">
                       <div>
-                        <span className="text-2xl font-black text-forest-900">
-                          {formatPrice(prod.promoPrice!)}
+                        <span className="font-poppins font-semibold text-lg text-primaryText">
+                          {prod.promoPrice ? formatPrice(prod.promoPrice) : formatPrice(prod.priceTTC)}
                         </span>
-                        <span className="text-xs line-through text-gray-400 ml-2">
-                          {formatPrice(prod.priceTTC)}
-                        </span>
-                        <span className="text-[10px] text-gray-500 block">TTC / {prod.unit}</span>
+                        {prod.promoPrice && (
+                          <span className="text-xs line-through text-secondaryText ml-1.5">
+                            {formatPrice(prod.priceTTC)}
+                          </span>
+                        )}
+                        <span className="text-[10px] text-secondaryText block">TTC / {prod.unit}</span>
                       </div>
-                      <span className="text-xs font-semibold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded">
-                        En stock
+                      <span className="badge-success text-[11px]">
+                        {prod.stock > 0 ? `${prod.stock} disponibles` : 'Rupture'}
                       </span>
                     </div>
 
                     <Link
                       href={`/produit/${prod.slug}`}
-                      className="w-full bg-forest-800 hover:bg-forest-700 text-white font-bold py-2.5 px-3 rounded-xl text-xs flex items-center justify-center space-x-1.5 transition shadow"
+                      className="btn-primary w-full text-xs text-center inline-flex items-center justify-center gap-1.5"
                     >
-                      <span>Profiter de l'offre</span>
+                      <span>Voir le produit &amp; commander</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>

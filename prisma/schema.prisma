@@ -4,8 +4,67 @@ generator client {
   provider = "prisma-client-js"
 }
 
+enum code_challenge_method {
+  S256
+  PLAIN
+}
+
+enum factor_type {
+  otp
+  totp
+  webauthn
+}
+
+enum factor_status {
+  enabled
+  disabled
+  revoked
+}
+
+enum oauth_response_type {
+  code
+}
+
+enum oauth_authorization_status {
+  pending
+}
+
+enum oauth_registration_type {
+  confidential
+}
+
+enum one_time_token_type {
+  email
+  reset
+}
+
+enum aal_level {
+  level1
+  level2
+}
+
+model profiles {
+  id String @id @db.Uuid
+  user_id String
+  email String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @updatedAt
+}
+
+model blog_tags {
+  id String @id @db.Uuid
+  name String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
+model blog_categories {
+  id String @id @db.Uuid
+  name String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+}
+
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 

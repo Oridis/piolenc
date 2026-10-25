@@ -16,22 +16,22 @@ export default async function AdminUsersPage() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <div className="flex items-center space-x-2">
-            <div className="p-2 bg-red-100 text-red-800 rounded-lg">
+          <div className="flex items-center space-x-2.5">
+            <div className="p-2 bg-forest-100 text-forest-800 rounded-lg">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold font-heading text-primaryText tracking-tight">
               Utilisateurs Administratifs &amp; Rôles (RBAC)
             </h1>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Contrôle d'accès strict par métier : Super Admin, Commercial, Logistique, Comptable, Gestionnaire de contenu.
+          <p className="text-xs text-secondaryText mt-1">
+            Contrôle d'accès strict par métier : Direction, Commercial, Logistique, Comptable, Gestionnaire de contenu.
           </p>
         </div>
 
         {/* Roles & Permissions Reference Table */}
-        <div className="bg-wood-50 p-5 rounded-2xl border border-wood-200 text-xs">
-          <h3 className="font-extrabold text-wood-950 uppercase tracking-wider mb-2">
+        <div className="bg-beige-50 p-5 rounded-xl border border-subtleBorder text-xs">
+          <h3 className="font-semibold text-primaryText uppercase tracking-wider mb-2">
             Matrice des Droits et Périmètres d'Action
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
@@ -43,19 +43,19 @@ export default async function AdminUsersPage() {
               { role: 'ACCOUNTANT', desc: 'Rapprochement des virements bancaires, certification du crédit, factures pro forma.' },
               { role: 'CONTENT_MANAGER', desc: 'Pages CMS, guides techniques, avis clients et fiches produits.' },
             ].map((r) => (
-              <div key={r.role} className="bg-white p-3 rounded-xl border border-wood-200">
-                <span className="font-bold text-forest-900 block font-mono text-[11px]">{r.role}</span>
-                <p className="text-[11px] text-gray-600 mt-1">{r.desc}</p>
+              <div key={r.role} className="bg-white p-3 rounded-lg border border-subtleBorder shadow-subtle">
+                <span className="font-semibold text-forest-800 block font-mono text-[11px]">{r.role}</span>
+                <p className="text-[11px] text-secondaryText mt-1 leading-relaxed">{r.desc}</p>
               </div>
             ))}
           </div>
         </div>
 
         {/* Admin Users Table */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-subtleBorder shadow-subtle overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[10px] border-b border-gray-100">
+              <thead className="bg-beige-50 text-secondaryText font-semibold uppercase tracking-wider text-[11px] border-b border-subtleBorder">
                 <tr>
                   <th className="py-3 px-4">Utilisateur</th>
                   <th className="py-3 px-4">Email</th>
@@ -64,30 +64,30 @@ export default async function AdminUsersPage() {
                   <th className="py-3 px-4">Statut</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-subtleBorder">
                 {users.map((u) => {
                   const permissions = ROLE_PERMISSIONS[u.role as keyof typeof ROLE_PERMISSIONS] || [];
 
                   return (
-                    <tr key={u.id} className="hover:bg-gray-50 transition">
-                      <td className="py-3.5 px-4 font-bold text-gray-900">
+                    <tr key={u.id} className="hover:bg-beige-50/50 transition">
+                      <td className="py-3.5 px-4 font-semibold text-primaryText">
                         {u.firstName} {u.lastName}
                       </td>
-                      <td className="py-3.5 px-4 text-gray-600 font-mono">
+                      <td className="py-3.5 px-4 text-secondaryText font-mono">
                         {u.email}
                       </td>
                       <td className="py-3.5 px-4">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 font-mono">
+                        <span className="badge-warning font-mono">
                           {u.role}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 text-gray-600">
+                      <td className="py-3.5 px-4 text-secondaryText">
                         <span className="font-mono text-[11px]">
                           {u.role === 'SUPER_ADMIN' ? 'Toutes les permissions (*)' : permissions.join(', ')}
                         </span>
                       </td>
                       <td className="py-3.5 px-4">
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800">
+                        <span className="badge-success">
                           Actif
                         </span>
                       </td>

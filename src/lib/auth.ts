@@ -3,7 +3,7 @@ import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import { prisma } from './prisma';
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'allo_maison_production_secure_jwt_secret_firewood_2026_xyz';
+const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'woodmachine_production_secure_jwt_secret_firewood_2026_xyz';
 
 export interface TokenPayload {
   userId: string;
@@ -34,7 +34,7 @@ export function verifyToken(token: string): TokenPayload | null {
 }
 
 export async function getCurrentUser() {
-  const cookieStore = cookies();
+  const cookieStore = await cookies();
   const token = cookieStore.get('auth_token')?.value;
   if (!token) return null;
 

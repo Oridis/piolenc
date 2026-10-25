@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Calculator, Flame, Home, ShieldAlert, CheckCircle2, ArrowRight } from 'lucide-react';
+import { Calculator, Home, AlertCircle, ArrowRight } from 'lucide-react';
 
 export default function QuantityCalculator() {
   const [surfaceM2, setSurfaceM2] = useState<number>(100);
@@ -10,68 +10,51 @@ export default function QuantityCalculator() {
   const [insulation, setInsulation] = useState<'rt2012' | 'moyenne' | 'ancienne'>('moyenne');
   const [appliance, setAppliance] = useState<'poele' | 'insert' | 'cheminee'>('poele');
 
-  // Calculation algorithm:
-  // Base consumption in stères per 100m²:
-  // Principal: 6 to 10 stères depending on insulation
-  // Appoint: 3 to 5 stères
-  // Agrement: 1 to 2 stères
-  let baseConsumptionRatio = 0.07; // stère per m2
+  let baseConsumptionRatio = 0.08;
+  if (heatingType === 'appoint') baseConsumptionRatio = 0.035;
+  else if (heatingType === 'agrement') baseConsumptionRatio = 0.015;
 
-  if (heatingType === 'principal') {
-    baseConsumptionRatio = 0.08;
-  } else if (heatingType === 'appoint') {
-    baseConsumptionRatio = 0.035;
-  } else {
-    baseConsumptionRatio = 0.015;
-  }
-
-  // Insulation multiplier
   let insulationMultiplier = 1.0;
   if (insulation === 'rt2012') insulationMultiplier = 0.65;
-  else if (insulation === 'moyenne') insulationMultiplier = 1.0;
   else if (insulation === 'ancienne') insulationMultiplier = 1.45;
 
-  // Appliance efficiency multiplier
   let applianceMultiplier = 1.0;
-  if (appliance === 'poele') applianceMultiplier = 0.85; // ~80-85% yield
-  else if (appliance === 'insert') applianceMultiplier = 1.0; // ~70-75% yield
-  else if (appliance === 'cheminee') applianceMultiplier = 2.2; // ~15-20% yield (open fireplace consumes heavily)
+  if (appliance === 'poele') applianceMultiplier = 0.85;
+  else if (appliance === 'cheminee') applianceMultiplier = 2.2;
 
   const rawSteres = surfaceM2 * baseConsumptionRatio * insulationMultiplier * applianceMultiplier;
-  const recommendedSteres = Math.max(1, Math.round(rawSteres * 2) / 2); // rounded to nearest 0.5 stère
-
-  // Pallet equivalents (1 pallet of 2 stères)
+  const recommendedSteres = Math.max(1, Math.round(rawSteres * 2) / 2);
   const recommendedPallets = Math.max(1, Math.ceil(recommendedSteres / 2));
   const estimatedKWh = Math.round(recommendedSteres * 2000);
   const estimatedWeightKg = Math.round(recommendedSteres * 450);
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-      <div className="bg-gradient-to-r from-forest-900 to-forest-800 p-6 sm:p-8 text-white">
+    <div className="bg-white rounded-xl shadow-card border border-subtleBorder overflow-hidden font-sans">
+      <div className="bg-forest p-6 sm:p-7 text-white">
         <div className="flex items-center space-x-3 mb-2">
-          <div className="p-2 bg-forest-700 text-amber-400 rounded-lg">
-            <Calculator className="w-6 h-6" />
+          <div className="w-9 h-9 rounded-md bg-forest-dark flex items-center justify-center text-beige">
+            <Calculator className="w-5 h-5" />
           </div>
-          <h2 className="text-xl sm:text-2xl font-black">
-            Calculateur de Quantité de Bois Recommandée
+          <h2 className="font-poppins font-medium text-xl text-white">
+            Calculateur de volume de bois nécessaire
           </h2>
         </div>
-        <p className="text-forest-200 text-sm max-w-2xl">
-          Estimez précisément le nombre de stères et de palettes nécessaires pour chauffer votre logement tout au long de l'hiver selon vos caractéristiques réelles.
+        <p className="text-ivory/80 text-xs max-w-2xl leading-relaxed">
+          Estimez précisément le cubage en stères et le nombre de palettes nécessaires selon votre surface, votre isolation et votre équipement de chauffage.
         </p>
       </div>
 
-      <div className="p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
-        {/* Left Inputs (7 cols) */}
-        <div className="lg:col-span-7 space-y-6">
+      <div className="p-6 sm:p-7 grid grid-cols-1 lg:grid-cols-12 gap-7">
+        {/* Left Inputs */}
+        <div className="lg:col-span-7 space-y-5">
           {/* Surface */}
           <div>
             <div className="flex justify-between items-center mb-2">
-              <label className="text-sm font-bold text-gray-900 flex items-center space-x-2">
-                <Home className="w-4 h-4 text-forest-700" />
+              <label className="text-xs font-medium text-primaryText flex items-center gap-1.5">
+                <Home className="w-3.5 h-3.5 text-forest" />
                 <span>Surface chauffée au bois</span>
               </label>
-              <span className="text-base font-extrabold text-forest-900 bg-forest-50 px-3 py-1 rounded-full border border-forest-200">
+              <span className="text-xs font-semibold font-poppins text-primaryText bg-ivory px-2.5 py-0.5 rounded border border-subtleBorder">
                 {surfaceM2} m²
               </span>
             </div>
@@ -82,9 +65,9 @@ export default function QuantityCalculator() {
               step="5"
               value={surfaceM2}
               onChange={(e) => setSurfaceM2(Number(e.target.value))}
-              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-forest-700"
+              className="w-full h-1.5 bg-beige-200 rounded-md appearance-none cursor-pointer accent-forest"
             />
-            <div className="flex justify-between text-[11px] text-gray-400 mt-1">
+            <div className="flex justify-between text-[11px] text-secondaryText mt-1">
               <span>30 m²</span>
               <span>100 m²</span>
               <span>200 m²</span>
@@ -94,27 +77,27 @@ export default function QuantityCalculator() {
 
           {/* Usage Type */}
           <div>
-            <label className="block text-sm font-bold text-gray-900 mb-2">
-              Type d'utilisation du bois
+            <label className="block text-xs font-medium text-primaryText mb-1.5">
+              Type d&apos;utilisation du bois
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {[
-                { id: 'principal', title: 'Chauffage Principal', desc: 'Chauffe toute la maison' },
-                { id: 'appoint', title: 'Chauffage d\'Appoint', desc: 'Complément soirs & week-end' },
-                { id: 'agrement', title: 'Plaisir & Agrément', desc: 'Flambée occasionnelle' },
+                { id: 'principal', title: 'Chauffage principal', desc: 'Chauffe l\'ensemble du logement' },
+                { id: 'appoint', title: 'Chauffage d\'appoint', desc: 'Complément en soirée et week-end' },
+                { id: 'agrement', title: 'Agrément', desc: 'Flambée occasionnelle de plaisir' },
               ].map((item) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => setHeatingType(item.id as any)}
-                  className={`text-left p-3 rounded-xl border text-xs transition ${
+                  className={`text-left p-3 rounded-md border text-xs transition-colors duration-150 ${
                     heatingType === item.id
-                      ? 'border-forest-700 bg-forest-50/70 text-forest-950 font-bold ring-2 ring-forest-700/20'
-                      : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                      ? 'border-forest bg-forest-50/60 font-medium'
+                      : 'border-subtleBorder bg-white hover:bg-ivory text-primaryText'
                   }`}
                 >
-                  <p className="font-semibold text-gray-900">{item.title}</p>
-                  <p className="text-[11px] text-gray-500 mt-0.5">{item.desc}</p>
+                  <p className="font-poppins font-medium text-primaryText text-xs">{item.title}</p>
+                  <p className="text-[11px] text-secondaryText mt-0.5 leading-tight">{item.desc}</p>
                 </button>
               ))}
             </div>
@@ -122,27 +105,27 @@ export default function QuantityCalculator() {
 
           {/* Insulation Level */}
           <div>
-            <label className="block text-sm font-bold text-gray-900 mb-2">
-              Niveau d'isolation thermique
+            <label className="block text-xs font-medium text-primaryText mb-1.5">
+              Niveau d&apos;isolation thermique
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {[
-                { id: 'rt2012', title: 'Très bien isolé', desc: 'BBC, RT2012, RE2020' },
-                { id: 'moyenne', title: 'Isolation standard', desc: 'Double vitrage, combles isolés' },
-                { id: 'ancienne', title: 'Peu ou mal isolé', desc: 'Maison ancienne non rénovée' },
+                { id: 'rt2012', title: 'Très performante', desc: 'RT2012 / RE2020 / BBC' },
+                { id: 'moyenne', title: 'Standard', desc: 'Double vitrage, combles isolés' },
+                { id: 'ancienne', title: 'Peu isolée', desc: 'Bâti ancien non rénové' },
               ].map((item) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => setInsulation(item.id as any)}
-                  className={`text-left p-3 rounded-xl border text-xs transition ${
+                  className={`text-left p-3 rounded-md border text-xs transition-colors duration-150 ${
                     insulation === item.id
-                      ? 'border-forest-700 bg-forest-50/70 text-forest-950 font-bold ring-2 ring-forest-700/20'
-                      : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                      ? 'border-forest bg-forest-50/60 font-medium'
+                      : 'border-subtleBorder bg-white hover:bg-ivory text-primaryText'
                   }`}
                 >
-                  <p className="font-semibold text-gray-900">{item.title}</p>
-                  <p className="text-[11px] text-gray-500 mt-0.5">{item.desc}</p>
+                  <p className="font-poppins font-medium text-primaryText text-xs">{item.title}</p>
+                  <p className="text-[11px] text-secondaryText mt-0.5 leading-tight">{item.desc}</p>
                 </button>
               ))}
             </div>
@@ -150,77 +133,79 @@ export default function QuantityCalculator() {
 
           {/* Heating Appliance */}
           <div>
-            <label className="block text-sm font-bold text-gray-900 mb-2">
-              Appareil de chauffage
+            <label className="block text-xs font-medium text-primaryText mb-1.5">
+              Appareil de combustion
             </label>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
               {[
-                { id: 'poele', title: 'Poêle scandinave / fonte', desc: 'Rendement &gt; 80%' },
+                { id: 'poele', title: 'Poêle à bois moderne', desc: 'Rendement supérieur à 80%' },
                 { id: 'insert', title: 'Foyer fermé / Insert', desc: 'Rendement ~70%' },
-                { id: 'cheminee', title: 'Cheminée ouverte', desc: 'Rendement faible &lt; 20%' },
+                { id: 'cheminee', title: 'Cheminée ouverte', desc: 'Rendement faible < 20%' },
               ].map((item) => (
                 <button
                   key={item.id}
                   type="button"
                   onClick={() => setAppliance(item.id as any)}
-                  className={`text-left p-3 rounded-xl border text-xs transition ${
+                  className={`text-left p-3 rounded-md border text-xs transition-colors duration-150 ${
                     appliance === item.id
-                      ? 'border-forest-700 bg-forest-50/70 text-forest-950 font-bold ring-2 ring-forest-700/20'
-                      : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                      ? 'border-forest bg-forest-50/60 font-medium'
+                      : 'border-subtleBorder bg-white hover:bg-ivory text-primaryText'
                   }`}
                 >
-                  <p className="font-semibold text-gray-900">{item.title}</p>
-                  <p className="text-[11px] text-gray-500 mt-0.5">{item.desc}</p>
+                  <p className="font-poppins font-medium text-primaryText text-xs">{item.title}</p>
+                  <p className="text-[11px] text-secondaryText mt-0.5 leading-tight">{item.desc}</p>
                 </button>
               ))}
             </div>
           </div>
         </div>
 
-        {/* Right Recommended Results (5 cols) */}
-        <div className="lg:col-span-5 bg-wood-50/80 rounded-2xl p-6 border border-wood-200/80 flex flex-col justify-between">
+        {/* Right Recommended Results */}
+        <div className="lg:col-span-5 bg-ivory rounded-xl p-5 border border-subtleBorder flex flex-col justify-between">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-wood-700 block mb-1">
+            <span className="text-[11px] font-medium uppercase tracking-wider text-secondaryText block mb-1">
               Résultat personnalisé
             </span>
-            <h3 className="text-lg font-bold text-gray-900 mb-4">Volume recommandé pour l'hiver :</h3>
+            <h3 className="font-poppins font-medium text-sm text-primaryText mb-3">
+              Volume recommandé pour la saison d&apos;hiver :
+            </h3>
 
             {/* Main Result Card */}
-            <div className="bg-white p-5 rounded-xl border border-wood-200 shadow-sm text-center mb-6">
-              <span className="text-4xl sm:text-5xl font-black text-forest-900">
+            <div className="bg-white p-5 rounded-lg border border-subtleBorder text-center mb-4">
+              <span className="font-poppins font-semibold text-4xl text-primaryText">
                 {recommendedSteres}
               </span>
-              <span className="text-lg font-bold text-forest-800 ml-2">stères</span>
-              <p className="text-xs text-gray-500 mt-1">
-                Soit l'équivalent de <strong className="text-gray-900">{recommendedPallets} palette{recommendedPallets > 1 ? 's' : ''}</strong> de 2 stères
+              <span className="font-poppins font-medium text-lg text-secondaryText ml-1.5">stères</span>
+              <p className="text-xs text-secondaryText mt-1">
+                Équivalent à <strong className="text-primaryText font-medium">{recommendedPallets} palette{recommendedPallets > 1 ? 's' : ''}</strong> de 2 stères (1,40 m³)
               </p>
             </div>
 
             {/* Metrics Breakdown */}
-            <div className="space-y-3 text-xs text-gray-700 mb-6">
-              <div className="flex justify-between items-center py-1.5 border-b border-wood-200/60">
+            <div className="space-y-2 text-xs text-secondaryText mb-4">
+              <div className="flex justify-between items-center py-1 border-b border-subtleBorder/60">
                 <span>Énergie calorifique estimée</span>
-                <span className="font-bold text-gray-900">~{estimatedKWh.toLocaleString()} kWh</span>
+                <span className="font-medium text-primaryText">~{estimatedKWh.toLocaleString()} kWh</span>
               </div>
-              <div className="flex justify-between items-center py-1.5 border-b border-wood-200/60">
+              <div className="flex justify-between items-center py-1 border-b border-subtleBorder/60">
                 <span>Masse totale de bois sec</span>
-                <span className="font-bold text-gray-900">~{estimatedWeightKg.toLocaleString()} kg</span>
+                <span className="font-medium text-primaryText">~{estimatedWeightKg.toLocaleString()} kg</span>
               </div>
-              <div className="flex justify-between items-center py-1.5 border-b border-wood-200/60">
-                <span>Essence idéale conseillée</span>
-                <span className="font-bold text-forest-900">Chêne &amp; Hêtre étuvé</span>
+              <div className="flex justify-between items-center py-1 border-b border-subtleBorder/60">
+                <span>Essences préconisées</span>
+                <span className="font-medium text-primaryText">Chêne &amp; Hêtre étuvés</span>
               </div>
-              <div className="flex justify-between items-center py-1.5">
-                <span>Format recommandé</span>
-                <span className="font-bold text-gray-900">Bûches 33 cm ou 25 cm</span>
+              <div className="flex justify-between items-center py-1">
+                <span>Format de bûches adapté</span>
+                <span className="font-medium text-primaryText">Bûches 33 cm ou 25 cm</span>
               </div>
             </div>
 
             {appliance === 'cheminee' && (
-              <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg text-xs text-amber-900 flex items-start space-x-2 mb-4">
-                <ShieldAlert className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+              <div className="p-3 bg-white border border-subtleBorder rounded-md text-[11px] text-secondaryText flex items-start gap-2 mb-3">
+                <AlertCircle className="w-3.5 h-3.5 text-statusWarning shrink-0 mt-0.5" />
                 <span>
-                  Une cheminée ouverte consomme 4 à 5 fois plus de bois qu'un foyer fermé moderne. L'installation d'un insert vous ferait économiser jusqu'à 60% de bois.
+                  Une cheminée ouverte présente une déperdition thermique importante. L&apos;installation d&apos;un insert permettrait d&apos;économiser jusqu&apos;à 60% de bois.
                 </span>
               </div>
             )}
@@ -228,10 +213,10 @@ export default function QuantityCalculator() {
 
           <Link
             href="/boutique"
-            className="w-full bg-forest-800 text-white font-bold py-3.5 px-4 rounded-xl hover:bg-forest-700 transition flex items-center justify-center space-x-2 shadow-md text-sm text-center"
+            className="btn-primary w-full text-xs text-center inline-flex items-center justify-center gap-1.5"
           >
-            <span>Voir les palettes correspondantes</span>
-            <ArrowRight className="w-4 h-4" />
+            <span>Consulter les palettes en boutique</span>
+            <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
       </div>

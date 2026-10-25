@@ -5,19 +5,12 @@ import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/lib/pricing';
 import {
-  Flame,
   Truck,
   ShieldCheck,
-  CheckCircle,
-  AlertTriangle,
   Minus,
   Plus,
   ShoppingBag,
-  ArrowRight,
   Star,
-  MapPin,
-  Calendar,
-  Layers,
 } from 'lucide-react';
 
 interface ProductClientDetailsProps {
@@ -52,46 +45,47 @@ export default function ProductClientDetails({
   };
 
   return (
-    <div className="space-y-12">
-      {/* Breadcrumb */}
-      <nav className="text-xs text-gray-500 flex items-center space-x-2">
-        <Link href="/" className="hover:text-forest-800">Accueil</Link>
+    <div className="space-y-10 font-sans">
+      {/* Breadcrumb Navigation */}
+      <nav className="text-xs text-secondaryText flex items-center space-x-2">
+        <Link href="/" className="hover:text-forest transition-colors">Accueil</Link>
         <span>/</span>
-        <Link href="/boutique" className="hover:text-forest-800">Boutique</Link>
+        <Link href="/boutique" className="hover:text-forest transition-colors">Boutique</Link>
         <span>/</span>
-        <span className="text-gray-900 font-bold truncate">{product.name}</span>
+        <span className="text-primaryText font-medium truncate">{product.name}</span>
       </nav>
 
-      {/* Main Product Info Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
-        {/* Left: Images Gallery (6 cols) */}
+      {/* Main Product Info: 2 Columns */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        {/* Left Column: Gallery (6 cols) */}
         <div className="lg:col-span-6 space-y-4">
-          <div className="relative rounded-3xl overflow-hidden bg-gray-100 border border-gray-200 aspect-[4/3] shadow-sm">
+          <div className="relative rounded-xl overflow-hidden bg-ivory border border-subtleBorder aspect-[4/3]">
             <img
               src={activeImage || images[0]}
               alt={product.name}
               className="w-full h-full object-cover"
             />
-            <div className="absolute top-4 left-4 bg-forest-900/90 backdrop-blur-sm text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow">
+            <div className="absolute top-3 left-3 badge-neutral bg-white/95 text-[11px] font-medium">
               {product.humidityRate}
             </div>
             {product.promoPrice && (
-              <div className="absolute top-4 right-4 bg-amber-500 text-gray-950 text-xs font-black px-3 py-1.5 rounded-lg shadow">
-                OFFRE SPÉCIALE
+              <div className="absolute top-3 right-3 badge-warning bg-amber-100 text-amber-900 border-amber-300 text-[11px]">
+                Offre spéciale
               </div>
             )}
           </div>
 
           {images.length > 1 && (
-            <div className="flex space-x-3 overflow-x-auto pb-2">
+            <div className="flex space-x-2.5 overflow-x-auto pb-1">
               {images.map((img, idx) => (
                 <button
                   key={idx}
                   type="button"
                   onClick={() => setActiveImage(img)}
-                  className={`w-20 h-20 rounded-xl overflow-hidden border-2 transition shrink-0 ${
-                    activeImage === img ? 'border-forest-700 ring-2 ring-forest-700/20' : 'border-gray-200 opacity-70'
+                  className={`w-18 h-18 rounded-lg overflow-hidden border transition-colors shrink-0 bg-ivory ${
+                    activeImage === img ? 'border-forest ring-1 ring-forest' : 'border-subtleBorder opacity-80'
                   }`}
+                  aria-label={`Afficher la photo ${idx + 1}`}
                 >
                   <img src={img} alt="" className="w-full h-full object-cover" />
                 </button>
@@ -99,71 +93,67 @@ export default function ProductClientDetails({
             </div>
           )}
 
-          {/* Logistics Box */}
-          <div className="bg-wood-50 rounded-2xl p-5 border border-wood-200 text-xs space-y-3">
-            <h4 className="font-extrabold text-wood-950 flex items-center space-x-2 text-sm">
-              <Truck className="w-4 h-4 text-wood-800" />
+          {/* Delivery & Logistics Specification Box */}
+          <div className="bg-ivory rounded-xl p-5 border border-subtleBorder text-xs space-y-2">
+            <h4 className="font-poppins font-medium text-primaryText flex items-center gap-2 text-xs">
+              <Truck className="w-4 h-4 text-forest" />
               <span>Modalités de livraison pour cette palette</span>
             </h4>
-            <div className="space-y-1.5 text-wood-900">
-              <p>• Dépose au sol par camion porteur équipé d'un hayon élévateur et d'un transpalette tout-terrain.</p>
-              <p>• Prise de rendez-vous téléphonique préalable sous 48h par le transporteur.</p>
-              <p>• Poids total de la palette : ~{product.weightKg} kg (conditionnement sécurisé résistant aux intempéries).</p>
+            <div className="space-y-1 text-secondaryText leading-relaxed">
+              <p>· Dépose par camion porteur avec hayon élévateur et transpalette tout-terrain devant votre abri.</p>
+              <p>· Prise de contact téléphonique préalable pour convenir du créneau de livraison.</p>
+              <p>· Poids total de la palette : environ {product.weightKg} kg sous housse étanche de protection.</p>
             </div>
           </div>
         </div>
 
-        {/* Right: Purchasing & Details (6 cols) */}
-        <div className="lg:col-span-6 space-y-6">
+        {/* Right Column: Buying Panel (6 cols) */}
+        <div className="lg:col-span-6 space-y-5">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-wood-700">
-              Réf : {product.reference} • {product.species}
+            <span className="text-[11px] font-medium uppercase tracking-wider text-secondaryText">
+              Réf : {product.reference} · {product.species}
             </span>
-            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight mt-1">
+            <h1 className="font-poppins font-semibold text-2xl sm:text-3xl text-primaryText tracking-tight mt-1">
               {product.name}
             </h1>
-            <p className="text-sm text-gray-600 mt-2 leading-relaxed">
+            <p className="text-xs sm:text-sm text-secondaryText mt-2 leading-relaxed">
               {product.shortDescription}
             </p>
           </div>
 
-          {/* Pricing Box */}
-          <div className="p-5 bg-white rounded-2xl border border-gray-200 shadow-sm flex items-center justify-between">
+          {/* Pricing & Stock Card */}
+          <div className="p-5 bg-white rounded-xl border border-subtleBorder flex items-center justify-between">
             <div>
               <div className="flex items-baseline space-x-2">
-                <span className="text-3xl sm:text-4xl font-black text-forest-900">
+                <span className="font-poppins font-semibold text-3xl text-primaryText">
                   {formatPrice(effectivePriceTTC)}
                 </span>
                 {product.promoPrice && (
-                  <span className="text-sm line-through text-gray-400">
+                  <span className="text-sm line-through text-secondaryText">
                     {formatPrice(product.priceTTC)}
                   </span>
                 )}
-                <span className="text-xs text-gray-500 font-semibold">TTC</span>
+                <span className="text-xs text-secondaryText font-medium">TTC</span>
               </div>
-              <span className="text-xs text-gray-500 block mt-0.5">
-                Dont TVA {product.vatRate}% ({formatPrice(product.priceHT)} HT) • Conditionnement : {product.unit}
+              <span className="text-[11px] text-secondaryText block mt-0.5">
+                Dont TVA {product.vatRate}% ({formatPrice(product.priceHT)} HT) · {product.unit}
               </span>
             </div>
 
-            <div className="text-right">
+            <div>
               {isOutOfStock ? (
-                <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-red-100 text-red-800">
-                  Rupture temporaire
-                </span>
+                <span className="badge-error">Rupture temporaire</span>
               ) : (
-                <span className="inline-block px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800">
-                  En stock ({product.stock} dispo)
-                </span>
+                <span className="badge-success">En stock ({product.stock} dispo)</span>
               )}
             </div>
           </div>
 
-          {/* Variants Selector if present */}
+          {/* Variant Selector */}
           {product.variants && product.variants.length > 0 && (
             <div>
-              <label className="block text-xs font-bold text-gray-900 mb-2">
-                Choisir une variante :
+              <label className="block text-xs font-medium text-primaryText mb-1.5">
+                Sélectionnez votre longueur ou conditionnement :
               </label>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {product.variants.map((v: any) => (
@@ -171,40 +161,40 @@ export default function ProductClientDetails({
                     key={v.id}
                     type="button"
                     onClick={() => setSelectedVariant(v)}
-                    className={`p-3 rounded-xl border text-xs font-medium text-left transition ${
+                    className={`p-3 rounded-lg border text-xs text-left transition-colors duration-150 ${
                       selectedVariant?.id === v.id
-                        ? 'border-forest-700 bg-forest-50 text-forest-950 font-bold ring-2 ring-forest-700/20'
-                        : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                        ? 'border-forest bg-forest-50/60 font-medium'
+                        : 'border-subtleBorder bg-white hover:bg-ivory text-primaryText'
                     }`}
                   >
-                    <p className="font-bold text-gray-900">{v.title}</p>
-                    <p className="text-[11px] text-gray-500 mt-0.5">{v.packaging} ({v.logLength})</p>
+                    <p className="font-medium text-primaryText">{v.title}</p>
+                    <p className="text-[11px] text-secondaryText mt-0.5">{v.packaging} ({v.logLength})</p>
                   </button>
                 ))}
               </div>
             </div>
           )}
 
-          {/* Quantity and Add to Cart Button */}
-          <div className="space-y-4 pt-2">
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center border border-gray-300 rounded-xl bg-white p-1">
+          {/* Quantity Selector & Add to Cart */}
+          <div className="space-y-3 pt-1">
+            <div className="flex items-center space-x-3">
+              <div className="inline-flex items-center border border-subtleBorder rounded-md bg-white">
                 <button
                   type="button"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="p-2 hover:bg-gray-100 text-gray-600 rounded-lg"
-                  aria-label="Diminuer"
+                  className="p-2.5 text-secondaryText hover:text-primaryText hover:bg-ivory"
+                  aria-label="Diminuer la quantité"
                 >
-                  <Minus className="w-4 h-4" />
+                  <Minus className="w-3.5 h-3.5" />
                 </button>
-                <span className="px-4 text-sm font-extrabold text-gray-900">{quantity}</span>
+                <span className="px-3.5 text-xs font-semibold text-primaryText">{quantity}</span>
                 <button
                   type="button"
                   onClick={() => setQuantity(quantity + 1)}
-                  className="p-2 hover:bg-gray-100 text-gray-600 rounded-lg"
-                  aria-label="Augmenter"
+                  className="p-2.5 text-secondaryText hover:text-primaryText hover:bg-ivory"
+                  aria-label="Augmenter la quantité"
                 >
-                  <Plus className="w-4 h-4" />
+                  <Plus className="w-3.5 h-3.5" />
                 </button>
               </div>
 
@@ -212,48 +202,48 @@ export default function ProductClientDetails({
                 type="button"
                 onClick={handleAddToCart}
                 disabled={isOutOfStock}
-                className="flex-1 bg-forest-800 hover:bg-forest-700 disabled:bg-gray-300 text-white font-extrabold py-3.5 px-6 rounded-xl transition flex items-center justify-center space-x-2 text-sm shadow-md"
+                className="btn-primary flex-1 py-3 text-xs inline-flex items-center justify-center gap-2"
               >
-                <ShoppingBag className="w-5 h-5" />
+                <ShoppingBag className="w-4 h-4" />
                 <span>{isOutOfStock ? 'Victime de son succès' : 'Ajouter au panier'}</span>
               </button>
             </div>
 
-            <div className="p-3.5 bg-forest-50/70 border border-forest-200/60 rounded-xl text-xs text-forest-900 flex items-center space-x-2">
-              <ShieldCheck className="w-4 h-4 text-forest-700 shrink-0" />
+            <div className="p-3 bg-ivory rounded-md border border-subtleBorder text-xs text-secondaryText flex items-center space-x-2">
+              <ShieldCheck className="w-4 h-4 text-forest shrink-0" />
               <span>
-                Règlement sécurisé par virement bancaire après validation de votre commande.
+                Paiement direct par virement bancaire après validation de votre commande.
               </span>
             </div>
           </div>
 
-          {/* Technical Specs Key Highlights */}
-          <div className="border-t border-gray-200 pt-6 space-y-3 text-xs">
-            <h3 className="font-extrabold text-gray-900 text-sm">Caractéristiques techniques</h3>
-            <div className="grid grid-cols-2 gap-3 text-gray-700">
-              <div className="p-2.5 bg-gray-50 rounded-xl">
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Essences</span>
-                <strong className="text-gray-900">{product.species}</strong>
+          {/* Technical Specs Summary */}
+          <div className="border-t border-subtleBorder pt-5 space-y-3 text-xs">
+            <h3 className="font-poppins font-medium text-primaryText text-sm">Caractéristiques certifiées</h3>
+            <div className="grid grid-cols-2 gap-2.5">
+              <div className="p-2.5 bg-white border border-subtleBorder rounded-md">
+                <span className="text-secondaryText block text-[10px] uppercase font-medium">Essences</span>
+                <span className="font-medium text-primaryText">{product.species}</span>
               </div>
-              <div className="p-2.5 bg-gray-50 rounded-xl">
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Humidité certifiée</span>
-                <strong className="text-forest-800">{product.humidityRate}</strong>
+              <div className="p-2.5 bg-white border border-subtleBorder rounded-md">
+                <span className="text-secondaryText block text-[10px] uppercase font-medium">Humidité étuvée</span>
+                <span className="font-medium text-forest">{product.humidityRate}</span>
               </div>
-              <div className="p-2.5 bg-gray-50 rounded-xl">
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Longueur des bûches</span>
-                <strong className="text-gray-900">{product.logLength}</strong>
+              <div className="p-2.5 bg-white border border-subtleBorder rounded-md">
+                <span className="text-secondaryText block text-[10px] uppercase font-medium">Longueur bûches</span>
+                <span className="font-medium text-primaryText">{product.logLength}</span>
               </div>
-              <div className="p-2.5 bg-gray-50 rounded-xl">
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Pouvoir calorifique</span>
-                <strong className="text-gray-900">{product.calorificValue}</strong>
+              <div className="p-2.5 bg-white border border-subtleBorder rounded-md">
+                <span className="text-secondaryText block text-[10px] uppercase font-medium">Pouvoir calorifique</span>
+                <span className="font-medium text-primaryText">{product.calorificValue}</span>
               </div>
-              <div className="p-2.5 bg-gray-50 rounded-xl">
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Dimensions palette</span>
-                <strong className="text-gray-900">{product.dimensions}</strong>
+              <div className="p-2.5 bg-white border border-subtleBorder rounded-md">
+                <span className="text-secondaryText block text-[10px] uppercase font-medium">Dimensions palette</span>
+                <span className="font-medium text-primaryText">{product.dimensions}</span>
               </div>
-              <div className="p-2.5 bg-gray-50 rounded-xl">
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Délai estimé</span>
-                <strong className="text-gray-900">{product.leadTimeDays} à {product.leadTimeDays + 2} jours ouvrés</strong>
+              <div className="p-2.5 bg-white border border-subtleBorder rounded-md">
+                <span className="text-secondaryText block text-[10px] uppercase font-medium">Délai indicatif</span>
+                <span className="font-medium text-primaryText">{product.leadTimeDays} à {product.leadTimeDays + 2} jours</span>
               </div>
             </div>
           </div>
@@ -261,38 +251,38 @@ export default function ProductClientDetails({
       </div>
 
       {/* Description Section */}
-      <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm space-y-4">
-        <h2 className="text-lg font-black text-gray-900 tracking-tight">
-          Description détaillée du produit
+      <div className="bg-white rounded-xl p-6 sm:p-8 border border-subtleBorder space-y-3">
+        <h2 className="font-poppins font-medium text-lg text-primaryText">
+          Description et conseils d&apos;utilisation
         </h2>
-        <div className="text-xs text-gray-700 leading-relaxed whitespace-pre-line">
+        <div className="text-xs sm:text-sm text-secondaryText leading-relaxed whitespace-pre-line">
           {product.description}
         </div>
       </div>
 
-      {/* Verified Reviews Section */}
+      {/* Verified Reviews Section (if any) */}
       {product.reviews && product.reviews.length > 0 && (
-        <div className="bg-white rounded-3xl p-8 border border-gray-200 shadow-sm space-y-6">
+        <div className="bg-white rounded-xl p-6 sm:p-8 border border-subtleBorder space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-lg font-black text-gray-900 tracking-tight">
-              Avis clients vérifiés ({product.reviews.length})
+            <h2 className="font-poppins font-medium text-lg text-primaryText">
+              Retours d&apos;expérience clients ({product.reviews.length})
             </h2>
-            <div className="flex items-center space-x-1 text-amber-500 text-xs font-bold">
-              <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-              <span>5 / 5 Note globale</span>
+            <div className="flex items-center space-x-1 text-forest text-xs font-medium">
+              <Star className="w-3.5 h-3.5 fill-forest" />
+              <span>5 / 5 Note moyenne</span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {product.reviews.map((r: any) => (
-              <div key={r.id} className="p-4 bg-gray-50 rounded-2xl border border-gray-100 space-y-2 text-xs">
-                <div className="flex items-center space-x-1 text-amber-400">
+              <div key={r.id} className="p-4 bg-ivory rounded-lg border border-subtleBorder space-y-2 text-xs">
+                <div className="flex items-center space-x-0.5 text-forest">
                   {[...Array(r.rating)].map((_, i) => (
-                    <Star key={i} className="w-3.5 h-3.5 fill-amber-400" />
+                    <Star key={i} className="w-3 h-3 fill-forest" />
                   ))}
                 </div>
-                <p className="text-gray-700 italic">"{r.comment}"</p>
-                <div className="text-[11px] font-bold text-gray-900">
+                <p className="text-primaryText italic leading-relaxed">&ldquo;{r.comment}&rdquo;</p>
+                <div className="text-[11px] font-medium text-secondaryText">
                   {r.authorName} {r.authorCity ? `— ${r.authorCity}` : ''}
                 </div>
               </div>

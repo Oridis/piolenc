@@ -16,23 +16,23 @@ export default async function AdminAuditPage() {
     <AdminLayout>
       <div className="space-y-6">
         <div>
-          <div className="flex items-center space-x-2">
-            <div className="p-2 bg-gray-100 text-gray-800 rounded-lg">
+          <div className="flex items-center space-x-2.5">
+            <div className="p-2 bg-forest-100 text-forest-800 rounded-lg">
               <FileText className="w-5 h-5" />
             </div>
-            <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
+            <h1 className="text-xl sm:text-2xl font-bold font-heading text-primaryText tracking-tight">
               Journal d'Audit &amp; Traçabilité des Opérations Sensibles
             </h1>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
+          <p className="text-xs text-secondaryText mt-1">
             Chaque modification de paramètres, validation de paiement ou changement de statut est immuablement tracé.
           </p>
         </div>
 
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-subtleBorder shadow-subtle overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[10px] border-b border-gray-100">
+              <thead className="bg-beige-50 text-secondaryText font-semibold uppercase tracking-wider text-[11px] border-b border-subtleBorder">
                 <tr>
                   <th className="py-3 px-4">Date &amp; Heure</th>
                   <th className="py-3 px-4">Opérateur</th>
@@ -41,31 +41,31 @@ export default async function AdminAuditPage() {
                   <th className="py-3 px-4">Détails enregistrés</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-subtleBorder">
                 {logs.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="py-8 text-center text-gray-500">
+                    <td colSpan={5} className="py-8 text-center text-secondaryText">
                       Aucune action enregistrée pour le moment.
                     </td>
                   </tr>
                 ) : (
                   logs.map((l) => (
-                    <tr key={l.id} className="hover:bg-gray-50 transition">
-                      <td className="py-3.5 px-4 font-mono text-gray-500 text-[11px] whitespace-nowrap">
+                    <tr key={l.id} className="hover:bg-beige-50/50 transition">
+                      <td className="py-3.5 px-4 font-mono text-secondaryText text-[11px] whitespace-nowrap">
                         {new Date(l.createdAt).toLocaleString('fr-FR')}
                       </td>
-                      <td className="py-3.5 px-4 font-bold text-gray-900">
+                      <td className="py-3.5 px-4 font-semibold text-primaryText">
                         {l.user ? `${l.user.firstName} ${l.user.lastName}` : 'Système'}
                       </td>
                       <td className="py-3.5 px-4">
-                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-gray-100 text-gray-800">
+                        <span className="badge-neutral font-mono text-[10px]">
                           {l.action}
                         </span>
                       </td>
-                      <td className="py-3.5 px-4 font-semibold text-gray-700">
+                      <td className="py-3.5 px-4 font-medium text-primaryText">
                         {l.resourceType} {l.resourceId ? `#${l.resourceId.slice(0, 8)}...` : ''}
                       </td>
-                      <td className="py-3.5 px-4 font-mono text-[11px] text-gray-600 max-w-md truncate">
+                      <td className="py-3.5 px-4 font-mono text-[11px] text-secondaryText max-w-md truncate">
                         {l.details}
                       </td>
                     </tr>

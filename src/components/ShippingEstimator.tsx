@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Truck, MapPin, AlertCircle, CheckCircle, Clock, ShieldCheck } from 'lucide-react';
+import { Truck, MapPin, Clock, ShieldCheck, Check, Info } from 'lucide-react';
 import { calculateShippingFee, formatPrice } from '@/lib/pricing';
 
 export default function ShippingEstimator() {
@@ -9,10 +9,8 @@ export default function ShippingEstimator() {
   const [postalCode, setPostalCode] = useState<string>('75008');
   const [palletsCount, setPalletsCount] = useState<number>(1);
   const [difficultAccess, setDifficultAccess] = useState<boolean>(false);
-  const [hasCalculated, setHasCalculated] = useState<boolean>(true);
 
   const estimatedWeight = palletsCount * 900;
-  // Estimate a sample order subtotal to test free shipping threshold
   const sampleSubtotalTTC = palletsCount * 339;
 
   const result = calculateShippingFee(
@@ -27,35 +25,35 @@ export default function ShippingEstimator() {
   );
 
   return (
-    <div className="bg-white rounded-2xl shadow-xl border border-gray-200 overflow-hidden">
-      <div className="bg-gradient-to-r from-wood-800 to-wood-950 p-6 sm:p-8 text-white">
+    <div className="bg-white rounded-xl shadow-card border border-subtleBorder overflow-hidden font-sans">
+      <div className="bg-forest p-6 sm:p-7 text-white">
         <div className="flex items-center space-x-3 mb-2">
-          <div className="p-2 bg-wood-700 text-amber-400 rounded-lg">
-            <Truck className="w-6 h-6" />
+          <div className="w-9 h-9 rounded-md bg-forest-dark flex items-center justify-center text-beige">
+            <Truck className="w-5 h-5" />
           </div>
-          <h2 className="text-xl sm:text-2xl font-black">
-            Calculateur de Frais et Délais de Livraison
+          <h2 className="font-poppins font-medium text-xl text-white">
+            Estimation des frais et délais de livraison
           </h2>
         </div>
-        <p className="text-wood-200 text-sm max-w-2xl">
-          Consultez instantanément les tarifs de transport et les délais d'acheminement par camion avec hayon selon votre pays et code postal.
+        <p className="text-ivory/80 text-xs max-w-2xl leading-relaxed">
+          Calculez les frais de transport par camion porteur avec hayon élévateur et transpalette en fonction de votre zone géographique.
         </p>
       </div>
 
-      <div className="p-6 sm:p-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="p-6 sm:p-7 grid grid-cols-1 lg:grid-cols-12 gap-7">
         {/* Form Inputs */}
-        <div className="lg:col-span-7 space-y-5">
+        <div className="lg:col-span-7 space-y-4">
           {/* Country Selection */}
           <div>
-            <label className="block text-sm font-bold text-gray-900 mb-2">
-              Pays de destination
+            <label className="block text-xs font-medium text-primaryText mb-1.5">
+              Pays de livraison
             </label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {[
-                { code: 'FR', label: 'France 🇫🇷' },
-                { code: 'BE', label: 'Belgique 🇧🇪' },
-                { code: 'DE', label: 'Allemagne 🇩🇪' },
-                { code: 'CH', label: 'Suisse 🇨🇭' },
+                { code: 'FR', label: 'France' },
+                { code: 'BE', label: 'Belgique' },
+                { code: 'DE', label: 'Allemagne' },
+                { code: 'CH', label: 'Suisse' },
               ].map((c) => (
                 <button
                   key={c.code}
@@ -67,10 +65,10 @@ export default function ShippingEstimator() {
                     else if (c.code === 'CH') setPostalCode('1201');
                     else setPostalCode('75008');
                   }}
-                  className={`py-2.5 px-3 rounded-xl border text-xs font-bold text-center transition ${
+                  className={`py-2 px-3 rounded-md border text-xs font-medium text-center transition-colors duration-150 ${
                     country === c.code
-                      ? 'border-forest-700 bg-forest-50 text-forest-900 ring-2 ring-forest-700/20'
-                      : 'border-gray-200 hover:border-gray-300 text-gray-700'
+                      ? 'border-forest bg-forest text-white'
+                      : 'border-subtleBorder bg-white hover:bg-ivory text-primaryText'
                   }`}
                 >
                   {c.label}
@@ -80,29 +78,29 @@ export default function ShippingEstimator() {
           </div>
 
           {/* Postal Code & Pallets */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
             <div>
-              <label className="block text-sm font-bold text-gray-900 mb-1.5 flex items-center space-x-1">
-                <MapPin className="w-4 h-4 text-wood-700" />
-                <span>Code Postal</span>
+              <label className="block text-xs font-medium text-primaryText mb-1.5 flex items-center gap-1">
+                <MapPin className="w-3.5 h-3.5 text-forest" />
+                <span>Code postal</span>
               </label>
               <input
                 type="text"
                 value={postalCode}
                 onChange={(e) => setPostalCode(e.target.value)}
-                placeholder="ex: 69002, 1000, 79098..."
-                className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-forest-600 focus:outline-none"
+                placeholder="Ex : 69002, 1000..."
+                className="input-field text-xs"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-bold text-gray-900 mb-1.5">
-                Nombre de palettes (2 stères / pal)
+              <label className="block text-xs font-medium text-primaryText mb-1.5">
+                Nombre de palettes (2 stères / palette)
               </label>
               <select
                 value={palletsCount}
                 onChange={(e) => setPalletsCount(Number(e.target.value))}
-                className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-forest-600 focus:outline-none bg-white"
+                className="input-field text-xs bg-white"
               >
                 {[1, 2, 3, 4, 5, 6, 8, 10].map((num) => (
                   <option key={num} value={num}>
@@ -114,20 +112,20 @@ export default function ShippingEstimator() {
           </div>
 
           {/* Difficult access checkbox */}
-          <div className="p-4 bg-gray-50 rounded-xl border border-gray-200">
+          <div className="p-3.5 bg-ivory rounded-lg border border-subtleBorder">
             <label className="flex items-start space-x-3 cursor-pointer">
               <input
                 type="checkbox"
                 checked={difficultAccess}
                 onChange={(e) => setDifficultAccess(e.target.checked)}
-                className="mt-1 w-4 h-4 text-forest-700 rounded border-gray-300 focus:ring-forest-600"
+                className="mt-0.5 w-4 h-4 text-forest rounded border-subtleBorder focus:ring-forest"
               />
               <div className="text-xs">
-                <span className="font-bold text-gray-900 block">
-                  Accès restreint ou difficile (+35€)
+                <span className="font-medium text-primaryText block">
+                  Accès restreint ou difficile (+35 €)
                 </span>
-                <span className="text-gray-600 block mt-0.5">
-                  Cochez si votre voie est étroite, sans aire de retournement pour porteur 19T, ou en forte pente de montagne nécessitant un petit camion ou transpalette motorisé spécifique.
+                <span className="text-secondaryText block mt-0.5 leading-normal text-[11px]">
+                  Voie étroite, absence d&apos;aire de retournement pour camion porteur 19T, ou forte déclivité nécessitant un matériel adapté.
                 </span>
               </div>
             </label>
@@ -135,59 +133,72 @@ export default function ShippingEstimator() {
         </div>
 
         {/* Results Card */}
-        <div className="lg:col-span-5 bg-forest-50/70 rounded-2xl p-6 border border-forest-200/80 flex flex-col justify-between">
+        <div className="lg:col-span-5 bg-ivory rounded-xl p-5 border border-subtleBorder flex flex-col justify-between">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-forest-800 block mb-1">
-              Devis transport en direct
+            <span className="text-[11px] font-medium uppercase tracking-wider text-secondaryText block mb-1">
+              Tarif estimé pour votre zone
             </span>
-            <h3 className="text-lg font-bold text-gray-900 mb-4">
-              Livraison vers {country} ({postalCode}) :
+            <h3 className="font-poppins font-medium text-sm text-primaryText mb-3">
+              Destination : {country} ({postalCode})
             </h3>
 
             {/* Price display */}
-            <div className="bg-white p-5 rounded-xl border border-forest-200 shadow-sm mb-5 text-center">
+            <div className="bg-white p-4 rounded-lg border border-subtleBorder text-center mb-4">
               {result.isEligibleForFreeShipping && !difficultAccess ? (
                 <div>
-                  <span className="text-3xl font-black text-forest-700">LIVRAISON OFFERTE</span>
-                  <p className="text-xs text-forest-600 mt-1 font-semibold">
-                    Offre applicable dès 650€ d'achat en France &amp; Belgique !
+                  <span className="font-poppins font-semibold text-xl text-statusSuccess">LIVRAISON OFFERTE</span>
+                  <p className="text-[11px] text-secondaryText mt-1">
+                    Offre applicable dès 650 € d&apos;achat en France et Belgique.
                   </p>
                 </div>
               ) : (
                 <div>
-                  <span className="text-4xl font-black text-forest-900">
+                  <span className="font-poppins font-semibold text-3xl text-primaryText">
                     {formatPrice(result.shippingFeeTTC, country === 'CH' ? 'CHF' : 'EUR')}
                   </span>
-                  <span className="text-xs text-gray-500 block mt-1">
+                  <span className="text-[11px] text-secondaryText block mt-0.5">
                     TTC (dont TVA {result.vatRate}%)
                   </span>
                 </div>
               )}
             </div>
 
-            {/* Logistics features */}
-            <div className="space-y-3 text-xs text-gray-700">
-              <div className="flex items-center space-x-2 py-1.5 border-b border-forest-200/60">
-                <Clock className="w-4 h-4 text-forest-700 shrink-0" />
-                <span>Délai estimé : <strong>{result.estimatedLeadDays} à {result.estimatedLeadDays + 2} jours ouvrés</strong></span>
+            {/* Logistics details */}
+            <div className="space-y-2 text-xs text-secondaryText">
+              <div className="flex items-center justify-between py-1 border-b border-subtleBorder/60">
+                <span className="flex items-center gap-1.5 text-primaryText">
+                  <Clock className="w-3.5 h-3.5 text-forest" />
+                  <span>Délai d&apos;acheminement</span>
+                </span>
+                <span className="font-medium text-primaryText">{result.estimatedLeadDays} à {result.estimatedLeadDays + 2} jours ouvrés</span>
               </div>
-              <div className="flex items-center space-x-2 py-1.5 border-b border-forest-200/60">
-                <Truck className="w-4 h-4 text-forest-700 shrink-0" />
-                <span>Transporteur : <strong>{result.carrierName}</strong></span>
+              <div className="flex items-center justify-between py-1 border-b border-subtleBorder/60">
+                <span className="flex items-center gap-1.5 text-primaryText">
+                  <Truck className="w-3.5 h-3.5 text-forest" />
+                  <span>Transporteur</span>
+                </span>
+                <span className="font-medium text-primaryText">{result.carrierName}</span>
               </div>
-              <div className="flex items-center space-x-2 py-1.5 border-b border-forest-200/60">
-                <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>Équipement inclus : <strong>Hayon élévateur + transpalette</strong></span>
+              <div className="flex items-center justify-between py-1 border-b border-subtleBorder/60">
+                <span className="flex items-center gap-1.5 text-primaryText">
+                  <Check className="w-3.5 h-3.5 text-statusSuccess" />
+                  <span>Équipement inclus</span>
+                </span>
+                <span className="font-medium text-primaryText">Hayon &amp; transpalette</span>
               </div>
-              <div className="flex items-center space-x-2 py-1.5">
-                <ShieldCheck className="w-4 h-4 text-forest-700 shrink-0" />
-                <span>Prise de rendez-vous : <strong>Contact téléphonique préalable</strong></span>
+              <div className="flex items-center justify-between py-1">
+                <span className="flex items-center gap-1.5 text-primaryText">
+                  <ShieldCheck className="w-3.5 h-3.5 text-forest" />
+                  <span>Prise de rendez-vous</span>
+                </span>
+                <span className="font-medium text-primaryText">Appel préalable</span>
               </div>
             </div>
           </div>
 
-          <div className="mt-6 text-[11px] text-gray-500 bg-white p-3 rounded-lg border border-forest-100">
-            ℹ️ Le déchargement est garanti devant votre propriété ou dans votre cour si le sol est plat, dur et carrossable.
+          <div className="mt-4 p-2.5 rounded-md bg-white border border-subtleBorder flex items-start gap-2 text-[11px] text-secondaryText">
+            <Info className="w-3.5 h-3.5 text-secondaryText shrink-0 mt-0.5" />
+            <span>Dépose sur sol stabilisé et carrossable devant la propriété ou à l&apos;entrée de votre abri.</span>
           </div>
         </div>
       </div>

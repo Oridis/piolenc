@@ -1,0 +1,51 @@
+name: Prisma Migration Validation
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  validate-migrations:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        node-version: [20]
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Validate Prisma schema
+        run: |
+          npx prisma validate
+
+      - name: Generate Prisma client
+        run: |
+          npx prisma generate
+
+      - name: Check for migration gaps
+        run: |
+          npx prisma migrate diff --from-step base --to-step --output-format=prisma
+
+      - name: Run test scenarios
+        run: |
+          npm run test:scenarios
+
+      - name: Report success
+        if: success()
+        run: echo "✅ All Prisma migration validations passed"
+
+      - name: Report failure
+        if: failure()
+        run: echo "❌ Prisma migration validation failed" && exit 1

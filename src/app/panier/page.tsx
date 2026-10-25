@@ -14,8 +14,6 @@ import {
   ArrowRight,
   ShieldCheck,
   Truck,
-  ArrowLeft,
-  Tag,
 } from 'lucide-react';
 
 export default function CartPage() {
@@ -44,13 +42,13 @@ export default function CartPage() {
       if (subtotalTTC >= 300) {
         setAppliedDiscount({ code: 'BIENVENUE10', amount: 10 });
       } else {
-        setDiscountError('Ce code requiert un minimum de 300€ de commande');
+        setDiscountError('Ce code requiert un montant minimum de 300 €');
       }
     } else if (discountInput.toUpperCase() === 'HIVER2026') {
       if (subtotalTTC >= 600) {
         setAppliedDiscount({ code: 'HIVER2026', amount: Number((subtotalTTC * 0.05).toFixed(2)) });
       } else {
-        setDiscountError('Ce code requiert un minimum de 600€ de commande (5% de remise)');
+        setDiscountError('Ce code requiert un montant minimum de 600 € (5% de remise)');
       }
     } else {
       setDiscountError('Code promotionnel invalide ou expiré');
@@ -61,67 +59,73 @@ export default function CartPage() {
     <>
       <Navbar />
 
-      <main className="flex-1 py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
+      <main className="flex-1 font-sans bg-ivory py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
         <div>
-          <div className="flex items-center space-x-2">
-            <div className="p-2 bg-forest-100 text-forest-800 rounded-lg">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-9 h-9 rounded-md bg-ivory border border-subtleBorder flex items-center justify-center text-forest">
               <ShoppingBag className="w-5 h-5" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
-              Votre Panier de Bois de Chauffage
+            <h1 className="font-poppins font-semibold text-2xl sm:text-3xl text-primaryText tracking-tight">
+              Votre panier de commande
             </h1>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Vérifiez vos quantités avant de passer à l'étape des coordonnées et des contraintes d'accès camion.
+          <p className="text-xs text-secondaryText mt-1">
+            Vérifiez vos quantités avant de renseigner votre adresse de livraison et les critères d&apos;accès camion.
           </p>
         </div>
 
         {items.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 border border-gray-200 text-center space-y-4 shadow-sm max-w-xl mx-auto">
-            <ShoppingBag className="w-16 h-16 mx-auto text-gray-300" />
-            <h2 className="text-lg font-bold text-gray-900">Votre panier est actuellement vide</h2>
-            <p className="text-xs text-gray-500 max-w-sm mx-auto">
-              Retrouvez nos sélections de palettes de bois sec étuvé en bûches de 25 cm, 33 cm ou 50 cm.
+          <div className="bg-white rounded-xl p-12 border border-subtleBorder text-center space-y-4 shadow-subtle max-w-md mx-auto">
+            <div className="w-12 h-12 mx-auto rounded-full bg-ivory border border-subtleBorder flex items-center justify-center text-secondaryText">
+              <ShoppingBag className="w-6 h-6" />
+            </div>
+            <h2 className="font-poppins font-medium text-base text-primaryText">Votre panier est actuellement vide</h2>
+            <p className="text-xs text-secondaryText max-w-xs mx-auto leading-relaxed">
+              Consultez notre sélection de palettes de bois sec étuvé NF H1 prêtes pour l&apos;allumage immédiat.
             </p>
-            <Link
-              href="/boutique"
-              className="inline-flex items-center space-x-2 bg-forest-800 hover:bg-forest-700 text-white font-bold py-3 px-6 rounded-xl text-xs transition shadow-md"
-            >
-              <span>Découvrir la boutique de bois</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            <div className="pt-2">
+              <Link
+                href="/boutique"
+                className="btn-primary text-xs inline-flex items-center gap-1.5"
+              >
+                <span>Accéder à la boutique</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Items List (8 cols) */}
-            <div className="lg:col-span-8 bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden p-6 space-y-4">
-              <div className="flex justify-between items-center pb-3 border-b border-gray-100">
-                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-                  Articles ({totalItemsCount})
+            <div className="lg:col-span-8 bg-white rounded-xl border border-subtleBorder shadow-subtle overflow-hidden p-6 space-y-4">
+              <div className="flex justify-between items-center pb-3 border-b border-subtleBorder">
+                <span className="text-xs font-medium text-secondaryText uppercase tracking-wider">
+                  Articles sélectionnés ({totalItemsCount})
                 </span>
                 <button
                   onClick={clearCart}
-                  className="text-xs text-gray-400 hover:text-red-600 transition"
+                  className="text-xs text-secondaryText hover:text-statusError transition-colors"
                 >
                   Vider le panier
                 </button>
               </div>
 
-              <div className="divide-y divide-gray-100">
+              <div className="divide-y divide-subtleBorder/60">
                 {items.map((item) => (
                   <div key={item.productId} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center space-x-4 min-w-0">
-                      <img
-                        src={item.imageUrl}
-                        alt={item.name}
-                        className="w-16 h-16 sm:w-20 sm:h-20 object-cover rounded-xl border border-gray-200 shrink-0"
-                      />
+                    <div className="flex items-center space-x-3.5 min-w-0">
+                      <div className="w-16 h-16 sm:w-20 sm:h-20 min-w-[4rem] sm:min-w-[5rem] max-w-[5rem] rounded-md overflow-hidden border border-subtleBorder bg-ivory shrink-0">
+                        <img
+                          src={item.imageUrl || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=300'}
+                          alt={item.name}
+                          className="w-full h-full object-cover"
+                        />
+                      </div>
                       <div className="min-w-0">
-                        <h3 className="font-extrabold text-sm text-gray-900 truncate">{item.name}</h3>
-                        <p className="text-xs text-gray-500 mt-0.5">
-                          Format : {item.logLength} • {item.packaging}
+                        <h3 className="font-poppins font-medium text-sm text-primaryText truncate">{item.name}</h3>
+                        <p className="text-xs text-secondaryText mt-0.5">
+                          Format : {item.logLength} · {item.packaging}
                         </p>
-                        <p className="text-xs font-bold text-forest-800 mt-1">
+                        <p className="text-xs font-semibold text-forest mt-1">
                           {formatPrice(item.priceTTC)} TTC / unité
                         </p>
                       </div>
@@ -129,32 +133,35 @@ export default function CartPage() {
 
                     <div className="flex items-center justify-between sm:justify-end space-x-6">
                       {/* Quantity Controls */}
-                      <div className="flex items-center border border-gray-300 rounded-xl bg-white p-1">
+                      <div className="inline-flex items-center border border-subtleBorder rounded bg-white">
                         <button
                           onClick={() => updateQuantity(item.productId, item.quantity - 1)}
-                          className="p-1 hover:bg-gray-100 text-gray-600 rounded-lg"
+                          className="px-2 py-1 text-secondaryText hover:text-primaryText hover:bg-ivory"
+                          aria-label="Diminuer"
                         >
-                          <Minus className="w-3.5 h-3.5" />
+                          <Minus className="w-3 h-3" />
                         </button>
-                        <span className="px-3 text-xs font-bold text-gray-900">{item.quantity}</span>
+                        <span className="px-2.5 text-xs font-medium text-primaryText">{item.quantity}</span>
                         <button
                           onClick={() => updateQuantity(item.productId, item.quantity + 1)}
-                          className="p-1 hover:bg-gray-100 text-gray-600 rounded-lg"
+                          className="px-2 py-1 text-secondaryText hover:text-primaryText hover:bg-ivory"
+                          aria-label="Augmenter"
                         >
-                          <Plus className="w-3.5 h-3.5" />
+                          <Plus className="w-3 h-3" />
                         </button>
                       </div>
 
-                      <div className="text-right min-w-[80px]">
-                        <span className="font-black text-sm text-gray-900 block">
+                      <div className="text-right min-w-[90px]">
+                        <span className="font-poppins font-semibold text-sm text-primaryText block">
                           {formatPrice(item.priceTTC * item.quantity)}
                         </span>
                         <button
                           onClick={() => removeFromCart(item.productId)}
-                          className="text-gray-400 hover:text-red-600 p-1"
-                          title="Supprimer"
+                          className="text-secondaryText hover:text-statusError p-1 transition-colors mt-0.5"
+                          title="Supprimer cet article"
+                          aria-label="Supprimer cet article"
                         >
-                          <Trash2 className="w-4 h-4 inline" />
+                          <Trash2 className="w-3.5 h-3.5 inline" />
                         </button>
                       </div>
                     </div>
@@ -163,18 +170,18 @@ export default function CartPage() {
               </div>
 
               {/* Free delivery incentive bar */}
-              <div className="mt-4 p-4 bg-forest-50 border border-forest-200/80 rounded-2xl">
-                <div className="flex items-center space-x-2 text-xs font-bold text-forest-900 mb-1.5">
-                  <Truck className="w-4 h-4 text-forest-700 shrink-0" />
+              <div className="mt-4 p-4 bg-forest-50 border border-forest-100 rounded-lg">
+                <div className="flex items-center space-x-2 text-xs font-medium text-forest-dark mb-2">
+                  <Truck className="w-4 h-4 text-forest shrink-0" />
                   <span>
                     {remainingForFree > 0
-                      ? `Ajoutez ${formatPrice(remainingForFree)} de bois pour bénéficier de la livraison offerte !`
-                      : 'Félicitations, vous êtes éligible à la livraison offerte !'}
+                      ? `Ajoutez ${formatPrice(remainingForFree)} pour bénéficier de la livraison offerte !`
+                      : 'Votre commande bénéficie de la livraison offerte !'}
                   </span>
                 </div>
-                <div className="w-full bg-forest-200/60 rounded-full h-2 overflow-hidden">
+                <div className="w-full bg-forest-200/60 rounded-full h-1.5 overflow-hidden">
                   <div
-                    className="bg-forest-700 h-2 rounded-full transition-all duration-300"
+                    className="bg-forest h-1.5 rounded-full transition-all duration-300"
                     style={{ width: `${Math.min(100, (subtotalTTC / freeShippingThreshold) * 100)}%` }}
                   />
                 </div>
@@ -182,80 +189,83 @@ export default function CartPage() {
             </div>
 
             {/* Right Summary (4 cols) */}
-            <div className="lg:col-span-4 bg-white rounded-3xl border border-gray-200 shadow-sm p-6 space-y-6">
-              <h2 className="text-sm font-black text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-3">
-                Récapitulatif de votre commande
+            <div className="lg:col-span-4 bg-white rounded-xl border border-subtleBorder shadow-subtle p-6 space-y-5">
+              <h2 className="font-poppins font-medium text-xs text-secondaryText uppercase tracking-wider border-b border-subtleBorder pb-3">
+                Récapitulatif de commande
               </h2>
 
-              <div className="space-y-3 text-xs text-gray-700">
+              <div className="space-y-2.5 text-xs text-secondaryText">
                 <div className="flex justify-between items-center">
                   <span>Sous-total articles HT</span>
-                  <span className="font-semibold text-gray-900">{formatPrice(subtotalHT)}</span>
+                  <span className="font-medium text-primaryText">{formatPrice(subtotalHT)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span>TVA applicable (5.5% / 20%)</span>
-                  <span className="font-semibold text-gray-900">{formatPrice(subtotalTTC - subtotalHT)}</span>
+                  <span>TVA applicable</span>
+                  <span className="font-medium text-primaryText">{formatPrice(subtotalTTC - subtotalHT)}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span>Sous-total articles TTC</span>
-                  <span className="font-bold text-gray-900">{formatPrice(subtotalTTC)}</span>
+                  <span className="font-medium text-primaryText">{formatPrice(subtotalTTC)}</span>
                 </div>
 
                 {appliedDiscount && (
-                  <div className="flex justify-between items-center text-emerald-700 font-bold">
+                  <div className="flex justify-between items-center text-statusSuccess font-medium">
                     <span>Remise ({appliedDiscount.code})</span>
                     <span>- {formatPrice(appliedDiscount.amount)}</span>
                   </div>
                 )}
 
-                <div className="flex justify-between items-center text-forest-800">
-                  <span>Frais de livraison spécialisée</span>
-                  <span className="italic">Calculés à l'étape suivante</span>
+                <div className="flex justify-between items-center text-forest">
+                  <span>Frais de livraison</span>
+                  <span className="text-[11px] text-secondaryText">Calculés à l&apos;étape suivante</span>
                 </div>
 
-                <div className="border-t border-gray-200 pt-3 flex justify-between items-baseline">
-                  <span className="font-extrabold text-sm text-gray-900">Total estimé</span>
-                  <span className="text-2xl font-black text-forest-900">
+                <div className="border-t border-subtleBorder pt-3 flex justify-between items-baseline">
+                  <span className="font-poppins font-medium text-sm text-primaryText">Total estimé</span>
+                  <span className="font-poppins font-semibold text-2xl text-primaryText">
                     {formatPrice(Math.max(0, subtotalTTC - (appliedDiscount?.amount || 0)))}
                   </span>
                 </div>
               </div>
 
               {/* Promo Code Input */}
-              <div className="space-y-2 pt-2 border-t border-gray-100 text-xs">
-                <label className="block font-bold text-gray-900">Code promo / remise :</label>
+              <div className="space-y-1.5 pt-2 border-t border-subtleBorder text-xs">
+                <label className="block font-medium text-primaryText">Code avantage :</label>
                 <div className="flex space-x-2">
                   <input
                     type="text"
                     value={discountInput}
                     onChange={(e) => setDiscountInput(e.target.value)}
-                    placeholder="Ex: BIENVENUE10"
-                    className="flex-1 px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-none uppercase font-bold"
+                    placeholder="Ex : BIENVENUE10"
+                    className="input-field text-xs uppercase"
                   />
                   <button
                     type="button"
                     onClick={handleApplyDiscount}
-                    className="px-4 py-2 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-xl transition"
+                    className="btn-secondary text-xs px-3"
                   >
                     Appliquer
                   </button>
                 </div>
-                {discountError && <p className="text-red-600 text-[11px]">{discountError}</p>}
-                {appliedDiscount && <p className="text-emerald-700 text-[11px] font-bold">Code appliqué avec succès !</p>}
+                {discountError && <p className="text-statusError text-[11px]">{discountError}</p>}
+                {appliedDiscount && <p className="text-statusSuccess text-[11px] font-medium">Code appliqué avec succès</p>}
               </div>
 
               {/* Proceed to checkout CTA */}
               <Link
                 href="/commande"
-                className="w-full bg-forest-800 hover:bg-forest-700 text-white font-black py-4 px-4 rounded-2xl transition flex items-center justify-center space-x-2 shadow-lg hover:shadow-xl text-sm"
+                className="btn-primary w-full py-3 text-xs inline-flex items-center justify-center gap-2"
               >
-                <span>Passer la commande</span>
-                <ArrowRight className="w-4 h-4" />
+                <span>Valider le panier et continuer</span>
+                <ArrowRight className="w-3.5 h-3.5" />
               </Link>
 
-              <div className="text-[11px] text-gray-500 space-y-1.5 text-center">
-                <p>🔒 Paiement 100% sécurisé par virement bancaire.</p>
-                <p>Dépose de votre palette au plus près de votre garage.</p>
+              <div className="text-[11px] text-secondaryText space-y-1 text-center pt-1">
+                <p className="flex items-center justify-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-forest" />
+                  <span>Règlement sécurisé par virement bancaire direct</span>
+                </p>
+                <p>Dépose de votre palette devant votre abri</p>
               </div>
             </div>
           </div>

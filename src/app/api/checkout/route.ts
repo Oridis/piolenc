@@ -141,8 +141,28 @@ export async function POST(request: Request) {
     );
 
     // 3. Generate unique order number and unguessable secure token
-    const randomSuffix = Math.floor(1000 + Math.random() * 9000);
-    const orderNumber = `AM-${new Date().getFullYear()}-${randomSuffix}`;
+    // Try up to 10 times to find a unique order number (handles concurrent requests)
+    let attempts = 0;
+    const maxAttempts = 10;
+    let orderNumber: string | null = null;
+    while (attempts < maxAttempts && orderNumber === null) {
+      const randomSuffix = Math.floor(1000 + Math.random() * 9000);
+      const candidate = `AM-${new Date().getFullYear()}-${randomSuffix}`;
+      // Check if order number already exists in the database
+      const existing = await prisma.order.findUnique({
+        where: { orderNumber: candidate },
+      });
+      if (!existing) {
+        orderNumber = candidate;
+      }
+      attempts++;
+    }
+    // Fallback if all attempts collided (extremely unlikely)
+    if (orderNumber === null) {
+      const fallbackSuffix = Math.floor(100000 + Math.random() * 900000);
+      orderNumber = `AM-${new Date().getFullYear()}-${fallbackSuffix}`;
+    }
+
     const secureToken = `tok_${crypto.randomBytes(16).toString('hex')}`;
 
     // 4. Create immutable order snapshot
@@ -224,7 +244,7 @@ export async function POST(request: Request) {
                 create: {
                   status: 'Commande enregistrée',
                   sourceType: 'WAREHOUSE_CONFIRMED',
-                  location: 'Dépôt Central Allo Maison',
+                  location: 'Dépôt Central Piolenc Bois Direct',
                   description: 'Votre commande a bien été validée et attend le règlement bancaire.',
                 },
               },
@@ -264,7 +284,7 @@ export async function POST(request: Request) {
 
       await dispatchTransactionalEmail({
         templateId: 2,
-        recipientEmail: siteSettings.adminNotificationEmail || 'commandes@allomaison-bois.fr',
+        recipientEmail: siteSettings.adminNotificationEmail || 'commandes@woodmachine.fr',
         orderId: order.id,
         subject: email2Template.subject,
         htmlContent: email2Template.htmlContent,

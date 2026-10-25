@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Lock, Mail, Key, ShieldCheck, ArrowRight, User } from 'lucide-react';
+import { Lock, Mail, Key, ArrowRight, ShieldCheck, CreditCard, Truck, User } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -48,19 +48,19 @@ export default function LoginPage() {
     <>
       <Navbar />
 
-      <main className="flex-1 py-12 px-4 sm:px-6 lg:px-8 max-w-md mx-auto space-y-6">
+      <main className="flex-1 font-sans bg-ivory py-12 px-4 sm:px-6 lg:px-8 max-w-md mx-auto space-y-6">
         <div className="text-center space-y-2">
-          <div className="w-12 h-12 bg-forest-100 text-forest-800 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
-            <Lock className="w-6 h-6" />
+          <div className="w-10 h-10 bg-white border border-subtleBorder text-forest rounded-lg flex items-center justify-center mx-auto shadow-subtle">
+            <Lock className="w-5 h-5" />
           </div>
-          <h1 className="text-2xl font-black text-gray-900 tracking-tight">Connexion à votre Espace</h1>
-          <p className="text-xs text-gray-500">
+          <h1 className="font-poppins font-semibold text-2xl text-primaryText tracking-tight">Connexion à votre espace</h1>
+          <p className="text-xs text-secondaryText">
             Accédez à vos commandes de bois, factures et suivi de livraison en direct.
           </p>
         </div>
 
         {error && (
-          <div className="p-3.5 bg-red-50 border border-red-200 rounded-xl text-xs text-red-800 font-bold">
+          <div className="p-3.5 bg-red-50 border border-red-200 rounded-lg text-xs text-statusError font-medium">
             {error}
           </div>
         )}
@@ -70,34 +70,34 @@ export default function LoginPage() {
             e.preventDefault();
             handleLogin();
           }}
-          className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm space-y-4 text-xs"
+          className="bg-white p-6 rounded-xl border border-subtleBorder shadow-subtle space-y-4 text-xs"
         >
           <div>
-            <label className="block font-bold text-gray-900 mb-1">Adresse Email :</label>
+            <label className="block font-medium text-primaryText mb-1">Adresse email :</label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+              <Mail className="w-4 h-4 text-secondaryText absolute left-3 top-3" />
               <input
                 type="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="jean.dupont@example.com"
-                className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-none"
+                className="input-field pl-9 text-xs"
               />
             </div>
           </div>
 
           <div>
-            <label className="block font-bold text-gray-900 mb-1">Mot de passe :</label>
+            <label className="block font-medium text-primaryText mb-1">Mot de passe :</label>
             <div className="relative">
-              <Key className="w-4 h-4 text-gray-400 absolute left-3 top-3" />
+              <Key className="w-4 h-4 text-secondaryText absolute left-3 top-3" />
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full pl-9 pr-3 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-none"
+                className="input-field pl-9 text-xs"
               />
             </div>
           </div>
@@ -105,57 +105,72 @@ export default function LoginPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-forest-800 hover:bg-forest-700 text-white font-bold py-3 rounded-xl transition flex items-center justify-center space-x-2 shadow-md"
+            className="btn-primary w-full py-2.5 text-xs inline-flex items-center justify-center gap-1.5"
           >
             <span>{loading ? 'Connexion en cours...' : 'Se connecter'}</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-3.5 h-3.5" />
           </button>
 
-          <div className="pt-2 text-center text-gray-500 text-[11px]">
+          <div className="pt-1 text-center text-secondaryText text-[11px]">
             Pas encore de compte client ?{' '}
-            <Link href="/inscription" className="text-forest-800 font-bold hover:underline">
+            <Link href="/inscription" className="text-forest hover:underline font-medium">
               Créer un compte
             </Link>
           </div>
         </form>
 
-        {/* 1-Click Fast Demo Credentials for Evaluation */}
-        <div className="bg-wood-50 p-5 rounded-2xl border border-wood-200 text-xs space-y-3">
-          <span className="font-extrabold text-wood-900 uppercase tracking-wider block text-[10px]">
-            Accès Démo 1-Clic pour Test Fonctionnel
+        {/* 1-Click Fast Demo Credentials */}
+        <div className="bg-white p-5 rounded-xl border border-subtleBorder text-xs space-y-3">
+          <span className="font-poppins font-medium text-secondaryText uppercase tracking-wider block text-[10px]">
+            Accès de test rapide (1-clic)
           </span>
           <div className="grid grid-cols-2 gap-2">
             <button
               type="button"
-              onClick={() => handleLogin('admin@allomaison-bois.fr', 'AdminAlloMaison2026!')}
-              className="p-2 bg-white rounded-xl border border-wood-200 hover:border-forest-600 text-left font-bold text-forest-950 transition"
+              onClick={() => handleLogin('admin@woodmachine-bois.fr', 'Password123!')}
+              className="p-2.5 bg-ivory rounded-lg border border-subtleBorder hover:border-forest text-left transition-colors"
             >
-              👑 Super Admin
-              <span className="block text-[10px] text-gray-500 font-normal">Accès total backoffice</span>
+              <div className="flex items-center gap-1.5 font-medium text-primaryText">
+                <ShieldCheck className="w-3.5 h-3.5 text-forest" />
+                <span>Super Admin</span>
+              </div>
+              <span className="block text-[10px] text-secondaryText mt-0.5">Accès backoffice</span>
             </button>
+
             <button
               type="button"
-              onClick={() => handleLogin('compta@allomaison-bois.fr', 'AdminAlloMaison2026!')}
-              className="p-2 bg-white rounded-xl border border-wood-200 hover:border-forest-600 text-left font-bold text-amber-950 transition"
+              onClick={() => handleLogin('compta@woodmachine-bois.fr', 'Password123!')}
+              className="p-2.5 bg-ivory rounded-lg border border-subtleBorder hover:border-forest text-left transition-colors"
             >
-              💳 Comptable
-              <span className="block text-[10px] text-gray-500 font-normal">Rapprochement virements</span>
+              <div className="flex items-center gap-1.5 font-medium text-primaryText">
+                <CreditCard className="w-3.5 h-3.5 text-forest" />
+                <span>Comptable</span>
+              </div>
+              <span className="block text-[10px] text-secondaryText mt-0.5">Rapprochement</span>
             </button>
+
             <button
               type="button"
-              onClick={() => handleLogin('logistique@allomaison-bois.fr', 'AdminAlloMaison2026!')}
-              className="p-2 bg-white rounded-xl border border-wood-200 hover:border-forest-600 text-left font-bold text-blue-950 transition"
+              onClick={() => handleLogin('logistique@woodmachine-bois.fr', 'Password123!')}
+              className="p-2.5 bg-ivory rounded-lg border border-subtleBorder hover:border-forest text-left transition-colors"
             >
-              🚚 Logistique
-              <span className="block text-[10px] text-gray-500 font-normal">Expéditions &amp; jalons</span>
+              <div className="flex items-center gap-1.5 font-medium text-primaryText">
+                <Truck className="w-3.5 h-3.5 text-forest" />
+                <span>Logistique</span>
+              </div>
+              <span className="block text-[10px] text-secondaryText mt-0.5">Jalons &amp; suivi</span>
             </button>
+
             <button
               type="button"
-              onClick={() => handleLogin('jean.dupont@example.com', 'Client2026!')}
-              className="p-2 bg-white rounded-xl border border-wood-200 hover:border-forest-600 text-left font-bold text-gray-900 transition"
+              onClick={() => handleLogin('jean.dupont@example.com', 'Password123!')}
+              className="p-2.5 bg-ivory rounded-lg border border-subtleBorder hover:border-forest text-left transition-colors"
             >
-              👤 Client Démo
-              <span className="block text-[10px] text-gray-500 font-normal">Jean Dupont</span>
+              <div className="flex items-center gap-1.5 font-medium text-primaryText">
+                <User className="w-3.5 h-3.5 text-forest" />
+                <span>Client Démo</span>
+              </div>
+              <span className="block text-[10px] text-secondaryText mt-0.5">Jean Dupont</span>
             </button>
           </div>
         </div>

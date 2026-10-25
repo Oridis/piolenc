@@ -4,18 +4,12 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { formatPrice } from '@/lib/pricing';
 import {
   Truck,
-  CheckCircle2,
+  Check,
   Clock,
   AlertTriangle,
   MapPin,
-  Calendar,
-  Phone,
-  ShieldCheck,
-  Package,
-  ArrowRight,
   ExternalLink,
 } from 'lucide-react';
 
@@ -51,8 +45,8 @@ export default function PublicTrackingPage({
     return (
       <>
         <Navbar />
-        <main className="flex-1 py-16 px-4 max-w-xl mx-auto text-center text-xs text-gray-500">
-          Chargement de votre suivi de livraison sécurisé...
+        <main className="flex-1 font-sans bg-ivory py-16 px-4 max-w-xl mx-auto text-center text-xs text-secondaryText">
+          Chargement de votre suivi logistique sécurisé...
         </main>
         <Footer />
       </>
@@ -63,13 +57,15 @@ export default function PublicTrackingPage({
     return (
       <>
         <Navbar />
-        <main className="flex-1 py-16 px-4 max-w-xl mx-auto text-center space-y-4">
-          <div className="p-4 bg-red-50 text-red-700 rounded-2xl border border-red-200 text-xs font-bold">
-            {error || 'Lien de suivi invalide ou expiré.'}
+        <main className="flex-1 font-sans bg-ivory py-16 px-4 max-w-md mx-auto text-center space-y-4">
+          <div className="bg-white p-6 rounded-xl border border-subtleBorder shadow-subtle space-y-3">
+            <div className="p-3 bg-red-50 text-statusError rounded-lg text-xs font-medium">
+              {error || 'Lien de suivi invalide ou expiré.'}
+            </div>
+            <Link href="/" className="btn-primary text-xs">
+              Retour à l&apos;accueil
+            </Link>
           </div>
-          <Link href="/" className="inline-block px-5 py-2.5 bg-forest-800 text-white rounded-xl text-xs font-bold">
-            Retour à l'accueil
-          </Link>
         </main>
         <Footer />
       </>
@@ -79,7 +75,6 @@ export default function PublicTrackingPage({
   const shipment = data.shipment;
   const isPaid = data.paymentStatus === 'PAYMENT_VERIFIED';
 
-  // 8 Chronological milestones mapping
   const MILESTONES = [
     { id: 'ORDER_CREATED', title: '1. Commande reçue', done: true },
     { id: 'PAYMENT_VERIFIED', title: '2. Virement vérifié', done: isPaid },
@@ -95,24 +90,24 @@ export default function PublicTrackingPage({
     <>
       <Navbar siteName={data.siteName} phone={data.supportPhone} />
 
-      <main className="flex-1 py-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-8">
+      <main className="flex-1 font-sans bg-ivory py-10 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-8">
         {/* Top Header Card */}
-        <div className="bg-gradient-to-r from-forest-950 via-forest-900 to-wood-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col sm:flex-row justify-between sm:items-center gap-4">
+        <div className="bg-white rounded-xl p-6 sm:p-7 border border-subtleBorder shadow-subtle flex flex-col sm:flex-row justify-between sm:items-center gap-4">
           <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-amber-300">
-              Espace de Suivi Sécurisé
+            <span className="text-xs font-medium uppercase tracking-wider text-secondaryText">
+              Espace de suivi sécurisé
             </span>
-            <h1 className="text-2xl sm:text-3xl font-black tracking-tight mt-1">
-              Commande {data.orderNumber}
+            <h1 className="font-poppins font-semibold text-2xl text-primaryText tracking-tight mt-0.5">
+              Suivi de la commande {data.orderNumber}
             </h1>
-            <p className="text-xs text-forest-200 mt-1">
-              Client : {data.customerFirstName} • Destination : {data.shippingCity}
+            <p className="text-xs text-secondaryText mt-1">
+              Destinataire : {data.customerFirstName} · Ville : {data.shippingCity}
             </p>
           </div>
 
-          <div className="bg-white/10 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/20 text-right">
-            <span className="text-[10px] text-forest-200 block uppercase font-bold">Compte à rebours livraison</span>
-            <span className="text-base font-black text-amber-400 block mt-0.5">
+          <div className="bg-ivory px-4 py-3 rounded-lg border border-subtleBorder text-left sm:text-right">
+            <span className="text-[10px] text-secondaryText block uppercase font-medium">Délai estimé</span>
+            <span className="font-poppins font-semibold text-sm text-primaryText block mt-0.5">
               {shipment?.remainingTimeText || 'Délai en cours de confirmation'}
             </span>
           </div>
@@ -120,37 +115,37 @@ export default function PublicTrackingPage({
 
         {/* Delay Alert if any */}
         {shipment?.isDelayed && (
-          <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start space-x-3 text-xs text-amber-900">
-            <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-lg flex items-start space-x-3 text-xs text-amber-900">
+            <AlertTriangle className="w-4 h-4 text-statusWarning shrink-0 mt-0.5" />
             <div>
-              <strong className="font-bold block">Information retard logistique :</strong>
-              Une légère variation de délai est constatée en raison des conditions d'acheminement routier. Le chauffeur vous contactera préalablement par téléphone pour fixer l'horaire précis.
+              <strong className="font-medium block">Information d&apos;acheminement :</strong>
+              Une légère adaptation du calendrier est constatée en raison des flux transporteur. Le chauffeur vous contactera préalablement pour convenir du créneau de passage.
             </div>
           </div>
         )}
 
         {/* 8-Step Timeline Horizontal Progression */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-gray-200 shadow-sm space-y-6">
-          <h2 className="text-sm font-black text-gray-900 uppercase tracking-wider">
-            Chronologie de votre commande
+        <div className="bg-white rounded-xl p-6 sm:p-7 border border-subtleBorder shadow-subtle space-y-5">
+          <h2 className="font-poppins font-medium text-xs text-secondaryText uppercase tracking-wider">
+            Progression de l&apos;acheminement
           </h2>
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 text-center text-[11px]">
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2.5 text-center text-[11px]">
             {MILESTONES.map((m, idx) => (
               <div
                 key={m.id}
-                className={`p-3 rounded-xl border flex flex-col items-center justify-center space-y-1.5 transition ${
+                className={`p-3 rounded-lg border flex flex-col items-center justify-center space-y-1.5 transition-colors ${
                   m.done
-                    ? 'bg-forest-50 border-forest-300 text-forest-950 font-bold'
-                    : 'bg-gray-50 border-gray-200 text-gray-400 opacity-60'
+                    ? 'bg-forest-50/70 border-forest-200 text-forest font-medium'
+                    : 'bg-ivory/50 border-subtleBorder text-secondaryText opacity-60'
                 }`}
               >
                 <div
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                    m.done ? 'bg-forest-700 text-white' : 'bg-gray-300 text-gray-600'
+                  className={`w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-medium ${
+                    m.done ? 'bg-forest text-white' : 'bg-beige-200 text-secondaryText'
                   }`}
                 >
-                  {m.done ? '✓' : idx + 1}
+                  {m.done ? <Check className="w-3.5 h-3.5" /> : idx + 1}
                 </div>
                 <span className="leading-tight">{m.title}</span>
               </div>
@@ -159,37 +154,37 @@ export default function PublicTrackingPage({
         </div>
 
         {/* Logistics Information & Events Log */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Detailed Carrier Info (4 cols) */}
-          <div className="lg:col-span-4 bg-white rounded-3xl p-6 border border-gray-200 shadow-sm space-y-4 text-xs">
-            <h3 className="font-extrabold text-gray-900 text-sm border-b border-gray-100 pb-3 flex items-center space-x-2">
-              <Truck className="w-4 h-4 text-forest-700" />
-              <span>Détails de l'Expédition</span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-7 items-start">
+          {/* Carrier Info */}
+          <div className="lg:col-span-4 bg-white rounded-xl p-6 border border-subtleBorder shadow-subtle space-y-4 text-xs">
+            <h3 className="font-poppins font-medium text-sm text-primaryText border-b border-subtleBorder pb-3 flex items-center space-x-2">
+              <Truck className="w-4 h-4 text-forest" />
+              <span>Détails de l&apos;expédition</span>
             </h3>
 
-            <div className="space-y-3 text-gray-700">
+            <div className="space-y-3 text-secondaryText">
               <div>
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Transporteur</span>
-                <strong className="text-gray-900 text-sm">{shipment?.carrierName || 'Geodis Calberson'}</strong>
+                <span className="text-[10px] uppercase font-medium text-secondaryText block">Transporteur</span>
+                <span className="font-medium text-primaryText text-xs">{shipment?.carrierName || 'Geodis Calberson'}</span>
               </div>
 
               <div>
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Numéro d'expédition</span>
-                <span className="font-mono text-sm font-bold text-gray-900 block">{shipment?.trackingNumber || 'En cours d\'attribution'}</span>
+                <span className="text-[10px] uppercase font-medium text-secondaryText block">Numéro d&apos;expédition</span>
+                <span className="font-mono text-xs font-semibold text-primaryText block">{shipment?.trackingNumber || 'En cours d\'attribution'}</span>
               </div>
 
               <div>
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Date estimée de livraison</span>
-                <strong className="text-forest-900 text-sm">
+                <span className="text-[10px] uppercase font-medium text-secondaryText block">Date indicative</span>
+                <span className="font-medium text-primaryText text-xs">
                   {shipment?.estimatedDeliveryDate
                     ? new Date(shipment.estimatedDeliveryDate).toLocaleDateString('fr-FR')
                     : 'En cours de confirmation'}
-                </strong>
+                </span>
               </div>
 
               <div>
-                <span className="text-gray-400 block text-[10px] uppercase font-bold">Équipement dédié</span>
-                <span>Camion porteur avec hayon élévateur + transpalette</span>
+                <span className="text-[10px] uppercase font-medium text-secondaryText block">Matériel de dépose</span>
+                <span className="text-primaryText">Camion porteur avec hayon élévateur et transpalette</span>
               </div>
 
               {shipment?.carrierTrackingUrl && (
@@ -198,68 +193,68 @@ export default function PublicTrackingPage({
                     href={shipment.carrierTrackingUrl}
                     target="_blank"
                     rel="noreferrer"
-                    className="inline-flex items-center space-x-1.5 text-forest-800 font-bold hover:underline"
+                    className="inline-flex items-center gap-1.5 text-forest hover:underline font-medium text-xs"
                   >
-                    <span>Suivi sur le site du transporteur</span>
+                    <span>Lien direct transporteur</span>
                     <ExternalLink className="w-3.5 h-3.5" />
                   </a>
                 </div>
               )}
             </div>
 
-            <div className="p-3 bg-wood-50 rounded-xl border border-wood-200 text-wood-900 text-[11px] space-y-1">
-              <strong>Besoin d'aide ?</strong>
-              <p>Notre service client est à votre disposition au <strong>{data.supportPhone}</strong> ou par email à <strong>{data.supportEmail}</strong>.</p>
+            <div className="p-3 bg-ivory rounded-md border border-subtleBorder text-secondaryText text-[11px] space-y-1">
+              <strong className="text-primaryText font-medium">Assistance logistique :</strong>
+              <p>Notre équipe répond au <strong>{data.supportPhone}</strong> ou par email à <strong>{data.supportEmail}</strong>.</p>
             </div>
           </div>
 
-          {/* Chronological Events Timeline (8 cols) */}
-          <div className="lg:col-span-8 bg-white rounded-3xl p-6 sm:p-8 border border-gray-200 shadow-sm space-y-6 text-xs">
-            <h3 className="font-extrabold text-gray-900 text-sm border-b border-gray-100 pb-3 flex items-center space-x-2">
-              <Clock className="w-4 h-4 text-forest-700" />
-              <span>Historique Chronologique des Événements</span>
+          {/* Chronological Milestone Events */}
+          <div className="lg:col-span-8 bg-white rounded-xl p-6 sm:p-7 border border-subtleBorder shadow-subtle space-y-5 text-xs">
+            <h3 className="font-poppins font-medium text-sm text-primaryText border-b border-subtleBorder pb-3 flex items-center space-x-2">
+              <Clock className="w-4 h-4 text-forest" />
+              <span>Historique des jalons logistiques</span>
             </h3>
 
             {shipment?.events && shipment.events.length > 0 ? (
-              <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-forest-200">
+              <div className="relative pl-6 space-y-5 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-subtleBorder">
                 {shipment.events.map((ev: any) => {
-                  let sourceBadge = 'Info saisie';
-                  let badgeStyle = 'bg-gray-100 text-gray-700';
+                  let sourceBadge = 'Saisie interne';
+                  let badgeStyle = 'badge-neutral';
 
                   if (ev.sourceType === 'CARRIER_API') {
-                    sourceBadge = 'Position réelle transporteur (Scan)';
-                    badgeStyle = 'bg-blue-100 text-blue-800';
+                    sourceBadge = 'Position transporteur confirmée';
+                    badgeStyle = 'badge-success';
                   } else if (ev.sourceType === 'WAREHOUSE_CONFIRMED') {
-                    sourceBadge = 'Étape entrepôt confirmée';
-                    badgeStyle = 'bg-green-100 text-green-800';
+                    sourceBadge = 'Validation plateforme';
+                    badgeStyle = 'badge-success';
                   } else if (ev.sourceType === 'CALCULATED_ESTIMATE') {
-                    sourceBadge = 'Estimation calculée';
-                    badgeStyle = 'bg-purple-100 text-purple-800';
+                    sourceBadge = 'Estimation prévisionnelle';
+                    badgeStyle = 'badge-neutral';
                   }
 
                   return (
                     <div key={ev.id} className="relative">
                       {/* Timeline dot */}
-                      <div className="absolute -left-6 top-0.5 w-4 h-4 rounded-full bg-forest-700 border-4 border-white shadow-sm" />
+                      <div className="absolute -left-6 top-1 w-3.5 h-3.5 rounded-full bg-forest border-2 border-white" />
 
-                      <div className="bg-gray-50/70 p-4 rounded-2xl border border-gray-100 space-y-1.5">
+                      <div className="bg-ivory/60 p-4 rounded-lg border border-subtleBorder space-y-1.5">
                         <div className="flex flex-wrap justify-between items-center gap-2">
-                          <h4 className="font-black text-gray-900 text-sm">{ev.status}</h4>
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${badgeStyle}`}>
+                          <h4 className="font-poppins font-medium text-primaryText text-xs">{ev.status}</h4>
+                          <span className={`${badgeStyle} text-[10px]`}>
                             {sourceBadge}
                           </span>
                         </div>
 
                         {ev.location && (
-                          <div className="flex items-center space-x-1 text-gray-500 text-[11px]">
-                            <MapPin className="w-3.5 h-3.5 text-gray-400" />
+                          <div className="flex items-center space-x-1.5 text-secondaryText text-[11px]">
+                            <MapPin className="w-3.5 h-3.5 text-secondaryText" />
                             <span>{ev.location}</span>
                           </div>
                         )}
 
-                        <p className="text-gray-700 leading-relaxed pt-1">{ev.description}</p>
+                        <p className="text-primaryText leading-relaxed pt-0.5">{ev.description}</p>
 
-                        <span className="text-[10px] text-gray-400 block pt-1 font-mono">
+                        <span className="text-[10px] text-secondaryText block pt-1 font-mono">
                           {new Date(ev.occurredAt).toLocaleString('fr-FR')}
                         </span>
                       </div>
@@ -268,8 +263,8 @@ export default function PublicTrackingPage({
                 })}
               </div>
             ) : (
-              <div className="p-8 text-center text-gray-500">
-                La commande est en cours de validation par nos équipes. Les événements de transport apparaîtront ici dès l'expédition.
+              <div className="p-8 text-center text-secondaryText">
+                La commande est en cours de validation par nos équipes. Les jalons de transport apparaîtront ici dès l&apos;expédition des palettes.
               </div>
             )}
           </div>

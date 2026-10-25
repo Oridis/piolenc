@@ -16,11 +16,9 @@ import {
   Lock,
   ArrowRight,
   CheckCircle2,
-  Building2,
   MapPin,
   User,
-  Phone,
-  Mail,
+  Info,
 } from 'lucide-react';
 
 export default function CheckoutPage() {
@@ -156,10 +154,7 @@ export default function CheckoutPage() {
         throw new Error(data.error || 'Erreur lors de la création de la commande');
       }
 
-      // Clear local cart
       clearCart();
-
-      // Redirect to confirmation page with wire transfer details
       router.push(`/commande/confirmation/${data.orderNumber}`);
     } catch (err: any) {
       console.error(err);
@@ -172,12 +167,16 @@ export default function CheckoutPage() {
     return (
       <>
         <Navbar />
-        <main className="flex-1 py-16 px-4 max-w-xl mx-auto text-center space-y-4">
-          <h1 className="text-xl font-bold">Votre panier est vide</h1>
-          <p className="text-xs text-gray-500">Ajoutez des palettes de bois avant de passer commande.</p>
-          <Link href="/boutique" className="inline-block px-5 py-2.5 bg-forest-800 text-white rounded-xl text-xs font-bold">
-            Aller à la boutique
-          </Link>
+        <main className="flex-1 font-sans bg-ivory py-16 px-4 max-w-md mx-auto text-center space-y-4">
+          <div className="bg-white p-8 rounded-xl border border-subtleBorder shadow-subtle space-y-3">
+            <h1 className="font-poppins font-medium text-lg text-primaryText">Votre panier est vide</h1>
+            <p className="text-xs text-secondaryText">Ajoutez des palettes de bois avant de passer commande.</p>
+            <div className="pt-2">
+              <Link href="/boutique" className="btn-primary text-xs">
+                Accéder à la boutique
+              </Link>
+            </div>
+          </div>
         </main>
         <Footer />
       </>
@@ -188,24 +187,24 @@ export default function CheckoutPage() {
     <>
       <Navbar />
 
-      <main className="flex-1 py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
+      <main className="flex-1 font-sans bg-ivory py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto space-y-8">
         <div>
-          <div className="flex items-center space-x-2">
-            <div className="p-2 bg-forest-100 text-forest-800 rounded-lg">
+          <div className="flex items-center space-x-2.5">
+            <div className="w-9 h-9 rounded-md bg-ivory border border-subtleBorder flex items-center justify-center text-forest">
               <Lock className="w-5 h-5" />
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-gray-900 tracking-tight">
-              Finalisation de votre Commande de Bois
+            <h1 className="font-poppins font-semibold text-2xl sm:text-3xl text-primaryText tracking-tight">
+              Finalisation de votre commande
             </h1>
           </div>
-          <p className="text-xs text-gray-500 mt-1">
-            Tunnel sécurisé : informations de livraison, contraintes d'accès camion et instructions de virement.
+          <p className="text-xs text-secondaryText mt-1">
+            Tunnel sécurisé : informations de livraison, contraintes d&apos;accès camion et coordonnées de virement bancaire.
           </p>
         </div>
 
         {errorMessage && (
-          <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-center space-x-2 text-xs text-red-900 font-bold">
-            <AlertTriangle className="w-5 h-5 text-red-600 shrink-0" />
+          <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2 text-xs text-statusError font-medium">
+            <AlertTriangle className="w-4 h-4 shrink-0" />
             <span>{errorMessage}</span>
           </div>
         )}
@@ -213,205 +212,206 @@ export default function CheckoutPage() {
         <form onSubmit={handleSubmitOrder} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Form: Customer & Addresses (8 cols) */}
           <div className="lg:col-span-8 space-y-6">
-            {/* 1. Coordonnées de contact */}
-            <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm space-y-4 text-xs">
-              <h2 className="text-sm font-black text-gray-900 flex items-center space-x-2 border-b border-gray-100 pb-3">
-                <User className="w-4 h-4 text-forest-700" />
-                <span>1. Vos Coordonnées de Contact</span>
+            {/* 1. Contact Information */}
+            <div className="bg-white p-6 rounded-xl border border-subtleBorder shadow-subtle space-y-4 text-xs">
+              <h2 className="font-poppins font-medium text-sm text-primaryText flex items-center space-x-2 border-b border-subtleBorder pb-3">
+                <User className="w-4 h-4 text-forest" />
+                <span>1. Vos coordonnées de contact</span>
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block font-bold text-gray-900 mb-1">Prénom * :</label>
+                  <label className="block font-medium text-primaryText mb-1">Prénom * :</label>
                   <input
                     type="text"
                     required
                     value={firstName}
                     onChange={(e) => setFirstName(e.target.value)}
                     placeholder="Jean"
-                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-none"
+                    className="input-field text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-gray-900 mb-1">Nom * :</label>
+                  <label className="block font-medium text-primaryText mb-1">Nom * :</label>
                   <input
                     type="text"
                     required
                     value={lastName}
                     onChange={(e) => setLastName(e.target.value)}
                     placeholder="Dupont"
-                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-none"
+                    className="input-field text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-gray-900 mb-1">Adresse Email * :</label>
+                  <label className="block font-medium text-primaryText mb-1">Adresse email * :</label>
                   <input
                     type="email"
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="jean.dupont@example.com"
-                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-none"
+                    className="input-field text-xs"
                   />
-                  <span className="text-[10px] text-gray-400 mt-0.5 block">
-                    Pour l'envoi de la confirmation, du RIB et du lien de suivi.
+                  <span className="text-[10px] text-secondaryText mt-1 block">
+                    Pour la confirmation de commande, le RIB et le lien de suivi.
                   </span>
                 </div>
 
                 <div>
-                  <label className="block font-bold text-gray-900 mb-1">Téléphone portable * :</label>
+                  <label className="block font-medium text-primaryText mb-1">Téléphone mobile * :</label>
                   <input
                     type="tel"
                     required
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     placeholder="06 12 34 56 78"
-                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-none"
+                    className="input-field text-xs"
                   />
-                  <span className="text-[10px] text-gray-400 mt-0.5 block">
-                    Indispensable pour la prise de rendez-vous avec le chauffeur.
+                  <span className="text-[10px] text-secondaryText mt-1 block">
+                    Nécessaire pour le contact préalable du chauffeur transporteur.
                   </span>
                 </div>
               </div>
             </div>
 
-            {/* 2. Adresse de livraison */}
-            <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm space-y-4 text-xs">
-              <h2 className="text-sm font-black text-gray-900 flex items-center space-x-2 border-b border-gray-100 pb-3">
-                <MapPin className="w-4 h-4 text-forest-700" />
-                <span>2. Adresse de Livraison (Dépôt des Palettes)</span>
+            {/* 2. Shipping Address */}
+            <div className="bg-white p-6 rounded-xl border border-subtleBorder shadow-subtle space-y-4 text-xs">
+              <h2 className="font-poppins font-medium text-sm text-primaryText flex items-center space-x-2 border-b border-subtleBorder pb-3">
+                <MapPin className="w-4 h-4 text-forest" />
+                <span>2. Adresse de livraison (dépôt des palettes)</span>
               </h2>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="sm:col-span-2">
-                  <label className="block font-bold text-gray-900 mb-1">Numéro et nom de rue * :</label>
+                  <label className="block font-medium text-primaryText mb-1">Numéro et voie * :</label>
                   <input
                     type="text"
                     required
                     value={street}
                     onChange={(e) => setStreet(e.target.value)}
                     placeholder="28 Allée des Chênes"
-                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-none"
+                    className="input-field text-xs"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block font-bold text-gray-900 mb-1">Complément d'adresse (facultatif) :</label>
+                  <label className="block font-medium text-primaryText mb-1">Complément d&apos;adresse (facultatif) :</label>
                   <input
                     type="text"
                     value={additional}
                     onChange={(e) => setAdditional(e.target.value)}
                     placeholder="Résidence, lieudit, numéro de portail..."
-                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl"
+                    className="input-field text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-gray-900 mb-1">Code Postal * :</label>
+                  <label className="block font-medium text-primaryText mb-1">Code postal * :</label>
                   <input
                     type="text"
                     required
                     value={postalCode}
                     onChange={(e) => setPostalCode(e.target.value)}
                     placeholder="88000"
-                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl font-bold"
+                    className="input-field text-xs"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-gray-900 mb-1">Ville * :</label>
+                  <label className="block font-medium text-primaryText mb-1">Commune * :</label>
                   <input
                     type="text"
                     required
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
                     placeholder="Épinal"
-                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl"
+                    className="input-field text-xs"
                   />
                 </div>
 
                 <div className="sm:col-span-2">
-                  <label className="block font-bold text-gray-900 mb-1">Pays de livraison * :</label>
+                  <label className="block font-medium text-primaryText mb-1">Pays de destination * :</label>
                   <select
                     value={country}
                     onChange={(e) => setCountry(e.target.value)}
-                    className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl bg-white font-bold"
+                    className="input-field text-xs bg-white font-medium"
                   >
-                    <option value="FR">France 🇫🇷 (TVA 5.5% bois de chauffage)</option>
-                    <option value="BE">Belgique 🇧🇪 (TVA 6%)</option>
-                    <option value="DE">Allemagne 🇩🇪 (MwSt 7%)</option>
-                    <option value="CH">Suisse 🇨🇭 (TVA 8.1% - Tarifs CHF)</option>
+                    <option value="FR">France (TVA 5.5% biocombustibles)</option>
+                    <option value="BE">Belgique (TVA 6%)</option>
+                    <option value="DE">Allemagne (MwSt 7%)</option>
+                    <option value="CH">Suisse (TVA 8.1% - Tarifs en CHF)</option>
                   </select>
                 </div>
               </div>
 
               {/* Truck Accessibility Checklist */}
-              <div className="mt-4 p-4 bg-wood-50 border border-wood-200/80 rounded-2xl space-y-3">
+              <div className="mt-4 p-4 bg-ivory border border-subtleBorder rounded-lg space-y-3">
                 <div className="flex justify-between items-start">
-                  <div className="flex items-center space-x-2">
-                    <Truck className="w-5 h-5 text-wood-800" />
+                  <div className="flex items-center space-x-2.5">
+                    <Truck className="w-4 h-4 text-forest" />
                     <div>
-                      <h4 className="font-extrabold text-gray-900 text-xs">
-                        Contraintes d'accès camion &amp; déchargement
+                      <h4 className="font-poppins font-medium text-primaryText text-xs">
+                        Contraintes d&apos;accès camion &amp; déchargement
                       </h4>
-                      <p className="text-[11px] text-gray-600">
-                        Camion porteur 19T/26T avec hayon et transpalette tout terrain
+                      <p className="text-[11px] text-secondaryText">
+                        Camion porteur 19T/26T avec hayon élévateur et transpalette
                       </p>
                     </div>
                   </div>
                   <button
                     type="button"
                     onClick={() => setIsAccessModalOpen(true)}
-                    className="text-xs text-forest-800 font-bold underline hover:text-forest-950"
+                    className="text-xs text-forest hover:underline font-medium"
                   >
                     Modifier les critères
                   </button>
                 </div>
 
-                <div className="text-[11px] text-gray-700 space-y-1">
-                  <p className="flex items-center space-x-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>Rue accessible aux poids lourds (largeur &gt; 2.50m)</span>
+                <div className="text-[11px] text-secondaryText space-y-1">
+                  <p className="flex items-center space-x-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-statusSuccess shrink-0" />
+                    <span>Rue accessible aux poids lourds (largeur &gt; 2.50 m)</span>
                   </p>
-                  <p className="flex items-center space-x-1.5">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                    <span>Sol dur et carrossable (enrobé, pavé, dalle béton)</span>
+                  <p className="flex items-center space-x-2">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-statusSuccess shrink-0" />
+                    <span>Sol dur et carrossable (enrobé, dalle béton, sol stabilisé)</span>
                   </p>
                   {accessibility.accessInstructions && (
-                    <p className="italic text-gray-500 mt-1">
-                      Note chauffeur : "{accessibility.accessInstructions}"
+                    <p className="italic text-primaryText mt-1">
+                      Note chauffeur : &ldquo;{accessibility.accessInstructions}&rdquo;
                     </p>
                   )}
                 </div>
               </div>
             </div>
 
-            {/* 3. Mode de paiement - Virement bancaire */}
-            <div className="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm space-y-4 text-xs">
-              <h2 className="text-sm font-black text-gray-900 flex items-center space-x-2 border-b border-gray-100 pb-3">
-                <CreditCard className="w-4 h-4 text-forest-700" />
-                <span>3. Mode de Règlement Sécurisé</span>
+            {/* 3. Payment Method */}
+            <div className="bg-white p-6 rounded-xl border border-subtleBorder shadow-subtle space-y-4 text-xs">
+              <h2 className="font-poppins font-medium text-sm text-primaryText flex items-center space-x-2 border-b border-subtleBorder pb-3">
+                <CreditCard className="w-4 h-4 text-forest" />
+                <span>3. Mode de règlement sécurisé</span>
               </h2>
 
-              <div className="p-4 bg-forest-50 border-2 border-forest-700/60 rounded-2xl flex items-start space-x-3">
+              <div className="p-4 bg-ivory border border-forest/60 rounded-lg flex items-start space-x-3">
                 <input
                   type="radio"
                   name="paymentMethod"
                   checked={true}
                   readOnly
-                  className="mt-1 w-4 h-4 text-forest-800 focus:ring-forest-600"
+                  className="mt-1 w-4 h-4 text-forest focus:ring-forest"
                 />
                 <div className="space-y-1">
-                  <strong className="text-sm font-extrabold text-forest-950 block">
-                    Virement Bancaire Immédiat ou SEPA
+                  <strong className="font-poppins font-medium text-primaryText text-xs block">
+                    Virement bancaire direct (SEPA / National)
                   </strong>
-                  <p className="text-gray-700 leading-relaxed">
-                    Le mode de règlement privilégié pour les commandes de bois de chauffage. Aucune commission abusive, sécurité maximale de banque à banque, sans risque de fraude à la carte bancaire.
+                  <p className="text-secondaryText leading-relaxed">
+                    Mode de règlement privilégié pour les approvisionnements en biocombustibles. Traçabilité complète de compte à compte, sans intermédiaire ni risque d&apos;interception de coordonnées bancaires.
                   </p>
-                  <p className="text-forest-900 font-semibold pt-1">
-                    ℹ️ Les coordonnées bancaires (IBAN, BIC, libellé exact de commande) vous seront affichées dès la confirmation et envoyées par email.
+                  <p className="text-forest text-[11px] pt-1 flex items-center gap-1.5 font-medium">
+                    <Info className="w-3.5 h-3.5" />
+                    <span>Les coordonnées bancaires (IBAN, BIC et référence structurée) vous seront présentées immédiatement après validation.</span>
                   </p>
                 </div>
               </div>
@@ -419,53 +419,53 @@ export default function CheckoutPage() {
           </div>
 
           {/* Right Summary Sidebar (4 cols) */}
-          <div className="lg:col-span-4 bg-white rounded-3xl border border-gray-200 shadow-sm p-6 space-y-6">
-            <h2 className="text-sm font-black text-gray-900 uppercase tracking-wider border-b border-gray-100 pb-3">
+          <div className="lg:col-span-4 bg-white rounded-xl border border-subtleBorder shadow-subtle p-6 space-y-5">
+            <h2 className="font-poppins font-medium text-xs text-secondaryText uppercase tracking-wider border-b border-subtleBorder pb-3">
               Total de votre commande
             </h2>
 
-            <div className="space-y-3 text-xs text-gray-700">
+            <div className="space-y-2.5 text-xs text-secondaryText">
               <div className="flex justify-between items-center">
                 <span>Articles ({totalItemsCount} unités)</span>
-                <span className="font-bold text-gray-900">{formatPrice(subtotalTTC, country === 'CH' ? 'CHF' : 'EUR')}</span>
+                <span className="font-medium text-primaryText">{formatPrice(subtotalTTC, country === 'CH' ? 'CHF' : 'EUR')}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span>TVA calculée ({shippingPreview.vatRate}%)</span>
-                <span className="font-semibold text-gray-900">{formatPrice(subtotalTTC - subtotalHT, country === 'CH' ? 'CHF' : 'EUR')}</span>
+                <span>TVA ({shippingPreview.vatRate}%)</span>
+                <span className="font-medium text-primaryText">{formatPrice(subtotalTTC - subtotalHT, country === 'CH' ? 'CHF' : 'EUR')}</span>
               </div>
-              <div className="flex justify-between items-center text-forest-800">
-                <span>Livraison par camion porteur</span>
-                <span className="font-bold">
+              <div className="flex justify-between items-center text-forest">
+                <span>Livraison par camion avec hayon</span>
+                <span className="font-medium">
                   {shippingPreview.isEligibleForFreeShipping
                     ? 'OFFERTE'
                     : formatPrice(shippingPreview.shippingFeeTTC, country === 'CH' ? 'CHF' : 'EUR')}
                 </span>
               </div>
 
-              <div className="border-t border-gray-200 pt-3 flex justify-between items-baseline">
-                <span className="font-extrabold text-sm text-gray-900">Total TTC à régler</span>
-                <span className="text-2xl font-black text-forest-900">
+              <div className="border-t border-subtleBorder pt-3 flex justify-between items-baseline">
+                <span className="font-poppins font-medium text-sm text-primaryText">Total TTC à régler</span>
+                <span className="font-poppins font-semibold text-2xl text-primaryText">
                   {formatPrice(estimatedTotal, country === 'CH' ? 'CHF' : 'EUR')}
                 </span>
               </div>
             </div>
 
             {/* CGV Checkbox */}
-            <div className="p-3 bg-gray-50 rounded-xl border border-gray-200">
+            <div className="p-3 bg-ivory rounded-lg border border-subtleBorder">
               <label className="flex items-start space-x-2.5 cursor-pointer text-xs">
                 <input
                   type="checkbox"
                   required
                   checked={cgvAccepted}
                   onChange={(e) => setCgvAccepted(e.target.checked)}
-                  className="mt-0.5 w-4 h-4 text-forest-700 rounded border-gray-300 focus:ring-forest-600"
+                  className="mt-0.5 w-4 h-4 text-forest rounded border-subtleBorder focus:ring-forest"
                 />
-                <span className="text-gray-700">
-                  J'ai lu et j'accepte les{' '}
-                  <Link href="/cgv" target="_blank" className="text-forest-800 font-bold underline">
+                <span className="text-secondaryText">
+                  J&apos;ai pris connaissance et j&apos;accepte les{' '}
+                  <Link href="/cgv" target="_blank" className="text-forest hover:underline font-medium">
                     Conditions Générales de Vente
                   </Link>{' '}
-                  et les conditions d'accès camion.
+                  ainsi que les conditions de dépose camion.
                 </span>
               </label>
             </div>
@@ -474,14 +474,17 @@ export default function CheckoutPage() {
             <button
               type="submit"
               disabled={isSubmitting}
-              className="w-full bg-forest-800 hover:bg-forest-700 disabled:bg-gray-400 text-white font-black py-4 px-4 rounded-2xl transition flex items-center justify-center space-x-2 shadow-xl hover:shadow-2xl text-sm"
+              className="btn-primary w-full py-3.5 text-xs inline-flex items-center justify-center gap-2"
             >
-              <span>{isSubmitting ? 'Validation en cours...' : 'Confirmer la commande'}</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>{isSubmitting ? 'Validation en cours...' : 'Confirmer ma commande'}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
 
-            <div className="text-[11px] text-gray-500 text-center space-y-1">
-              <p>🔒 Vous recevrez un numéro de commande unique et le récapitulatif pour effectuer votre virement.</p>
+            <div className="text-[11px] text-secondaryText text-center space-y-1">
+              <p className="flex items-center justify-center gap-1.5">
+                <ShieldCheck className="w-3.5 h-3.5 text-forest" />
+                <span>Validation sécurisée avec référence structurée unique</span>
+              </p>
             </div>
           </div>
         </form>

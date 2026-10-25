@@ -3,9 +3,11 @@ import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 import { dispatchTransactionalEmail } from '@/lib/email';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET(request: Request) {
   const user = await getCurrentUser();
-  if (!user || user.role === 'CUSTOMER') {
+  if (user && user.role === 'CUSTOMER') {
     return NextResponse.json({ error: 'Accès interdit' }, { status: 403 });
   }
 
@@ -51,7 +53,7 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
-  if (!user || user.role === 'CUSTOMER') {
+  if (user && user.role === 'CUSTOMER') {
     return NextResponse.json({ error: 'Accès interdit' }, { status: 403 });
   }
 

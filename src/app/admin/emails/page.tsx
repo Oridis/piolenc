@@ -12,6 +12,7 @@ import {
   RotateCw,
   Send,
   Eye,
+  X,
 } from 'lucide-react';
 
 export default function AdminEmailsPage() {
@@ -57,7 +58,7 @@ export default function AdminEmailsPage() {
       });
       const data = await res.json();
       if (res.ok) {
-        alert('Email relancé avec succès !');
+        alert('Email relancé avec succès');
         loadEmails();
       } else {
         alert(data.error || 'Erreur lors de la relance');
@@ -75,22 +76,22 @@ export default function AdminEmailsPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <div className="flex items-center space-x-2">
-              <div className="p-2 bg-purple-100 text-purple-800 rounded-lg">
+            <div className="flex items-center space-x-2.5">
+              <div className="p-2 bg-forest-100 text-forest-800 rounded-lg">
                 <Mail className="w-5 h-5" />
               </div>
-              <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-bold font-heading text-primaryText tracking-tight">
                 File d'Attente &amp; Journal des Emails Transactionnels
               </h1>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-secondaryText mt-1">
               Contrôlez chaque notification envoyée aux clients, examinez les erreurs et relancez en 1 clic.
             </p>
           </div>
 
           <button
             onClick={loadEmails}
-            className="flex items-center space-x-1.5 px-3 py-2 bg-white border border-gray-300 rounded-xl text-xs font-semibold text-gray-700 hover:bg-gray-50"
+            className="flex items-center space-x-1.5 px-3 py-2 bg-white border border-subtleBorder rounded-lg text-xs font-semibold text-primaryText hover:bg-beige-50 transition shadow-subtle"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Actualiser la file</span>
@@ -99,46 +100,46 @@ export default function AdminEmailsPage() {
 
         {/* Metric Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <span className="text-[11px] font-bold text-gray-500 uppercase">Total générés</span>
-            <span className="text-xl font-black text-gray-900 block mt-1">{counts.total}</span>
+          <div className="bg-white p-4 rounded-xl border border-subtleBorder shadow-subtle">
+            <span className="text-[11px] font-semibold text-secondaryText uppercase tracking-wider">Total générés</span>
+            <span className="text-xl font-bold font-heading text-primaryText block mt-1">{counts.total}</span>
           </div>
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <span className="text-[11px] font-bold text-emerald-600 uppercase">Délivrés / Envoyés</span>
-            <span className="text-xl font-black text-emerald-700 block mt-1">{counts.sent}</span>
+          <div className="bg-white p-4 rounded-xl border border-subtleBorder shadow-subtle">
+            <span className="text-[11px] font-semibold text-emerald-800 uppercase tracking-wider">Délivrés / Envoyés</span>
+            <span className="text-xl font-bold font-heading text-emerald-700 block mt-1">{counts.sent}</span>
           </div>
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <span className="text-[11px] font-bold text-red-600 uppercase">Échecs</span>
-            <span className="text-xl font-black text-red-700 block mt-1">{counts.failed}</span>
+          <div className="bg-white p-4 rounded-xl border border-subtleBorder shadow-subtle">
+            <span className="text-[11px] font-semibold text-red-800 uppercase tracking-wider">Échecs</span>
+            <span className="text-xl font-bold font-heading text-red-700 block mt-1">{counts.failed}</span>
           </div>
-          <div className="bg-white p-4 rounded-xl border border-gray-200">
-            <span className="text-[11px] font-bold text-amber-600 uppercase">En attente</span>
-            <span className="text-xl font-black text-amber-700 block mt-1">{counts.queued}</span>
+          <div className="bg-white p-4 rounded-xl border border-subtleBorder shadow-subtle">
+            <span className="text-[11px] font-semibold text-amber-800 uppercase tracking-wider">En attente</span>
+            <span className="text-xl font-bold font-heading text-amber-700 block mt-1">{counts.queued}</span>
           </div>
         </div>
 
         {/* Filters */}
-        <div className="bg-white p-4 rounded-2xl border border-gray-200 flex flex-col sm:flex-row gap-3 items-center justify-between">
+        <div className="bg-white p-4 rounded-xl border border-subtleBorder shadow-subtle flex flex-col sm:flex-row gap-3 items-center justify-between">
           <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+            <Search className="w-4 h-4 text-secondaryText absolute left-3 top-2.5" />
             <input
               type="text"
               placeholder="Rechercher par email destinataire, sujet..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-forest-600 focus:outline-none"
+              className="w-full pl-9 pr-3 py-2 border border-subtleBorder rounded-lg text-xs text-primaryText focus:ring-2 focus:ring-forest-600 focus:outline-none"
             />
           </div>
 
-          <div className="flex space-x-2 text-xs w-full sm:w-auto">
+          <div className="flex space-x-1.5 text-xs w-full sm:w-auto">
             {['', 'SENT', 'FAILED', 'QUEUED'].map((st) => (
               <button
                 key={st}
                 onClick={() => setStatusFilter(st)}
-                className={`px-3 py-1.5 rounded-xl font-bold transition ${
+                className={`px-3 py-1.5 rounded-lg font-semibold transition ${
                   statusFilter === st
-                    ? 'bg-forest-800 text-white shadow-sm'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-forest-700 text-white shadow-subtle'
+                    : 'bg-beige-100 text-secondaryText hover:text-primaryText hover:bg-beige-200'
                 }`}
               >
                 {st === '' ? 'Tous' : st === 'SENT' ? 'Envoyés' : st === 'FAILED' ? 'Échecs' : 'En attente'}
@@ -148,15 +149,15 @@ export default function AdminEmailsPage() {
         </div>
 
         {/* Emails Table */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-subtleBorder shadow-subtle overflow-hidden">
           {loading ? (
-            <div className="p-12 text-center text-xs text-gray-500">Chargement des journaux emails...</div>
+            <div className="p-12 text-center text-xs text-secondaryText">Chargement des journaux emails...</div>
           ) : emails.length === 0 ? (
-            <div className="p-12 text-center text-xs text-gray-500">Aucun journal trouvé.</div>
+            <div className="p-12 text-center text-xs text-secondaryText">Aucun journal trouvé.</div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[10px] border-b border-gray-100">
+                <thead className="bg-beige-50 text-secondaryText font-semibold uppercase tracking-wider text-[11px] border-b border-subtleBorder">
                   <tr>
                     <th className="py-3 px-4">Modèle</th>
                     <th className="py-3 px-4">Destinataire</th>
@@ -167,53 +168,53 @@ export default function AdminEmailsPage() {
                     <th className="py-3 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-subtleBorder">
                   {emails.map((log) => {
                     const isSent = log.status === 'SENT';
                     const isFailed = log.status === 'FAILED';
 
                     return (
-                      <tr key={log.id} className="hover:bg-gray-50 transition">
-                        <td className="py-3.5 px-4 font-bold text-gray-800">
+                      <tr key={log.id} className="hover:bg-beige-50/50 transition">
+                        <td className="py-3.5 px-4 font-semibold text-primaryText">
                           Email #{log.templateId}
                         </td>
-                        <td className="py-3.5 px-4 font-medium text-gray-900">
-                          {log.recipientEmail}
+                        <td className="py-3.5 px-4">
+                          <span className="font-medium text-primaryText">{log.recipientEmail}</span>
                           {log.order && (
-                            <span className="block text-[10px] text-gray-400">
+                            <span className="block text-[10px] text-secondaryText">
                               Commande {log.order.orderNumber}
                             </span>
                           )}
                         </td>
-                        <td className="py-3.5 px-4 text-gray-700 max-w-xs truncate font-medium">
+                        <td className="py-3.5 px-4 text-secondaryText max-w-xs truncate">
                           {log.subject}
                         </td>
                         <td className="py-3.5 px-4">
                           {isSent ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800">
-                              ● Envoyé
+                            <span className="badge-success">
+                              Envoyé
                             </span>
                           ) : isFailed ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-red-100 text-red-800">
-                              ● Échec
+                            <span className="badge-destructive">
+                              Échec
                             </span>
                           ) : (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-                              ● En attente
+                            <span className="badge-warning">
+                              En attente
                             </span>
                           )}
                         </td>
-                        <td className="py-3.5 px-4 text-gray-500 text-[11px]">
+                        <td className="py-3.5 px-4 text-secondaryText text-[11px]">
                           {log.sentAt ? new Date(log.sentAt).toLocaleString('fr-FR') : 'Non envoyé'}
                         </td>
-                        <td className="py-3.5 px-4 font-mono text-gray-600">
+                        <td className="py-3.5 px-4 font-mono text-secondaryText">
                           {log.retryCount}
                         </td>
                         <td className="py-3.5 px-4 text-right space-x-1.5 whitespace-nowrap">
                           {log.contentHtml && (
                             <button
                               onClick={() => setPreviewEmail(log)}
-                              className="px-2.5 py-1 border border-gray-300 hover:bg-gray-50 text-gray-700 rounded-lg font-semibold text-[11px]"
+                              className="px-2.5 py-1 border border-subtleBorder hover:bg-beige-100 text-primaryText rounded-lg font-medium text-[11px] transition"
                               title="Prévisualiser le modèle"
                             >
                               Aperçu
@@ -222,7 +223,7 @@ export default function AdminEmailsPage() {
                           <button
                             onClick={() => handleResend(log.id)}
                             disabled={resendingId === log.id}
-                            className="px-2.5 py-1 bg-purple-700 hover:bg-purple-800 text-white rounded-lg font-bold text-[11px] shadow-sm"
+                            className="btn-primary py-1 px-2.5 text-[11px]"
                             title="Relancer l'envoi"
                           >
                             {resendingId === log.id ? '...' : 'Relancer'}
@@ -240,18 +241,23 @@ export default function AdminEmailsPage() {
         {/* Modal for email preview */}
         {previewEmail && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setPreviewEmail(null)} />
-            <div className="relative bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-gray-200 z-10 space-y-4 max-h-[90vh] overflow-y-auto">
-              <div className="flex justify-between items-start pb-3 border-b border-gray-100">
+            <div className="absolute inset-0 bg-forest-950/60 backdrop-blur-xs" onClick={() => setPreviewEmail(null)} />
+            <div className="relative bg-white rounded-xl max-w-2xl w-full p-6 shadow-elevated border border-subtleBorder z-10 space-y-4 max-h-[90vh] overflow-y-auto">
+              <div className="flex justify-between items-start pb-3 border-b border-subtleBorder">
                 <div>
-                  <h3 className="text-sm font-black text-gray-900">{previewEmail.subject}</h3>
-                  <p className="text-xs text-gray-500">Destinataire : {previewEmail.recipientEmail}</p>
+                  <h3 className="text-sm font-bold font-heading text-primaryText">{previewEmail.subject}</h3>
+                  <p className="text-xs text-secondaryText">Destinataire : {previewEmail.recipientEmail}</p>
                 </div>
-                <button onClick={() => setPreviewEmail(null)} className="text-gray-400 hover:text-gray-700">✕</button>
+                <button
+                  onClick={() => setPreviewEmail(null)}
+                  className="p-1 rounded-lg text-secondaryText hover:text-primaryText hover:bg-beige-100 transition"
+                >
+                  <X className="w-5 h-5" />
+                </button>
               </div>
 
               <div
-                className="border border-gray-200 rounded-xl p-4 bg-gray-50 overflow-auto max-h-[60vh]"
+                className="border border-subtleBorder rounded-lg p-4 bg-beige-50/50 overflow-auto max-h-[60vh]"
                 dangerouslySetInnerHTML={{ __html: previewEmail.contentHtml }}
               />
             </div>

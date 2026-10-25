@@ -1,6 +1,6 @@
 # ALLO MAISON — Plateforme E-Commerce Spécialisée en Bois de Chauffage
 
-Bienvenue sur la plateforme e-commerce professionnelle **Allo Maison**, conçue pour la vente, la distribution et la livraison spécialisée de bois de chauffage haute performance (bûches sèches étuvées NF H1, bûches compressées, granulés/pellets DINplus).
+Bienvenue sur la plateforme e-commerce professionnelle **Wood Machine**, conçue pour la vente, la distribution et la livraison spécialisée de bois de chauffage haute performance (bûches sèches étuvées NF H1, bûches compressées, granulés/pellets DINplus).
 
 Conçu pour opérer en **France**, en **Belgique**, en **Allemagne** et en **Suisse**, le système gère les spécificités fiscales, les contraintes logistiques lourdes (camion porteur avec hayon et transpalette tout terrain) et le paiement sécurisé par **virement bancaire vérifiable**.
 
@@ -65,10 +65,42 @@ cp .env.example .env
 ```
 
 ### 4. Initialiser la base de données & les données de démonstration
+
+**Important** : Vérifiez que `DATABASE_URL` dans `.env` pointe vers la bonne base de données. Par défaut, il doit être `file:./prisma/dev3.db` (base avec migrations et données.seed).
+
+Si la base est vide ou si vous démarrez une nouvelle installation :
 ```bash
+# Réinitialiser et recréer la base avec toutes les migrations
+npx prisma migrate reset --force
 npx prisma db push
+
+# Réinitialiser les données de démonstration
 npm run db:seed
 ```
+
+### 4bis. Alternative : procédure d'initialisation complète (recommandée)
+```bash
+# Cette procédure réinitialise la base et réapplique seed
+npm run db:init
+```
+
+### 4ter. Sauvegarde de la base de données SQLite
+```bash
+# Créer une copie de sauvegarde de la base de données
+copy prisma\dev3.db prisma\dev3.db.backup
+
+# Restaurer depuis une sauvegarde
+copy prisma\dev3.db.backup prisma\dev3.db
+npx prisma migrate reset --force
+npm run db:seed
+```
+
+### 5. Lancer le serveur de développement
+```bash
+npm run dev
+```
+Rendez-vous sur [http://localhost:3000](http://localhost:3000).
+
 
 ### 5. Lancer le serveur de développement
 ```bash

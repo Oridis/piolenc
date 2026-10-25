@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { 
@@ -14,88 +14,118 @@ import {
   X, 
   ShieldCheck, 
   ChevronDown,
-  BookOpen
+  BookOpen,
+  Layers,
+  Droplets,
+  Warehouse
 } from 'lucide-react';
 
 interface NavbarProps {
   siteName?: string;
   phone?: string;
   slogan?: string;
+  logoUrl?: string;
 }
 
 export default function Navbar({
-  siteName = 'Allo Maison',
-  phone = '+33 (0)3 29 00 12 34',
+  siteName: initialSiteName = 'piolencboisdirect',
+  phone: initialPhone = '+33 (0)3 29 00 12 34',
   slogan = 'Spécialiste du bois de chauffage haute performance',
+  logoUrl: initialLogoUrl,
 }: NavbarProps) {
   const { totalItemsCount, setIsCartDrawerOpen } = useCart();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [guidesDropdownOpen, setGuidesDropdownOpen] = useState(false);
+  const [siteName, setSiteName] = useState(initialSiteName);
+  const [phone, setPhone] = useState(initialPhone);
+  const [logoUrl, setLogoUrl] = useState(initialLogoUrl);
+
+  // Sync with live settings in case logo was recently uploaded
+  useEffect(() => {
+    fetch('/api/settings')
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.siteName) setSiteName(data.siteName);
+        if (data.companyPhone) setPhone(data.companyPhone);
+        if (data.logoUrl) setLogoUrl(data.logoUrl);
+      })
+      .catch(() => {});
+  }, []);
 
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-gray-200">
-      {/* Top reassuring banner */}
-      <div className="bg-forest-900 text-white text-xs py-2 px-4">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
-          <div className="flex items-center space-x-4">
-            <span className="flex items-center space-x-1.5 text-forest-200">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Bois sec certifié NF &lt; 20% • Forêts durables</span>
+    <header className="sticky top-0 z-40 bg-white border-b border-subtleBorder">
+      {/* Top Reassuring Service Bar - Streamlined single-row on mobile */}
+      <div className="bg-forest text-white text-xs py-1.5 sm:py-2 px-3 sm:px-6 lg:px-8 border-b border-forest-dark">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 text-[11px] sm:text-xs">
+          {/* Left: Quality guarantee */}
+          <div className="flex items-center space-x-3 text-ivory/95 truncate">
+            <span className="inline-flex items-center gap-1.5 font-medium truncate">
+              <ShieldCheck className="w-3.5 h-3.5 text-beige shrink-0" />
+              <span className="truncate">Bois sec certifié NF H1</span>
+              <span className="hidden sm:inline text-ivory/80">(&lt; 20% humidité)</span>
             </span>
-            <span className="hidden md:inline text-forest-300">|</span>
-            <span className="hidden md:inline text-forest-200">
-              Livraison par camion porteur avec hayon et transpalette
+            <span className="hidden md:inline text-forest-secondary">|</span>
+            <span className="hidden md:inline text-ivory/80">
+              Livraison spécialisée avec hayon
             </span>
           </div>
 
-          <div className="flex items-center space-x-4">
+          {/* Right: Contact & Delivery countries */}
+          <div className="flex items-center space-x-3 shrink-0">
             <a
               href={`tel:${phone.replace(/\s+/g, '')}`}
-              className="flex items-center space-x-1.5 text-forest-100 hover:text-white transition font-medium"
+              className="inline-flex items-center gap-1.5 text-ivory hover:text-white transition-colors duration-150 font-medium"
             >
-              <PhoneCall className="w-3.5 h-3.5 text-amber-400" />
-              <span>Conseil &amp; Commande : {phone}</span>
+              <PhoneCall className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-beige shrink-0" />
+              <span className="hidden sm:inline">Service client : </span>
+              <span>{phone}</span>
             </a>
-            <span className="text-forest-400">|</span>
-            <div className="flex items-center space-x-1 font-semibold text-forest-100">
-              <span title="France">🇫🇷</span>
-              <span title="Belgique">🇧🇪</span>
-              <span title="Allemagne">🇩🇪</span>
-              <span title="Suisse">🇨🇭</span>
-            </div>
+            <span className="hidden lg:inline text-forest-secondary">|</span>
+            <span className="hidden lg:inline text-ivory/80 font-medium tracking-wide">
+              Livraison : FR · BE · DE · CH
+            </span>
           </div>
         </div>
       </div>
 
-      {/* Main navigation bar */}
+      {/* Main Navigation Bar */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
-          {/* Logo & Brand */}
-          <Link href="/" className="flex items-center space-x-3 group">
-            <div className="w-11 h-11 bg-gradient-to-br from-forest-800 to-forest-950 rounded-xl flex items-center justify-center text-amber-400 shadow-md group-hover:scale-105 transition">
-              <Flame className="w-6 h-6 fill-amber-400 text-amber-400" />
-            </div>
-            <div>
-              <span className="text-2xl font-extrabold tracking-tight text-forest-950 block">
-                {siteName}
-              </span>
-              <span className="text-[11px] font-medium text-wood-700 tracking-wide block uppercase">
-                Bois de chauffage étuvé
-              </span>
-            </div>
+        <div className="flex items-center justify-between h-16 sm:h-18 py-2 sm:py-3">
+          {/* Brand Logo - Completely unboxed without stacked subtitle */}
+          <Link href="/" className="flex items-center space-x-2.5 sm:space-x-3 group">
+            {logoUrl ? (
+              <img
+                src={logoUrl}
+                alt={siteName}
+                className="h-9 sm:h-11 w-auto max-w-[180px] sm:max-w-[220px] object-contain shrink-0"
+              />
+            ) : (
+              <Flame className="w-6 h-6 sm:w-7 sm:h-7 text-forest shrink-0 fill-forest/15" />
+            )}
+            <span className="font-poppins font-semibold text-lg sm:text-xl tracking-tight text-primaryText block leading-tight">
+              {siteName}
+            </span>
           </Link>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center space-x-6 text-sm font-semibold text-gray-700">
-            <Link href="/boutique" className="hover:text-forest-800 transition py-2">
+          <nav className="hidden lg:flex items-center space-x-7 text-sm font-medium font-poppins text-primaryText">
+            <Link 
+              href="/boutique" 
+              className="hover:text-forest transition-colors duration-150 py-1"
+            >
               Boutique
             </Link>
-            <Link href="/catalogue" className="hover:text-forest-800 transition py-2">
-              Catalogue &amp; Tarifs
+            <Link 
+              href="/catalogue" 
+              className="hover:text-forest transition-colors duration-150 py-1"
+            >
+              Catalogue
             </Link>
-            <Link href="/promotions" className="text-amber-700 hover:text-amber-800 transition py-2 flex items-center space-x-1">
-              <span>Offres Spéciales</span>
-              <span className="bg-amber-100 text-amber-800 text-[10px] px-1.5 py-0.5 rounded-full font-bold">Promo</span>
+            <Link 
+              href="/promotions" 
+              className="hover:text-forest transition-colors duration-150 py-1"
+            >
+              Offres
             </Link>
 
             {/* Guides Dropdown */}
@@ -103,86 +133,108 @@ export default function Navbar({
               <button
                 onClick={() => setGuidesDropdownOpen(!guidesDropdownOpen)}
                 onMouseEnter={() => setGuidesDropdownOpen(true)}
-                className="flex items-center space-x-1 hover:text-forest-800 transition py-2"
+                className="inline-flex items-center gap-1 hover:text-forest transition-colors duration-150 py-1"
               >
                 <span>Guides &amp; Conseils</span>
-                <ChevronDown className="w-3.5 h-3.5" />
+                <ChevronDown className="w-3.5 h-3.5 text-secondaryText" />
               </button>
 
               {guidesDropdownOpen && (
                 <div
                   onMouseLeave={() => setGuidesDropdownOpen(false)}
-                  className="absolute left-0 mt-1 w-64 bg-white border border-gray-100 shadow-xl rounded-xl py-2 z-50 text-xs"
+                  className="absolute left-0 mt-2 w-72 bg-white border border-subtleBorder shadow-card rounded-lg py-2 z-50 text-xs"
                 >
                   <Link
                     href="/guides/essences"
                     onClick={() => setGuidesDropdownOpen(false)}
-                    className="block px-4 py-2 hover:bg-forest-50 hover:text-forest-900 font-medium"
+                    className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-ivory text-primaryText transition-colors"
                   >
-                    🪵 Guide des essences de bois
+                    <Layers className="w-4 h-4 text-forest-secondary" />
+                    <div>
+                      <div className="font-medium">Guide des essences</div>
+                      <div className="text-[11px] text-secondaryText">Chêne, charme, hêtre, frêne</div>
+                    </div>
                   </Link>
                   <Link
                     href="/guides/humidite"
                     onClick={() => setGuidesDropdownOpen(false)}
-                    className="block px-4 py-2 hover:bg-forest-50 hover:text-forest-900 font-medium"
+                    className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-ivory text-primaryText transition-colors"
                   >
-                    💧 Humidité et pouvoir calorifique (NF)
+                    <Droplets className="w-4 h-4 text-forest-secondary" />
+                    <div>
+                      <div className="font-medium">Humidité &amp; Rendement NF</div>
+                      <div className="text-[11px] text-secondaryText">Moins de 20% d&apos;humidité garantie</div>
+                    </div>
                   </Link>
                   <Link
                     href="/guides/stockage"
                     onClick={() => setGuidesDropdownOpen(false)}
-                    className="block px-4 py-2 hover:bg-forest-50 hover:text-forest-900 font-medium"
+                    className="flex items-center gap-2.5 px-4 py-2.5 hover:bg-ivory text-primaryText transition-colors"
                   >
-                    🏡 Conseils de stockage et allumage
+                    <Warehouse className="w-4 h-4 text-forest-secondary" />
+                    <div>
+                      <div className="font-medium">Stockage &amp; Conservation</div>
+                      <div className="text-[11px] text-secondaryText">Ventilation et protection contre la pluie</div>
+                    </div>
                   </Link>
                 </div>
               )}
             </div>
 
-            <Link href="/calculateurs/quantite" className="hover:text-forest-800 transition py-2 flex items-center space-x-1 text-forest-800">
-              <Calculator className="w-4 h-4 text-forest-600" />
-              <span>Calculateur volume</span>
+            <Link 
+              href="/calculateurs/quantite" 
+              className="inline-flex items-center gap-1.5 hover:text-forest transition-colors duration-150 py-1 text-secondaryText hover:text-primaryText"
+            >
+              <Calculator className="w-4 h-4 text-forest" />
+              <span>Calculateur</span>
             </Link>
-            <Link href="/calculateurs/livraison" className="hover:text-forest-800 transition py-2 flex items-center space-x-1">
-              <Truck className="w-4 h-4 text-wood-600" />
-              <span>Frais &amp; Délais</span>
+            <Link 
+              href="/calculateurs/livraison" 
+              className="inline-flex items-center gap-1.5 hover:text-forest transition-colors duration-150 py-1 text-secondaryText hover:text-primaryText"
+            >
+              <Truck className="w-4 h-4 text-wood" />
+              <span>Livraison</span>
             </Link>
-            <Link href="/contact" className="hover:text-forest-800 transition py-2">
+            <Link 
+              href="/contact" 
+              className="hover:text-forest transition-colors duration-150 py-1 text-secondaryText hover:text-primaryText"
+            >
               Contact
             </Link>
           </nav>
 
-          {/* Right Action Buttons */}
+          {/* Right Action Icons */}
           <div className="flex items-center space-x-3">
             <Link
               href="/mon-compte"
-              className="hidden sm:flex items-center space-x-1.5 text-xs font-semibold text-gray-700 hover:text-forest-800 px-3 py-2 rounded-lg hover:bg-gray-100 transition"
-              title="Espace Client"
+              className="hidden sm:inline-flex items-center gap-2 text-xs font-medium text-primaryText hover:text-forest px-3 py-2 rounded-md hover:bg-ivory transition-colors duration-150"
+              title="Accès à l'espace client"
             >
-              <User className="w-4 h-4" />
+              <User className="w-4 h-4 text-secondaryText" />
               <span>Mon compte</span>
             </Link>
 
             <button
               onClick={() => setIsCartDrawerOpen(true)}
-              className="relative bg-forest-800 text-white p-2.5 rounded-xl hover:bg-forest-700 transition flex items-center space-x-2 shadow-sm"
-              aria-label="Voir le panier"
+              className="relative inline-flex items-center gap-2 bg-forest text-white text-xs font-medium font-poppins px-3.5 py-2 rounded-md hover:bg-forest-dark transition-colors duration-150 shadow-subtle"
+              aria-label="Ouvrir le panier"
             >
-              <ShoppingBag className="w-5 h-5" />
-              <span className="hidden sm:inline text-xs font-bold">Panier</span>
+              <ShoppingBag className="w-4 h-4" />
+              <span className="hidden sm:inline">Panier</span>
               {totalItemsCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 bg-amber-500 text-gray-950 text-[11px] font-black w-5 h-5 rounded-full flex items-center justify-center border-2 border-white shadow">
+                <span className="inline-flex items-center justify-center bg-beige text-forest-dark text-[11px] font-semibold h-5 min-w-[20px] px-1.5 rounded-full">
                   {totalItemsCount}
                 </span>
               )}
             </button>
 
-            {/* Mobile menu button */}
+            {/* Mobile Menu Toggle */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2 text-gray-600 hover:text-gray-900 rounded-lg hover:bg-gray-100"
+              className="lg:hidden p-2 text-secondaryText hover:text-primaryText rounded-md hover:bg-ivory"
+              aria-label="Ouvrir le menu"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -190,83 +242,79 @@ export default function Navbar({
 
       {/* Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-gray-200 bg-white px-4 py-5 space-y-3">
+        <div className="lg:hidden border-t border-subtleBorder bg-white px-4 py-4 space-y-2">
           <Link
             href="/boutique"
             onClick={() => setMobileMenuOpen(false)}
-            className="block text-base font-semibold text-gray-800 py-2 border-b border-gray-100"
+            className="block text-sm font-medium text-primaryText py-2 border-b border-subtleBorder/50"
           >
             Boutique
           </Link>
           <Link
             href="/catalogue"
             onClick={() => setMobileMenuOpen(false)}
-            className="block text-base font-semibold text-gray-800 py-2 border-b border-gray-100"
+            className="block text-sm font-medium text-primaryText py-2 border-b border-subtleBorder/50"
           >
             Catalogue &amp; Tarifs
           </Link>
           <Link
             href="/promotions"
             onClick={() => setMobileMenuOpen(false)}
-            className="block text-base font-semibold text-amber-700 py-2 border-b border-gray-100"
+            className="block text-sm font-medium text-primaryText py-2 border-b border-subtleBorder/50"
           >
-            🔥 Offres Spéciales
+            Offres du moment
           </Link>
+          <div className="pt-2 pb-1 text-xs font-medium text-secondaryText uppercase tracking-wider">
+            Guides &amp; Calculateurs
+          </div>
           <Link
             href="/guides/essences"
             onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm text-gray-700 py-2"
+            className="block text-sm text-primaryText py-1.5 pl-2"
           >
-            🪵 Guide des essences de bois
+            Guide des essences de bois
           </Link>
           <Link
             href="/guides/humidite"
             onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm text-gray-700 py-2"
+            className="block text-sm text-primaryText py-1.5 pl-2"
           >
-            💧 Humidité et pouvoir calorifique (NF)
+            Humidité et rendement NF
           </Link>
           <Link
             href="/guides/stockage"
             onClick={() => setMobileMenuOpen(false)}
-            className="block text-sm text-gray-700 py-2"
+            className="block text-sm text-primaryText py-1.5 pl-2"
           >
-            🏡 Conseils de stockage et allumage
+            Conseils de stockage
           </Link>
           <Link
             href="/calculateurs/quantite"
             onClick={() => setMobileMenuOpen(false)}
-            className="block text-base font-semibold text-forest-800 py-2 border-b border-gray-100"
+            className="block text-sm font-medium text-forest py-2 border-t border-subtleBorder/50 mt-2"
           >
             Calculateur de stères
           </Link>
           <Link
             href="/calculateurs/livraison"
             onClick={() => setMobileMenuOpen(false)}
-            className="block text-base font-semibold text-wood-800 py-2 border-b border-gray-100"
+            className="block text-sm font-medium text-primaryText py-2"
           >
-            Calculateur de livraison
-          </Link>
-          <Link
-            href="/a-propos"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block text-base font-semibold text-gray-800 py-2"
-          >
-            À propos de nous
-          </Link>
-          <Link
-            href="/contact"
-            onClick={() => setMobileMenuOpen(false)}
-            className="block text-base font-semibold text-gray-800 py-2"
-          >
-            Contactez-nous
+            Frais et délais de livraison
           </Link>
           <Link
             href="/mon-compte"
             onClick={() => setMobileMenuOpen(false)}
-            className="block text-base font-semibold text-forest-800 py-2"
+            className="block text-sm font-medium text-forest py-2 border-t border-subtleBorder/50 mt-2"
           >
-            Mon Compte Client
+            Espace Client &amp; Suivi
+          </Link>
+          <Link
+            href="/contact"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block text-sm text-secondaryText py-2"
+          >
+            Contactez le service client
           </Link>
         </div>
       )}

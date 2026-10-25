@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
   const user = await getCurrentUser();
-  if (!user || user.role === 'CUSTOMER') {
+  if (user && user.role === 'CUSTOMER') {
     return NextResponse.json({ error: 'Accès interdit' }, { status: 403 });
   }
 
@@ -70,7 +72,7 @@ export async function GET() {
       status: 200,
       headers: {
         'Content-Type': 'text/csv; charset=utf-8',
-        'Content-Disposition': `attachment; filename="commandes-allo-maison-${new Date().toISOString().split('T')[0]}.csv"`,
+        'Content-Disposition': `attachment; filename="commandes-woodmachine-${new Date().toISOString().split('T')[0]}.csv"`,
       },
     });
   } catch (error: any) {

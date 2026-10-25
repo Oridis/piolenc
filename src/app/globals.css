@@ -1,26 +1,181 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@500;600&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  /* Base Fallback Colors (Dynamically updated from Site Settings) */
+  --color-forest-rgb: 36 75 56;
+  --color-forest: rgb(var(--color-forest-rgb, 36 75 56));
+  --color-forest-dark-rgb: 25 55 41;
+  --color-forest-dark: rgb(var(--color-forest-dark-rgb, 25 55 41));
+  --color-forest-secondary-rgb: 71 102 83;
+  --color-forest-secondary: rgb(var(--color-forest-secondary-rgb, 71 102 83));
+  --color-forest-light-rgb: 50 93 71;
+  --color-forest-light: rgb(var(--color-forest-light-rgb, 50 93 71));
+  --color-forest-50-rgb: 244 247 245;
+  --color-forest-50: rgb(var(--color-forest-50-rgb, 244 247 245));
+  --color-forest-100-rgb: 230 237 232;
+  --color-forest-100: rgb(var(--color-forest-100-rgb, 230 237 232));
+
+  --color-wood-rgb: 138 100 69;
+  --color-wood: rgb(var(--color-wood-rgb, 138 100 69));
+  --color-wood-dark-rgb: 95 68 46;
+  --color-wood-dark: rgb(var(--color-wood-dark-rgb, 95 68 46));
+  --color-wood-light-rgb: 182 150 122;
+  --color-wood-light: rgb(var(--color-wood-light-rgb, 182 150 122));
+
+  --color-ivory: #F8F6F0;
+  --color-white: #FFFFFF;
+  --color-beige: #EDE7DA;
+  --color-text-primary: #242824;
+  --color-text-secondary: #6C716B;
+  --color-border: #E5E3DC;
+  --color-success: #287A50;
+  --color-warning: #A96816;
+  --color-error: #B42318;
+
+  /* Typography */
+  --font-heading: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* Radii */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 10px;
+  --radius-xl: 12px;
+  --radius-2xl: 14px;
+}
+
 @layer base {
+  html {
+    color: var(--color-text-primary);
+    background-color: var(--color-ivory);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
   body {
-    @apply bg-cream-50 text-gray-800 antialiased selection:bg-forest-100 selection:text-forest-900;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    color: #242824;
+    background-color: #F8F6F0;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
+    color: #242824;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+
+  /* Responsive Typographic Scale */
+  h1 {
+    font-size: clamp(2rem, 4vw + 1rem, 3.25rem);
+    line-height: 1.15;
+  }
+
+  h2 {
+    font-size: clamp(1.6rem, 2.5vw + 0.8rem, 2.35rem);
+    line-height: 1.25;
+  }
+
+  h3 {
+    font-size: clamp(1.25rem, 1.5vw + 0.6rem, 1.65rem);
+    line-height: 1.35;
+  }
+
+  h4 {
+    font-size: clamp(1.1rem, 1vw + 0.5rem, 1.25rem);
+    line-height: 1.4;
+  }
+
+  p, li, label, input, button, select, textarea {
+    font-family: var(--font-body);
+  }
+
+  /* Focus rings for WCAG 2.2 AA accessibility */
+  :focus-visible {
+    outline: 2px solid var(--color-forest, #244B38);
+    outline-offset: 2px;
   }
 }
 
-/* Custom scrollbar for modern feel */
+@layer components {
+  /* Professional Button Variants */
+  .btn-primary {
+    @apply inline-flex items-center justify-center font-medium font-poppins text-sm px-5 py-2.5 rounded-md text-white bg-forest hover:bg-forest-dark transition-colors duration-150 shadow-subtle disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center font-medium font-poppins text-sm px-5 py-2.5 rounded-md text-primaryText bg-white border border-subtleBorder hover:bg-ivory hover:border-forest-secondary transition-colors duration-150 shadow-subtle disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center font-medium font-poppins text-sm px-4 py-2 rounded-md text-forest border border-forest hover:bg-forest-50 transition-colors duration-150;
+  }
+
+  .btn-destructive {
+    @apply inline-flex items-center justify-center font-medium font-poppins text-sm px-4 py-2 rounded-md text-white bg-statusError hover:bg-red-800 transition-colors duration-150 shadow-subtle;
+  }
+
+  /* Clean Input Field */
+  .input-field {
+    @apply w-full px-3.5 py-2.5 text-sm text-primaryText bg-white border border-subtleBorder rounded-md placeholder-secondaryText transition-colors duration-150 focus:border-forest focus:ring-1 focus:ring-forest focus:outline-none disabled:bg-beige-100 disabled:text-secondaryText;
+  }
+
+  /* Subtle Card System */
+  .card-premium {
+    @apply bg-white border border-subtleBorder rounded-xl p-6 transition-all duration-150;
+  }
+
+  .card-subtle {
+    @apply bg-ivory border border-subtleBorder rounded-xl p-6;
+  }
+
+  /* Status Badges */
+  .badge-success {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-statusSuccess bg-emerald-50 border border-emerald-200/80 rounded-md;
+  }
+
+  .badge-warning {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-statusWarning bg-amber-50 border border-amber-200/80 rounded-md;
+  }
+
+  .badge-error {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-statusError bg-red-50 border border-red-200/80 rounded-md;
+  }
+
+  .badge-neutral {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-secondaryText bg-beige-50 border border-subtleBorder rounded-md;
+  }
+}
+
+/* Elegant and restrained scrollbar */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1ede4;
+  background: #F8F6F0;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cca278;
+  background: #D0C1A7;
   border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #a36d45;
+  background: #8A6445;
 }

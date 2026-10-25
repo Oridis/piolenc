@@ -7,16 +7,16 @@ export default function QuantityCalculatorPage() {
   return (
     <>
       <Navbar />
-      <main className="flex-1 py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-8">
+      <main className="flex-1 font-sans bg-ivory py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-8">
         <div className="space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-forest-800">
-            Outil d'Aide à la Décision
+          <span className="text-xs font-medium uppercase tracking-wider text-secondaryText">
+            Outil d&apos;aide à la décision
           </span>
-          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
-            Calculateur de Quantité de Bois de Chauffage
+          <h1 className="font-poppins font-semibold text-2xl sm:text-3xl text-primaryText tracking-tight">
+            Calculateur de volume de bois de chauffage
           </h1>
-          <p className="text-sm text-gray-600">
-            Déterminez précisément le nombre de stères et de palettes nécessaires selon votre surface, votre appareil et votre niveau d'isolation thermique.
+          <p className="text-xs sm:text-sm text-secondaryText leading-relaxed">
+            Déterminez précisément le cubage en stères et le nombre de palettes nécessaires selon votre surface, votre équipement et votre isolation thermique.
           </p>
         </div>
 

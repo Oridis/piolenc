@@ -5,21 +5,19 @@ import AdminLayout from '@/components/AdminLayout';
 import { formatPrice } from '@/lib/pricing';
 import {
   CreditCard,
-  ShoppingBag,
-  Truck,
   Package,
   AlertTriangle,
   ArrowRight,
   TrendingUp,
-  CheckCircle2,
-  Clock,
   Mail,
+  Truck,
+  Paintbrush,
+  FileSpreadsheet,
 } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
 export default async function AdminDashboardPage() {
-  const totalOrdersCount = await prisma.order.count();
   const pendingTransfers = await prisma.order.findMany({
     where: { paymentStatus: 'PENDING_TRANSFER' },
     orderBy: { createdAt: 'desc' },
@@ -50,28 +48,29 @@ export default async function AdminDashboardPage() {
 
   return (
     <AdminLayout>
-      <div className="space-y-8">
+      <div className="space-y-7 font-sans">
         {/* Page Title & Quick Actions */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <h1 className="text-2xl font-black text-gray-900 tracking-tight">Tableau de bord de pilotage</h1>
-            <p className="text-xs text-gray-500 mt-1">
-              Vue d'ensemble de l'activité commerciale, financière et logistique de votre négoce de bois.
+            <h1 className="font-poppins font-semibold text-2xl text-primaryText tracking-tight">Tableau de bord de gestion</h1>
+            <p className="text-xs text-secondaryText mt-0.5">
+              Vue synthétique de l&apos;activité commerciale, des virements à valider et des expéditions de palettes.
             </p>
           </div>
 
           <div className="flex flex-wrap gap-2.5">
             <Link
               href="/admin/virements"
-              className="bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 shadow-sm"
+              className="btn-primary text-xs py-2 px-3.5 inline-flex items-center gap-1.5"
             >
               <CreditCard className="w-4 h-4" />
               <span>Rapprocher les virements ({pendingTransfers.length})</span>
             </Link>
             <Link
               href="/admin/personnalisation"
-              className="bg-forest-800 hover:bg-forest-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center space-x-1.5 shadow-sm"
+              className="btn-secondary text-xs py-2 px-3.5 inline-flex items-center gap-1.5"
             >
+              <Paintbrush className="w-3.5 h-3.5 text-forest" />
               <span>Personnaliser le site</span>
             </Link>
           </div>
@@ -80,66 +79,66 @@ export default async function AdminDashboardPage() {
         {/* Top KPIs Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {/* Revenue */}
-          <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="bg-white p-5 rounded-xl border border-subtleBorder shadow-subtle">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Chiffre d'affaires encaissé</span>
-              <div className="p-2 bg-emerald-50 text-emerald-700 rounded-lg">
-                <TrendingUp className="w-5 h-5" />
+              <span className="text-[11px] font-medium text-secondaryText uppercase tracking-wider">Chiffre d&apos;affaires encaissé</span>
+              <div className="w-8 h-8 rounded-md bg-ivory border border-subtleBorder flex items-center justify-center text-forest">
+                <TrendingUp className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
-              <span className="text-2xl font-black text-gray-900">{formatPrice(totalRevenue)}</span>
-              <span className="text-xs text-emerald-600 block mt-1 font-semibold">
+              <span className="font-poppins font-semibold text-2xl text-primaryText">{formatPrice(totalRevenue)}</span>
+              <span className="text-[11px] text-statusSuccess block mt-0.5 font-medium">
                 Sur virements vérifiés
               </span>
             </div>
           </div>
 
           {/* Pending Transfers */}
-          <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="bg-white p-5 rounded-xl border border-subtleBorder shadow-subtle">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-amber-600 uppercase tracking-wider">Virements à vérifier</span>
-              <div className="p-2 bg-amber-50 text-amber-700 rounded-lg">
-                <CreditCard className="w-5 h-5" />
+              <span className="text-[11px] font-medium text-secondaryText uppercase tracking-wider">Virements à vérifier</span>
+              <div className="w-8 h-8 rounded-md bg-ivory border border-subtleBorder flex items-center justify-center text-statusWarning">
+                <CreditCard className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
-              <span className="text-2xl font-black text-amber-900">{pendingTransfers.length}</span>
-              <span className="text-xs text-gray-500 block mt-1">
-                Attente de rapprochement bancaire
+              <span className="font-poppins font-semibold text-2xl text-primaryText">{pendingTransfers.length}</span>
+              <span className="text-[11px] text-secondaryText block mt-0.5">
+                En attente de rapprochement bancaire
               </span>
             </div>
           </div>
 
           {/* Orders to prepare */}
-          <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="bg-white p-5 rounded-xl border border-subtleBorder shadow-subtle">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Commandes à préparer</span>
-              <div className="p-2 bg-blue-50 text-blue-700 rounded-lg">
-                <Package className="w-5 h-5" />
+              <span className="text-[11px] font-medium text-secondaryText uppercase tracking-wider">Commandes à préparer</span>
+              <div className="w-8 h-8 rounded-md bg-ivory border border-subtleBorder flex items-center justify-center text-forest">
+                <Package className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
-              <span className="text-2xl font-black text-gray-900">{ordersToPrepare.length}</span>
-              <span className="text-xs text-gray-500 block mt-1">
-                En attente d'expédition transporteur
+              <span className="font-poppins font-semibold text-2xl text-primaryText">{ordersToPrepare.length}</span>
+              <span className="text-[11px] text-secondaryText block mt-0.5">
+                En attente d&apos;expédition transporteur
               </span>
             </div>
           </div>
 
           {/* Low Stock or Email Alert */}
-          <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+          <div className="bg-white p-5 rounded-xl border border-subtleBorder shadow-subtle">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">Santé du système</span>
-              <div className="p-2 bg-purple-50 text-purple-700 rounded-lg">
-                <Mail className="w-5 h-5" />
+              <span className="text-[11px] font-medium text-secondaryText uppercase tracking-wider">File d&apos;emails</span>
+              <div className="w-8 h-8 rounded-md bg-ivory border border-subtleBorder flex items-center justify-center text-secondaryText">
+                <Mail className="w-4 h-4" />
               </div>
             </div>
             <div className="mt-3">
-              <span className="text-2xl font-black text-gray-900">
-                {failedEmailsCount === 0 ? '100%' : `${failedEmailsCount} échec(s)`}
+              <span className="font-poppins font-semibold text-2xl text-primaryText">
+                {failedEmailsCount === 0 ? 'Opérationnel' : `${failedEmailsCount} échec(s)`}
               </span>
-              <span className="text-xs text-gray-500 block mt-1">
+              <span className="text-[11px] text-secondaryText block mt-0.5">
                 {failedEmailsCount === 0 ? 'Toutes notifications délivrées' : 'Emails nécessitant une relance'}
               </span>
             </div>
@@ -147,12 +146,12 @@ export default async function AdminDashboardPage() {
         </div>
 
         {/* Two Columns: Recent Orders & Alerts */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-7">
           {/* Recent Orders (8 cols) */}
-          <div className="lg:col-span-8 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
-            <div className="p-5 border-b border-gray-100 flex items-center justify-between">
-              <h2 className="text-sm font-bold text-gray-900">Dernières commandes enregistrées</h2>
-              <Link href="/admin/commandes" className="text-xs font-semibold text-forest-700 hover:text-forest-900 flex items-center space-x-1">
+          <div className="lg:col-span-8 bg-white rounded-xl border border-subtleBorder shadow-subtle overflow-hidden">
+            <div className="p-4 sm:p-5 border-b border-subtleBorder flex items-center justify-between">
+              <h2 className="font-poppins font-medium text-sm text-primaryText">Dernières commandes enregistrées</h2>
+              <Link href="/admin/commandes" className="text-xs font-medium text-forest hover:underline inline-flex items-center gap-1">
                 <span>Voir toutes les commandes</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Link>
@@ -160,56 +159,56 @@ export default async function AdminDashboardPage() {
 
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[10px]">
+                <thead className="bg-ivory text-secondaryText uppercase tracking-wider text-[10px] font-medium">
                   <tr>
-                    <th className="py-3 px-4">Commande</th>
-                    <th className="py-3 px-4">Client</th>
-                    <th className="py-3 px-4">Montant</th>
-                    <th className="py-3 px-4">Paiement</th>
-                    <th className="py-3 px-4">Logistique</th>
-                    <th className="py-3 px-4 text-right">Actions</th>
+                    <th className="py-2.5 px-4">Commande</th>
+                    <th className="py-2.5 px-4">Client</th>
+                    <th className="py-2.5 px-4">Montant</th>
+                    <th className="py-2.5 px-4">Paiement</th>
+                    <th className="py-2.5 px-4">Statut</th>
+                    <th className="py-2.5 px-4 text-right">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100 text-gray-700">
+                <tbody className="divide-y divide-subtleBorder text-primaryText">
                   {recentOrders.map((order) => (
-                    <tr key={order.id} className="hover:bg-gray-50/70 transition">
-                      <td className="py-3 px-4 font-bold text-gray-900">
+                    <tr key={order.id} className="hover:bg-ivory/50 transition-colors">
+                      <td className="py-3 px-4 font-medium">
                         {order.orderNumber}
-                        <span className="block text-[10px] text-gray-400 font-normal">
+                        <span className="block text-[10px] text-secondaryText font-normal">
                           {new Date(order.createdAt).toLocaleDateString('fr-FR')}
                         </span>
                       </td>
                       <td className="py-3 px-4">
-                        <span className="font-medium text-gray-900">{order.customerFirstName} {order.customerLastName}</span>
-                        <span className="block text-[10px] text-gray-400">{order.customerEmail}</span>
+                        <span className="font-medium text-primaryText">{order.customerFirstName} {order.customerLastName}</span>
+                        <span className="block text-[10px] text-secondaryText">{order.customerEmail}</span>
                       </td>
-                      <td className="py-3 px-4 font-bold text-forest-900">
+                      <td className="py-3 px-4 font-semibold text-primaryText">
                         {formatPrice(order.totalAmount, order.currency)}
                       </td>
                       <td className="py-3 px-4">
                         {order.paymentStatus === 'PAYMENT_VERIFIED' ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800">
+                          <span className="badge-success text-[10px]">
                             Virement validé
                           </span>
                         ) : order.paymentStatus === 'TRANSFER_RECEIVED' ? (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800">
+                          <span className="badge-warning text-[10px]">
                             Reçu à vérifier
                           </span>
                         ) : (
-                          <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
+                          <span className="badge-neutral text-[10px]">
                             En attente virement
                           </span>
                         )}
                       </td>
                       <td className="py-3 px-4">
-                        <span className="inline-block px-2 py-0.5 rounded text-[10px] bg-gray-100 font-medium text-gray-700">
+                        <span className="badge-neutral text-[10px]">
                           {order.fulfillmentStatus}
                         </span>
                       </td>
                       <td className="py-3 px-4 text-right">
                         <Link
                           href={`/admin/virements`}
-                          className="text-forest-700 hover:text-forest-900 font-bold hover:underline"
+                          className="text-forest hover:underline font-medium"
                         >
                           Gérer
                         </Link>
@@ -224,17 +223,17 @@ export default async function AdminDashboardPage() {
           {/* Right Column: Low stocks & Action shortcuts (4 cols) */}
           <div className="lg:col-span-4 space-y-6">
             {/* Low Stocks Alert */}
-            <div className="bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
-              <div className="flex items-center space-x-2 text-sm font-bold text-gray-900 mb-3">
-                <AlertTriangle className="w-4 h-4 text-amber-600" />
+            <div className="bg-white p-5 rounded-xl border border-subtleBorder shadow-subtle space-y-3">
+              <div className="flex items-center space-x-2 text-sm font-medium font-poppins text-primaryText">
+                <AlertTriangle className="w-4 h-4 text-statusWarning" />
                 <h3>Surveillance des stocks</h3>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 {lowStockProducts.map((prod) => (
-                  <div key={prod.id} className="flex justify-between items-center text-xs pb-2 border-b border-gray-100">
-                    <span className="font-medium text-gray-800 truncate mr-2">{prod.name}</span>
-                    <span className="font-extrabold text-amber-700 shrink-0 bg-amber-50 px-2 py-0.5 rounded">
+                  <div key={prod.id} className="flex justify-between items-center text-xs pb-2 border-b border-subtleBorder last:border-b-0 last:pb-0">
+                    <span className="text-primaryText truncate mr-2">{prod.name}</span>
+                    <span className="badge-warning text-[10px] shrink-0">
                       {prod.stock} restants
                     </span>
                   </div>
@@ -242,35 +241,39 @@ export default async function AdminDashboardPage() {
               </div>
             </div>
 
-            {/* Quick Links */}
-            <div className="bg-wood-50 p-5 rounded-2xl border border-wood-200/80">
-              <h3 className="text-xs font-bold uppercase tracking-wider text-wood-800 mb-3">
-                Raccourcis indispensables
+            {/* Quick Actions Shortcuts */}
+            <div className="bg-white p-5 rounded-xl border border-subtleBorder shadow-subtle space-y-3">
+              <h3 className="text-[11px] font-medium uppercase tracking-wider text-secondaryText">
+                Actions rapides
               </h3>
               <div className="space-y-2 text-xs">
                 <Link
                   href="/admin/virements"
-                  className="block p-2.5 bg-white rounded-xl border border-wood-200 font-semibold text-gray-800 hover:text-forest-800 hover:border-forest-600 transition"
+                  className="flex items-center gap-2 p-2.5 rounded-lg border border-subtleBorder hover:bg-ivory text-primaryText transition-colors"
                 >
-                  💳 Rapprocher et valider un virement
+                  <CreditCard className="w-4 h-4 text-forest" />
+                  <span>Rapprocher et valider un virement</span>
                 </Link>
                 <Link
                   href="/admin/livraisons"
-                  className="block p-2.5 bg-white rounded-xl border border-wood-200 font-semibold text-gray-800 hover:text-forest-800 hover:border-forest-600 transition"
+                  className="flex items-center gap-2 p-2.5 rounded-lg border border-subtleBorder hover:bg-ivory text-primaryText transition-colors"
                 >
-                  🚚 Ajouter un événement de suivi camion
+                  <Truck className="w-4 h-4 text-forest" />
+                  <span>Ajouter un événement logistique</span>
                 </Link>
                 <Link
                   href="/admin/personnalisation"
-                  className="block p-2.5 bg-white rounded-xl border border-wood-200 font-semibold text-gray-800 hover:text-forest-800 hover:border-forest-600 transition"
+                  className="flex items-center gap-2 p-2.5 rounded-lg border border-subtleBorder hover:bg-ivory text-primaryText transition-colors"
                 >
-                  🎨 Modifier le nom ou les coordonnées bancaires
+                  <Paintbrush className="w-4 h-4 text-forest" />
+                  <span>Modifier le nom ou coordonnées bancaires</span>
                 </Link>
                 <Link
                   href="/api/admin/export/orders"
-                  className="block p-2.5 bg-white rounded-xl border border-wood-200 font-semibold text-gray-800 hover:text-forest-800 hover:border-forest-600 transition"
+                  className="flex items-center gap-2 p-2.5 rounded-lg border border-subtleBorder hover:bg-ivory text-primaryText transition-colors"
                 >
-                  📊 Exporter les commandes en CSV
+                  <FileSpreadsheet className="w-4 h-4 text-forest" />
+                  <span>Exporter les commandes en CSV</span>
                 </Link>
               </div>
             </div>

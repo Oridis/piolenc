@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import AdminLayout from '@/components/AdminLayout';
+import { generateThemeCss } from '@/lib/colors';
 import {
   Paintbrush,
   Save,
@@ -10,9 +11,12 @@ import {
   CreditCard,
   Mail,
   ShieldCheck,
-  Globe,
   Eye,
   Flame,
+  Info,
+  Upload,
+  Trash2,
+  Image as ImageIcon,
 } from 'lucide-react';
 
 export default function SiteCustomizationPage() {
@@ -21,6 +25,8 @@ export default function SiteCustomizationPage() {
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState<'brand' | 'bank' | 'company' | 'legal' | 'email'>('brand');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const faviconInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch('/api/settings')
@@ -29,8 +35,100 @@ export default function SiteCustomizationPage() {
         setSettings(data);
         setLoading(false);
       })
-      .catch((err) => console.error(err));
+      .catch((err) => {
+        console.error('Failed to load settings:', err);
+        setLoading(false);
+      });
   }, []);
+
+  // Update theme colors live on change
+  useEffect(() => {
+    if (settings?.primaryColor || settings?.secondaryColor) {
+      const themeCss = generateThemeCss(settings.primaryColor, settings.secondaryColor, settings.accentColor);
+      let styleTag = document.getElementById('dynamic-brand-theme');
+      if (!styleTag) {
+        styleTag = document.createElement('style');
+        styleTag.id = 'dynamic-brand-theme';
+        document.head.appendChild(styleTag);
+      }
+      styleTag.innerHTML = themeCss;
+    }
+  }, [settings?.primaryColor, settings?.secondaryColor, settings?.accentColor]);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert('Veuillez sélectionner un fichier image valide (PNG, SVG, JPG, WebP).');
+      return;
+    }
+
+    // Max 4MB file size check
+    if (file.size > 4 * 1024 * 1024) {
+      alert('L\'image est trop volumineuse (maximum 4 Mo).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      if (result) {
+        setSettings((prev: any) => ({
+          ...prev,
+          logoUrl: result,
+        }));
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveLogo = () => {
+    setSettings((prev: any) => ({
+      ...prev,
+      logoUrl: '',
+    }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleFaviconUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/') && !file.name.toLowerCase().endsWith('.ico')) {
+      alert('Veuillez sélectionner un fichier image ou favicon valide (ICO, PNG, SVG, WebP).');
+      return;
+    }
+
+    if (file.size > 2 * 1024 * 1024) {
+      alert('Le favicon est trop volumineux (maximum 2 Mo).');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      if (result) {
+        setSettings((prev: any) => ({
+          ...prev,
+          faviconUrl: result,
+        }));
+      }
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveFavicon = () => {
+    setSettings((prev: any) => ({
+      ...prev,
+      faviconUrl: '',
+    }));
+    if (faviconInputRef.current) {
+      faviconInputRef.current.value = '';
+    }
+  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,15 +142,22 @@ export default function SiteCustomizationPage() {
         body: JSON.stringify(settings),
       });
 
+      const text = await res.text();
+      let data: any = {};
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = { error: text || `Erreur serveur (${res.status})` };
+      }
+
       if (res.ok) {
         setSaveSuccess(true);
         setTimeout(() => setSaveSuccess(false), 4000);
       } else {
-        const data = await res.json();
         alert(data.error || 'Erreur lors de la sauvegarde');
       }
     } catch (err: any) {
-      alert(err.message);
+      alert(err.message || 'Erreur de connexion');
     } finally {
       setSaving(false);
     }
@@ -61,7 +166,7 @@ export default function SiteCustomizationPage() {
   if (loading || !settings) {
     return (
       <AdminLayout>
-        <div className="p-12 text-center text-xs text-gray-500">Chargement des paramètres de marque...</div>
+        <div className="p-12 text-center text-xs text-secondaryText">Chargement des paramètres de marque...</div>
       </AdminLayout>
     );
   }
@@ -70,33 +175,33 @@ export default function SiteCustomizationPage() {
     <AdminLayout>
       <form onSubmit={handleSave} className="space-y-6 max-w-5xl">
         {/* Header with Save & Publish */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-2xl border border-gray-200 shadow-sm">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white p-5 rounded-xl border border-subtleBorder shadow-subtle">
           <div>
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-2.5">
               <div className="p-2 bg-forest-100 text-forest-800 rounded-lg">
                 <Paintbrush className="w-5 h-5" />
               </div>
-              <h1 className="text-xl font-black text-gray-900 tracking-tight">
+              <h1 className="text-xl font-bold font-heading text-primaryText tracking-tight">
                 Identité et personnalisation centralisée du site
               </h1>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
+            <p className="text-xs text-secondaryText mt-1">
               Source unique de vérité : modifiez le nom, la marque, les coordonnées bancaires et le contenu sans développeur.
             </p>
           </div>
 
           <div className="flex items-center space-x-3">
             {saveSuccess && (
-              <span className="flex items-center space-x-1.5 text-xs text-emerald-700 font-bold bg-emerald-50 px-3 py-1.5 rounded-xl border border-emerald-200">
-                <CheckCircle2 className="w-4 h-4" />
-                <span>Publié avec succès partout !</span>
+              <span className="flex items-center space-x-1.5 text-xs text-emerald-800 font-semibold bg-emerald-50 px-3 py-1.5 rounded-lg border border-emerald-200">
+                <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                <span>Publié avec succès partout</span>
               </span>
             )}
 
             <button
               type="submit"
               disabled={saving}
-              className="bg-forest-800 hover:bg-forest-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md transition flex items-center space-x-2"
+              className="btn-primary"
             >
               <Save className="w-4 h-4" />
               <span>{saving ? 'Publication en cours...' : 'Enregistrer et publier'}</span>
@@ -104,38 +209,77 @@ export default function SiteCustomizationPage() {
           </div>
         </div>
 
-        {/* Live Brand Preview Card */}
-        <div className="bg-wood-50 p-5 rounded-2xl border border-wood-200">
-          <div className="flex items-center space-x-2 text-xs font-bold text-wood-800 uppercase tracking-wider mb-2">
-            <Eye className="w-4 h-4" />
-            <span>Prévisualisation en direct de l'en-tête client</span>
+        {/* Live Brand Preview Card - Dynamic Colors & Logo without Box */}
+        <div className="bg-beige-50 p-5 rounded-xl border border-subtleBorder space-y-3">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2 text-xs font-semibold text-primaryText uppercase tracking-wider">
+              <Eye className="w-4 h-4 text-forest" />
+              <span>Aperçu en direct de votre charte graphique &amp; de vos couleurs</span>
+            </div>
+            <div className="flex items-center space-x-2 text-[11px]">
+              <span className="flex items-center gap-1.5 px-2 py-0.5 rounded border border-subtleBorder bg-white font-mono">
+                <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: settings.primaryColor || '#244B38' }} />
+                <span>Principale: {settings.primaryColor || '#244B38'}</span>
+              </span>
+              <span className="flex items-center gap-1.5 px-2 py-0.5 rounded border border-subtleBorder bg-white font-mono">
+                <span className="w-3 h-3 rounded-full inline-block" style={{ backgroundColor: settings.secondaryColor || '#8A6445' }} />
+                <span>Secondaire: {settings.secondaryColor || '#8A6445'}</span>
+              </span>
+            </div>
           </div>
-          <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div
-                className="w-10 h-10 rounded-xl flex items-center justify-center text-amber-400 font-bold shadow"
-                style={{ backgroundColor: settings.primaryColor }}
-              >
-                <Flame className="w-6 h-6 fill-amber-400 text-amber-400" />
-              </div>
-              <div>
-                <span className="text-xl font-black text-gray-950 block">{settings.siteName}</span>
-                <span className="text-xs text-gray-500 block">{settings.slogan}</span>
-              </div>
+
+          <div className="rounded-lg overflow-hidden border border-subtleBorder shadow-subtle">
+            {/* Top Bar Preview */}
+            <div
+              className="text-white text-[11px] py-1.5 px-4 flex justify-between items-center transition-colors duration-200"
+              style={{ backgroundColor: settings.primaryColor || '#244B38' }}
+            >
+              <span>Bois sec certifié NF H1 · Taux d&apos;humidité &lt; 20%</span>
+              <span>Service client : {settings.companyPhone || '+33 (0)3 29 00 12 34'}</span>
             </div>
 
-            <div className="text-right text-xs">
-              <span className="font-bold text-gray-900 block">{settings.companyPhone}</span>
-              <span className="text-gray-500">{settings.companyEmail}</span>
+            {/* Header Content */}
+            <div className="bg-white p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex items-center space-x-3.5">
+                {settings.logoUrl ? (
+                  <img
+                    src={settings.logoUrl}
+                    alt={settings.siteName}
+                    className="h-10 sm:h-12 w-auto max-w-[220px] object-contain shrink-0"
+                  />
+                ) : (
+                  <Flame className="w-8 h-8 text-forest shrink-0 fill-forest/15" />
+                )}
+                <span className="text-lg font-bold font-heading text-primaryText block leading-tight">
+                  {settings.siteName}
+                </span>
+              </div>
+
+              <div className="flex items-center space-x-2">
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded-md text-xs font-semibold text-white shadow-sm transition-all"
+                  style={{ backgroundColor: settings.primaryColor || '#244B38' }}
+                >
+                  Bouton Principal
+                </button>
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded-md text-xs font-semibold text-white shadow-sm transition-all"
+                  style={{ backgroundColor: settings.secondaryColor || '#8A6445' }}
+                >
+                  Bouton Secondaire
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Tabs navigation */}
-        <div className="flex border-b border-gray-200 space-x-2">
+        <div className="flex border-b border-subtleBorder space-x-2">
           {[
             { id: 'brand', label: 'Marque & Nom du site', icon: Paintbrush },
-            { id: 'bank', label: 'Coordonnées Bancaires (Virement)', icon: CreditCard },
+            { id: 'bank', label: 'Coordonnées Bancaires', icon: CreditCard },
             { id: 'company', label: 'Entreprise & Contact', icon: Building2 },
             { id: 'legal', label: 'Textes Juridiques & CGV', icon: ShieldCheck },
             { id: 'email', label: 'Configuration Emails', icon: Mail },
@@ -147,10 +291,10 @@ export default function SiteCustomizationPage() {
                 key={tab.id}
                 type="button"
                 onClick={() => setActiveTab(tab.id as any)}
-                className={`flex items-center space-x-2 py-3 px-4 text-xs font-bold border-b-2 transition ${
+                className={`flex items-center space-x-2 py-2.5 px-3.5 text-xs font-semibold border-b-2 transition ${
                   active
-                    ? 'border-forest-800 text-forest-900 bg-white rounded-t-xl'
-                    : 'border-transparent text-gray-500 hover:text-gray-800'
+                    ? 'border-forest-700 text-forest-800 bg-white rounded-t-lg'
+                    : 'border-transparent text-secondaryText hover:text-primaryText'
                 }`}
               >
                 <Icon className="w-4 h-4" />
@@ -162,85 +306,244 @@ export default function SiteCustomizationPage() {
 
         {/* Tab 1: Brand */}
         {activeTab === 'brand' && (
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 space-y-5 text-xs">
-            <h2 className="text-sm font-bold text-gray-900 border-b border-gray-100 pb-2">
-              Identité de marque &amp; Nom du site
+          <div className="bg-white p-6 rounded-xl border border-subtleBorder shadow-subtle space-y-6 text-xs">
+            <h2 className="text-sm font-bold font-heading text-primaryText border-b border-subtleBorder pb-2">
+              Identité de marque, Logo &amp; Nom du site
             </h2>
+
+            {/* Logo Upload Section - Unboxed */}
+            <div className="p-4 bg-beige-50/70 border border-subtleBorder rounded-xl space-y-3">
+              <label className="block font-bold text-primaryText text-xs">
+                Logo de la boutique (Téléversement sans conteneur ni boîte) :
+              </label>
+              
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                {/* Visual rendering of current logo */}
+                <div className="min-w-[120px] min-h-[50px] flex items-center justify-start p-2">
+                  {settings.logoUrl ? (
+                    <img
+                      src={settings.logoUrl}
+                      alt={settings.siteName}
+                      className="h-12 w-auto max-w-[220px] object-contain"
+                    />
+                  ) : (
+                    <div className="flex items-center space-x-2 text-secondaryText italic text-xs">
+                      <ImageIcon className="w-4 h-4" />
+                      <span>Aucun logo image (icône texte par défaut)</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Upload action buttons */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleFileUpload}
+                    accept="image/png,image/jpeg,image/svg+xml,image/webp,image/gif"
+                    className="hidden"
+                  />
+                  
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="btn-secondary py-2 px-3 text-xs flex items-center space-x-1.5"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Téléverser une image de logo</span>
+                  </button>
+
+                  {settings.logoUrl && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveLogo}
+                      className="px-3 py-2 border border-red-200 text-red-700 bg-red-50 hover:bg-red-100 rounded-lg text-xs font-semibold flex items-center space-x-1 transition"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Supprimer le logo</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="text-[11px] text-secondaryText leading-relaxed space-y-1">
+                <p>
+                  <strong>Redimensionnement automatique garanti :</strong> Votre logo est affiché de façon libre et naturelle, sans boîte, sans fond imposé et sans bordure. Il est automatiquement contraint à une hauteur fluide (max. 48px) pour s'adapter à toutes les formes (rectangulaire, carrée, circulaire ou typographique).
+                </p>
+                <p>
+                  Formats acceptés : PNG transparent, SVG vectoriel, JPEG ou WebP (max. 4 Mo).
+                </p>
+              </div>
+
+              <div className="pt-2">
+                <label className="block text-[11px] font-semibold text-secondaryText mb-1">
+                  Ou URL directe de l'image du logo :
+                </label>
+                <input
+                  type="text"
+                  placeholder="https://... ou /logo.png"
+                  value={settings.logoUrl || ''}
+                  onChange={(e) => setSettings({ ...settings, logoUrl: e.target.value })}
+                  className="input-field text-xs font-mono"
+                />
+              </div>
+            </div>
+
+            {/* Favicon Upload Section - Modifiable depuis l'admin, sans conteneur */}
+            <div className="p-4 bg-beige-50/70 border border-subtleBorder rounded-xl space-y-3">
+              <label className="block font-bold text-primaryText text-xs">
+                Favicon du site (icône de l&apos;onglet navigateur) :
+              </label>
+
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                {/* Visual rendering of current favicon without box */}
+                <div className="min-w-[70px] min-h-[40px] flex items-center justify-start p-1 gap-2">
+                  {settings.faviconUrl ? (
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={settings.faviconUrl}
+                        alt="Favicon preview"
+                        className="w-8 h-8 object-contain shrink-0"
+                      />
+                      <span className="text-[10px] text-secondaryText font-mono">32x32</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center space-x-2 text-secondaryText italic text-xs">
+                      <ImageIcon className="w-4 h-4" />
+                      <span>Favicon par défaut (/favicon.ico)</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Upload action buttons */}
+                <div className="flex flex-wrap items-center gap-2">
+                  <input
+                    type="file"
+                    ref={faviconInputRef}
+                    onChange={handleFaviconUpload}
+                    accept="image/x-icon,image/vnd.microsoft.icon,image/png,image/svg+xml,image/webp,image/gif"
+                    className="hidden"
+                  />
+
+                  <button
+                    type="button"
+                    onClick={() => faviconInputRef.current?.click()}
+                    className="btn-secondary py-2 px-3 text-xs flex items-center space-x-1.5"
+                  >
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Téléverser un favicon</span>
+                  </button>
+
+                  {settings.faviconUrl && (
+                    <button
+                      type="button"
+                      onClick={handleRemoveFavicon}
+                      className="px-3 py-2 border border-red-200 text-red-700 bg-red-50 hover:bg-red-100 rounded-lg text-xs font-semibold flex items-center space-x-1 transition"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Réinitialiser le favicon</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+
+              <div className="text-[11px] text-secondaryText leading-relaxed space-y-1">
+                <p>
+                  <strong>Pris en compte instantanément :</strong> Le favicon est injecté dans l&apos;en-tête HTML de toutes les pages pour les visiteurs.
+                </p>
+                <p>
+                  Formats recommandés : .ico, PNG carré (32x32 ou 64x64 px), SVG vectoriel (max. 2 Mo).
+                </p>
+              </div>
+
+              <div className="pt-2">
+                <label className="block text-[11px] font-semibold text-secondaryText mb-1">
+                  Ou URL directe du favicon :
+                </label>
+                <input
+                  type="text"
+                  placeholder="/favicon.ico ou https://..."
+                  value={settings.faviconUrl || ''}
+                  onChange={(e) => setSettings({ ...settings, faviconUrl: e.target.value })}
+                  className="input-field text-xs font-mono"
+                />
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-bold text-gray-900 mb-1">
-                  Nom du site (ex: Allo Maison) :
+                <label className="block font-semibold text-primaryText mb-1">
+                  Nom du site (ex: piolencboisdirect) :
                 </label>
                 <input
                   type="text"
                   required
                   value={settings.siteName}
                   onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-                  className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl text-sm font-bold focus:ring-2 focus:ring-forest-600 focus:outline-none"
+                  className="input-field font-semibold"
                 />
-                <p className="text-[11px] text-gray-500 mt-1">
-                  Se répercute instantanément sur l'en-tête, le pied de page, les emails, les factures et les métadonnées SEO.
+                <p className="text-[11px] text-secondaryText mt-1">
+                  Se répercute instantanément sur l'en-tête, le pied de page, les emails et les métadonnées.
                 </p>
               </div>
 
               <div>
-                <label className="block font-bold text-gray-900 mb-1">
+                <label className="block font-semibold text-primaryText mb-1">
                   Slogan du site :
                 </label>
                 <input
                   type="text"
                   value={settings.slogan}
                   onChange={(e) => setSettings({ ...settings, slogan: e.target.value })}
-                  className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl text-sm focus:ring-2 focus:ring-forest-600 focus:outline-none"
+                  className="input-field"
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
               <div>
-                <label className="block font-bold text-gray-900 mb-1">Couleur Principale :</label>
+                <label className="block font-semibold text-primaryText mb-1">Couleur Principale :</label>
                 <div className="flex items-center space-x-2">
                   <input
                     type="color"
                     value={settings.primaryColor}
                     onChange={(e) => setSettings({ ...settings, primaryColor: e.target.value })}
-                    className="w-10 h-10 rounded-lg cursor-pointer border border-gray-300"
+                    className="w-10 h-10 rounded-lg cursor-pointer border border-subtleBorder"
                   />
                   <input
                     type="text"
                     value={settings.primaryColor}
                     onChange={(e) => setSettings({ ...settings, primaryColor: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-xl font-mono text-xs"
+                    className="input-field font-mono text-xs"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-gray-900 mb-1">Couleur Secondaire (Bois) :</label>
+                <label className="block font-semibold text-primaryText mb-1">Couleur Secondaire (Bois) :</label>
                 <div className="flex items-center space-x-2">
                   <input
                     type="color"
                     value={settings.secondaryColor}
                     onChange={(e) => setSettings({ ...settings, secondaryColor: e.target.value })}
-                    className="w-10 h-10 rounded-lg cursor-pointer border border-gray-300"
+                    className="w-10 h-10 rounded-lg cursor-pointer border border-subtleBorder"
                   />
                   <input
                     type="text"
                     value={settings.secondaryColor}
                     onChange={(e) => setSettings({ ...settings, secondaryColor: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-xl font-mono text-xs"
+                    className="input-field font-mono text-xs"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-gray-900 mb-1">Seuil Livraison Offerte (€) :</label>
+                <label className="block font-semibold text-primaryText mb-1">Seuil Livraison Offerte (€) :</label>
                 <input
                   type="number"
                   value={settings.freeShippingThreshold}
                   onChange={(e) => setSettings({ ...settings, freeShippingThreshold: parseFloat(e.target.value) })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl text-sm font-bold"
+                  className="input-field font-semibold"
                 />
               </div>
             </div>
@@ -249,70 +552,71 @@ export default function SiteCustomizationPage() {
 
         {/* Tab 2: Bank details */}
         {activeTab === 'bank' && (
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 space-y-5 text-xs">
-            <h2 className="text-sm font-bold text-gray-900 border-b border-gray-100 pb-2">
+          <div className="bg-white p-6 rounded-xl border border-subtleBorder shadow-subtle space-y-5 text-xs">
+            <h2 className="text-sm font-bold font-heading text-primaryText border-b border-subtleBorder pb-2">
               Coordonnées bancaires pour virement des clients
             </h2>
 
-            <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-900">
-              Ces coordonnées sont affichées sur la page de paiement, dans l'Email n°1 de confirmation et sur la facture pro forma. Ne jamais inventer d'IBAN fictif en production.
+            <div className="p-3 bg-beige-50 border border-subtleBorder rounded-lg text-secondaryText leading-relaxed flex items-start space-x-2">
+              <Info className="w-4 h-4 text-forest-700 shrink-0 mt-0.5" />
+              <span>Ces coordonnées sont affichées sur la page de paiement, dans l'email de confirmation et sur les récapitulatifs. Ne jamais saisir d'IBAN fictif en production.</span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-bold text-gray-900 mb-1">Nom du bénéficiaire :</label>
+                <label className="block font-semibold text-primaryText mb-1">Nom du bénéficiaire :</label>
                 <input
                   type="text"
                   required
                   value={settings.bankBeneficiary}
                   onChange={(e) => setSettings({ ...settings, bankBeneficiary: e.target.value })}
-                  className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl text-sm font-semibold"
+                  className="input-field font-semibold"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-gray-900 mb-1">Établissement bancaire :</label>
+                <label className="block font-semibold text-primaryText mb-1">Établissement bancaire :</label>
                 <input
                   type="text"
                   required
                   value={settings.bankName}
                   onChange={(e) => setSettings({ ...settings, bankName: e.target.value })}
-                  className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl text-sm"
+                  className="input-field"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-gray-900 mb-1">IBAN :</label>
+                <label className="block font-semibold text-primaryText mb-1">IBAN :</label>
                 <input
                   type="text"
                   required
                   value={settings.bankIban}
                   onChange={(e) => setSettings({ ...settings, bankIban: e.target.value })}
-                  className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl font-mono text-sm font-bold"
+                  className="input-field font-mono font-semibold"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-gray-900 mb-1">BIC / SWIFT :</label>
+                <label className="block font-semibold text-primaryText mb-1">BIC / SWIFT :</label>
                 <input
                   type="text"
                   required
                   value={settings.bankBic}
                   onChange={(e) => setSettings({ ...settings, bankBic: e.target.value })}
-                  className="w-full px-3.5 py-2.5 border border-gray-300 rounded-xl font-mono text-sm font-bold"
+                  className="input-field font-mono font-semibold"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block font-bold text-gray-900 mb-1">
+              <label className="block font-semibold text-primaryText mb-1">
                 Instructions de virement à l'attention du client :
               </label>
               <textarea
                 rows={3}
                 value={settings.bankInstructions}
                 onChange={(e) => setSettings({ ...settings, bankInstructions: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-xl text-xs"
+                className="input-field"
               />
             </div>
           </div>
@@ -320,119 +624,132 @@ export default function SiteCustomizationPage() {
 
         {/* Tab 3: Company */}
         {activeTab === 'company' && (
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 space-y-5 text-xs">
-            <h2 className="text-sm font-bold text-gray-900 border-b border-gray-100 pb-2">
+          <div className="bg-white p-6 rounded-xl border border-subtleBorder shadow-subtle space-y-5 text-xs">
+            <h2 className="text-sm font-bold font-heading text-primaryText border-b border-subtleBorder pb-2">
               Coordonnées de l'entreprise &amp; Horaires de service client
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-bold text-gray-900 mb-1">Raison sociale :</label>
+                <label className="block font-semibold text-primaryText mb-1">Raison sociale :</label>
                 <input
                   type="text"
                   value={settings.companyName}
                   onChange={(e) => setSettings({ ...settings, companyName: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl"
+                  className="input-field"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-gray-900 mb-1">Adresse complète du siège :</label>
+                <label className="block font-semibold text-primaryText mb-1">Adresse complète du siège :</label>
                 <input
                   type="text"
                   value={settings.companyAddress}
                   onChange={(e) => setSettings({ ...settings, companyAddress: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl"
+                  className="input-field"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-gray-900 mb-1">Téléphone service client :</label>
+                <label className="block font-semibold text-primaryText mb-1">Téléphone service client :</label>
                 <input
                   type="text"
                   value={settings.companyPhone}
                   onChange={(e) => setSettings({ ...settings, companyPhone: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl"
+                  className="input-field"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-gray-900 mb-1">Email de contact public :</label>
+                <label className="block font-semibold text-primaryText mb-1">Email de contact public :</label>
                 <input
                   type="email"
                   value={settings.companyEmail}
                   onChange={(e) => setSettings({ ...settings, companyEmail: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl"
+                  className="input-field"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-gray-900 mb-1">Numéro SIRET :</label>
+                <label className="block font-semibold text-primaryText mb-1">Numéro SIRET :</label>
                 <input
                   type="text"
                   value={settings.companySiret}
                   onChange={(e) => setSettings({ ...settings, companySiret: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl font-mono"
+                  className="input-field font-mono"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-gray-900 mb-1">TVA Intracommunautaire :</label>
+                <label className="block font-semibold text-primaryText mb-1">TVA Intracommunautaire :</label>
                 <input
                   type="text"
                   value={settings.companyVatNumber}
                   onChange={(e) => setSettings({ ...settings, companyVatNumber: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl font-mono"
+                  className="input-field font-mono"
                 />
               </div>
             </div>
 
-            <div>
-              <label className="block font-bold text-gray-900 mb-1">Horaires d'ouverture :</label>
-              <input
-                type="text"
-                value={settings.supportHours}
-                onChange={(e) => setSettings({ ...settings, supportHours: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-xl"
-              />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-semibold text-primaryText mb-1">Horaires d'ouverture :</label>
+                <input
+                  type="text"
+                  value={settings.supportHours}
+                  onChange={(e) => setSettings({ ...settings, supportHours: e.target.value })}
+                  className="input-field"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-primaryText mb-1">Zones de livraison :</label>
+                <input
+                  type="text"
+                  value={settings.deliveryZonesText || ''}
+                  onChange={(e) => setSettings({ ...settings, deliveryZonesText: e.target.value })}
+                  className="input-field"
+                  placeholder="France métropolitaine, Belgique, Allemagne, Suisse"
+                />
+              </div>
             </div>
           </div>
         )}
 
         {/* Tab 4: Legal Texts */}
         {activeTab === 'legal' && (
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 space-y-5 text-xs">
-            <h2 className="text-sm font-bold text-gray-900 border-b border-gray-100 pb-2">
+          <div className="bg-white p-6 rounded-xl border border-subtleBorder shadow-subtle space-y-5 text-xs">
+            <h2 className="text-sm font-bold font-heading text-primaryText border-b border-subtleBorder pb-2">
               Textes légaux et politiques contractuelles
             </h2>
 
             <div>
-              <label className="block font-bold text-gray-900 mb-1">Conditions Générales de Vente (CGV) :</label>
+              <label className="block font-semibold text-primaryText mb-1">Conditions Générales de Vente (CGV) :</label>
               <textarea
                 rows={4}
                 value={settings.cgvText}
                 onChange={(e) => setSettings({ ...settings, cgvText: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-xl font-mono text-[11px]"
+                className="input-field font-mono text-[11px]"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-gray-900 mb-1">Politique de Confidentialité RGPD :</label>
+              <label className="block font-semibold text-primaryText mb-1">Politique de Confidentialité RGPD :</label>
               <textarea
                 rows={3}
                 value={settings.privacyPolicyText}
                 onChange={(e) => setSettings({ ...settings, privacyPolicyText: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-xl font-mono text-[11px]"
+                className="input-field font-mono text-[11px]"
               />
             </div>
 
             <div>
-              <label className="block font-bold text-gray-900 mb-1">Modalités de Livraison &amp; Déchargement :</label>
+              <label className="block font-semibold text-primaryText mb-1">Modalités de Livraison &amp; Déchargement :</label>
               <textarea
                 rows={3}
                 value={settings.deliveryPolicyText}
                 onChange={(e) => setSettings({ ...settings, deliveryPolicyText: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-xl font-mono text-[11px]"
+                className="input-field font-mono text-[11px]"
               />
             </div>
           </div>
@@ -440,24 +757,27 @@ export default function SiteCustomizationPage() {
 
         {/* Tab 5: Email provider */}
         {activeTab === 'email' && (
-          <div className="bg-white p-6 rounded-2xl border border-gray-200 space-y-5 text-xs">
-            <h2 className="text-sm font-bold text-gray-900 border-b border-gray-100 pb-2">
+          <div className="bg-white p-6 rounded-xl border border-subtleBorder shadow-subtle space-y-5 text-xs">
+            <h2 className="text-sm font-bold font-heading text-primaryText border-b border-subtleBorder pb-2">
               Service d'envoi d'emails transactionnels
             </h2>
 
-            <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-900">
-              {settings.emailProvider === 'log'
-                ? 'ℹ️ Mode actuel : Journal d\'audit interne (Sandbox). Les emails sont générés, tracés en base de données et consultables dans l\'onglet "Emails & Notifications" sans nécessiter de serveur SMTP.'
-                : '✅ Mode SMTP Actif : Les emails sont réellement délivrés par votre serveur de messagerie.'}
+            <div className="p-3 bg-beige-50 border border-subtleBorder rounded-lg text-primaryText flex items-start space-x-2">
+              <Info className="w-4 h-4 text-forest-700 shrink-0 mt-0.5" />
+              <span>
+                {settings.emailProvider === 'log'
+                  ? 'Mode actuel : Journal d\'audit interne (Sandbox). Les emails sont générés, tracés en base de données et consultables dans l\'onglet "Emails & Notifications" sans nécessiter de serveur SMTP.'
+                  : 'Mode SMTP Actif : Les emails sont délivrés par votre serveur de messagerie externe.'}
+              </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
-                <label className="block font-bold text-gray-900 mb-1">Fournisseur :</label>
+                <label className="block font-semibold text-primaryText mb-1">Fournisseur :</label>
                 <select
                   value={settings.emailProvider}
                   onChange={(e) => setSettings({ ...settings, emailProvider: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl bg-white"
+                  className="input-field bg-white"
                 >
                   <option value="log">Journal d'audit sécurisé (Par défaut / Recette)</option>
                   <option value="smtp">Serveur SMTP externe (Production)</option>
@@ -465,52 +785,52 @@ export default function SiteCustomizationPage() {
               </div>
 
               <div>
-                <label className="block font-bold text-gray-900 mb-1">Email notification administrateur :</label>
+                <label className="block font-semibold text-primaryText mb-1">Email notification administrateur :</label>
                 <input
                   type="email"
                   value={settings.adminNotificationEmail}
                   onChange={(e) => setSettings({ ...settings, adminNotificationEmail: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-xl"
+                  className="input-field"
                 />
               </div>
 
               {settings.emailProvider === 'smtp' && (
                 <>
                   <div>
-                    <label className="block font-bold text-gray-900 mb-1">Hôte SMTP :</label>
+                    <label className="block font-semibold text-primaryText mb-1">Hôte SMTP :</label>
                     <input
                       type="text"
                       value={settings.smtpHost}
                       onChange={(e) => setSettings({ ...settings, smtpHost: e.target.value })}
                       placeholder="smtp.sendgrid.net, ssl0.ovh.net..."
-                      className="w-full px-3 py-2 border border-gray-300 rounded-xl font-mono"
+                      className="input-field font-mono"
                     />
                   </div>
                   <div>
-                    <label className="block font-bold text-gray-900 mb-1">Port SMTP :</label>
+                    <label className="block font-semibold text-primaryText mb-1">Port SMTP :</label>
                     <input
                       type="number"
                       value={settings.smtpPort}
                       onChange={(e) => setSettings({ ...settings, smtpPort: parseInt(e.target.value, 10) })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-xl"
+                      className="input-field"
                     />
                   </div>
                   <div>
-                    <label className="block font-bold text-gray-900 mb-1">Utilisateur SMTP :</label>
+                    <label className="block font-semibold text-primaryText mb-1">Utilisateur SMTP :</label>
                     <input
                       type="text"
                       value={settings.smtpUser}
                       onChange={(e) => setSettings({ ...settings, smtpUser: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-xl font-mono"
+                      className="input-field font-mono"
                     />
                   </div>
                   <div>
-                    <label className="block font-bold text-gray-900 mb-1">Mot de passe SMTP :</label>
+                    <label className="block font-semibold text-primaryText mb-1">Mot de passe SMTP :</label>
                     <input
                       type="password"
                       value={settings.smtpPassword || ''}
                       onChange={(e) => setSettings({ ...settings, smtpPassword: e.target.value })}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-xl font-mono"
+                      className="input-field font-mono"
                     />
                   </div>
                 </>

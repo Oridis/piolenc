@@ -7,16 +7,16 @@ export default function ShippingCalculatorPage() {
   return (
     <>
       <Navbar />
-      <main className="flex-1 py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-8">
+      <main className="flex-1 font-sans bg-ivory py-12 px-4 sm:px-6 lg:px-8 max-w-5xl mx-auto space-y-8">
         <div className="space-y-2">
-          <span className="text-xs font-bold uppercase tracking-wider text-wood-800">
-            Logistique &amp; Délais Poids Lourd
+          <span className="text-xs font-medium uppercase tracking-wider text-secondaryText">
+            Logistique &amp; Transport spécialisé
           </span>
-          <h1 className="text-3xl sm:text-4xl font-black text-gray-900 tracking-tight">
-            Calculateur de Frais et Délais de Livraison
+          <h1 className="font-poppins font-semibold text-2xl sm:text-3xl text-primaryText tracking-tight">
+            Calculateur des frais et délais d&apos;acheminement
           </h1>
-          <p className="text-sm text-gray-600">
-            Consultez les frais de transport par camion porteur avec hayon pour la France, la Belgique, l'Allemagne et la Suisse.
+          <p className="text-xs sm:text-sm text-secondaryText leading-relaxed">
+            Consultez les frais de transport par camion porteur avec hayon élévateur pour la France métropolitaine, la Belgique, l&apos;Allemagne et la Suisse.
           </p>
         </div>
 

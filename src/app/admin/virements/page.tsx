@@ -13,6 +13,8 @@ import {
   ShieldCheck,
   Send,
   RefreshCw,
+  X,
+  ExternalLink,
 } from 'lucide-react';
 
 export default function WireReconciliationPage() {
@@ -86,7 +88,7 @@ export default function WireReconciliationPage() {
 
       const data = await res.json();
       if (res.ok) {
-        setNotificationMsg(`Virement validé avec succès pour ${selectedOrder.orderNumber} ! Email de confirmation envoyé au client.`);
+        setNotificationMsg(`Virement validé avec succès pour ${selectedOrder.orderNumber}. Email de confirmation automatique expédié.`);
         loadOrders();
       } else {
         alert(data.error || 'Erreur lors de la validation');
@@ -104,22 +106,22 @@ export default function WireReconciliationPage() {
         {/* Title */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <div className="flex items-center space-x-2">
-              <div className="p-2 bg-amber-100 text-amber-800 rounded-lg">
+            <div className="flex items-center space-x-2.5">
+              <div className="p-2 bg-wood-100 text-wood-700 rounded-lg">
                 <CreditCard className="w-5 h-5" />
               </div>
-              <h1 className="text-xl sm:text-2xl font-black text-gray-900 tracking-tight">
+              <h1 className="text-xl sm:text-2xl font-bold font-heading text-primaryText tracking-tight">
                 Rapprochement des Virements Bancaires
               </h1>
             </div>
-            <p className="text-xs text-gray-500 mt-1">
-              Vérifiez la réception effective des fonds avant de basculer la commande en préparation.
+            <p className="text-xs text-secondaryText mt-1">
+              Contrôlez et validez la réception effective des fonds bancaires avant mise en préparation.
             </p>
           </div>
 
           <button
             onClick={loadOrders}
-            className="flex items-center space-x-1.5 px-3 py-2 bg-white border border-gray-200 text-xs font-semibold rounded-xl text-gray-700 hover:bg-gray-50"
+            className="flex items-center space-x-1.5 px-3 py-2 bg-white border border-subtleBorder text-xs font-semibold rounded-lg text-primaryText hover:bg-beige-50 transition shadow-subtle"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Actualiser</span>
@@ -127,35 +129,35 @@ export default function WireReconciliationPage() {
         </div>
 
         {/* Global Security Warning */}
-        <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl flex items-start space-x-3 text-xs text-amber-900">
-          <ShieldCheck className="w-5 h-5 text-amber-700 shrink-0 mt-0.5" />
-          <div>
-            <strong className="block font-bold">Règle de sécurité comptable Allo Maison :</strong>
-            Un justificatif ou récépissé transmis par le client ne constitue pas une preuve de crédit définitive. Ne cochez "Virement vérifié" qu'après constatation du crédit effectif sur votre relevé bancaire professionnel.
+        <div className="p-4 bg-wood-50 border border-wood-200 rounded-xl flex items-start space-x-3 text-xs text-wood-900">
+          <ShieldCheck className="w-5 h-5 text-wood-700 shrink-0 mt-0.5" />
+          <div className="leading-relaxed">
+            <strong className="font-semibold block text-wood-900">Règle de sécurité comptable Piolenc Bois Direct :</strong>
+            Un avis de virement ou récépissé transmis par le client ne constitue pas une confirmation irrévocable. Ne validez le règlement qu'après constatation du crédit effectif sur le compte bancaire professionnel.
           </div>
         </div>
 
         {notificationMsg && (
-          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center space-x-2 text-xs text-emerald-900 font-bold">
-            <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0" />
+          <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center space-x-2 text-xs text-emerald-900 font-semibold">
+            <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
             <span>{notificationMsg}</span>
           </div>
         )}
 
         {/* Filters & Search */}
-        <div className="bg-white p-4 rounded-2xl border border-gray-200 flex flex-col sm:flex-row gap-4 items-center justify-between">
+        <div className="bg-white p-4 rounded-xl border border-subtleBorder shadow-subtle flex flex-col sm:flex-row gap-4 items-center justify-between">
           <div className="relative w-full sm:w-80">
-            <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+            <Search className="w-4 h-4 text-secondaryText absolute left-3 top-2.5" />
             <input
               type="text"
               placeholder="Rechercher par n° de commande, nom, email..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-xl text-xs focus:ring-2 focus:ring-forest-600 focus:outline-none"
+              className="w-full pl-9 pr-4 py-2 border border-subtleBorder rounded-lg text-xs text-primaryText focus:ring-2 focus:ring-forest-600 focus:outline-none"
             />
           </div>
 
-          <div className="flex space-x-2 w-full sm:w-auto">
+          <div className="flex space-x-1.5 w-full sm:w-auto">
             {[
               { id: 'PENDING', label: 'À rapprocher' },
               { id: 'VERIFIED', label: 'Règlements validés' },
@@ -164,10 +166,10 @@ export default function WireReconciliationPage() {
               <button
                 key={tab.id}
                 onClick={() => setFilter(tab.id)}
-                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                   filter === tab.id
-                    ? 'bg-amber-700 text-white shadow-sm'
-                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    ? 'bg-forest-700 text-white shadow-subtle'
+                    : 'bg-beige-100 text-secondaryText hover:text-primaryText hover:bg-beige-200'
                 }`}
               >
                 {tab.label}
@@ -177,17 +179,17 @@ export default function WireReconciliationPage() {
         </div>
 
         {/* Orders Table */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-xl border border-subtleBorder shadow-subtle overflow-hidden">
           {loading ? (
-            <div className="p-12 text-center text-xs text-gray-500">Chargement des opérations bancaires...</div>
+            <div className="p-12 text-center text-xs text-secondaryText">Chargement des opérations bancaires...</div>
           ) : orders.length === 0 ? (
-            <div className="p-12 text-center text-xs text-gray-500">
+            <div className="p-12 text-center text-xs text-secondaryText">
               Aucun virement ne correspond aux critères sélectionnés.
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-gray-50 text-gray-500 uppercase tracking-wider text-[10px] border-b border-gray-100">
+                <thead className="bg-beige-50 text-secondaryText font-semibold uppercase tracking-wider text-[11px] border-b border-subtleBorder">
                   <tr>
                     <th className="py-3 px-4">Commande</th>
                     <th className="py-3 px-4">Client</th>
@@ -198,47 +200,51 @@ export default function WireReconciliationPage() {
                     <th className="py-3 px-4 text-right">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-100">
+                <tbody className="divide-y divide-subtleBorder">
                   {orders.map((order) => {
                     const rec = order.paymentRecords?.[0];
                     const isPaid = order.paymentStatus === 'PAYMENT_VERIFIED';
 
                     return (
-                      <tr key={order.id} className="hover:bg-gray-50 transition">
-                        <td className="py-3.5 px-4 font-bold text-gray-900">
+                      <tr key={order.id} className="hover:bg-beige-50/50 transition">
+                        <td className="py-3 px-4 font-semibold text-primaryText">
                           {order.orderNumber}
-                          <span className="block text-[10px] text-gray-400 font-normal">
+                          <span className="block text-[10px] text-secondaryText font-normal">
                             {new Date(order.createdAt).toLocaleDateString('fr-FR')}
                           </span>
                         </td>
-                        <td className="py-3.5 px-4">
-                          <span className="font-semibold text-gray-900">{order.customerFirstName} {order.customerLastName}</span>
-                          <span className="block text-[10px] text-gray-400">{order.customerEmail}</span>
+                        <td className="py-3 px-4">
+                          <span className="font-medium text-primaryText">{order.customerFirstName} {order.customerLastName}</span>
+                          <span className="block text-[10px] text-secondaryText">{order.customerEmail}</span>
                         </td>
-                        <td className="py-3.5 px-4 font-black text-gray-900">
+                        <td className="py-3 px-4 font-bold text-primaryText">
                           {formatPrice(order.totalAmount, order.currency)}
                         </td>
-                        <td className="py-3.5 px-4 font-semibold text-forest-800">
+                        <td className="py-3 px-4 font-semibold text-forest-700">
                           {rec && rec.receivedAmount > 0 ? formatPrice(rec.receivedAmount, order.currency) : '—'}
                         </td>
-                        <td className="py-3.5 px-4 text-gray-600 font-mono text-[11px]">
+                        <td className="py-3 px-4 text-secondaryText font-mono text-[11px]">
                           {rec?.bankReference || 'Non renseigné'}
                         </td>
-                        <td className="py-3.5 px-4">
+                        <td className="py-3 px-4">
                           {isPaid ? (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-100 text-green-800">
-                              ● Virement Vérifié
+                            <span className="badge-success">
+                              Virement validé
                             </span>
                           ) : (
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">
-                              ● En attente crédit
+                            <span className="badge-warning">
+                              En attente crédit
                             </span>
                           )}
                         </td>
-                        <td className="py-3.5 px-4 text-right">
+                        <td className="py-3 px-4 text-right">
                           <button
                             onClick={() => openReconciliationModal(order)}
-                            className="px-3 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg font-bold text-xs shadow-sm transition"
+                            className={`px-3 py-1.5 rounded-lg font-semibold text-xs transition shadow-subtle ${
+                              isPaid
+                                ? 'bg-beige-100 hover:bg-beige-200 text-primaryText border border-subtleBorder'
+                                : 'bg-forest-700 hover:bg-forest-800 text-white'
+                            }`}
                           >
                             {isPaid ? 'Consulter' : 'Rapprocher'}
                           </button>
@@ -255,36 +261,36 @@ export default function WireReconciliationPage() {
         {/* Modal for Reconciliation */}
         {selectedOrder && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setSelectedOrder(null)} />
-            <div className="relative bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl border border-gray-200 z-10 space-y-4">
-              <div className="flex justify-between items-start pb-3 border-b border-gray-100">
+            <div className="absolute inset-0 bg-forest-950/60 backdrop-blur-xs" onClick={() => setSelectedOrder(null)} />
+            <div className="relative bg-white rounded-xl max-w-lg w-full p-6 shadow-elevated border border-subtleBorder z-10 space-y-4">
+              <div className="flex justify-between items-start pb-3 border-b border-subtleBorder">
                 <div>
-                  <h3 className="text-base font-black text-gray-900">
+                  <h3 className="text-base font-bold font-heading text-primaryText">
                     Rapprochement Bancaire : {selectedOrder.orderNumber}
                   </h3>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-secondaryText">
                     Client : {selectedOrder.customerFirstName} {selectedOrder.customerLastName} ({selectedOrder.customerEmail})
                   </p>
                 </div>
                 <button
                   onClick={() => setSelectedOrder(null)}
-                  className="text-gray-400 hover:text-gray-700"
+                  className="p-1 rounded-lg text-secondaryText hover:text-primaryText hover:bg-beige-100 transition"
                 >
-                  ✕
+                  <X className="w-5 h-5" />
                 </button>
               </div>
 
               <form onSubmit={handleSaveReconciliation} className="space-y-4 text-xs">
-                <div className="p-3 bg-gray-50 rounded-xl border border-gray-200 flex justify-between items-center">
-                  <span className="font-semibold text-gray-700">Montant total attendu :</span>
-                  <span className="text-base font-black text-forest-900">
+                <div className="p-3 bg-beige-50 rounded-lg border border-subtleBorder flex justify-between items-center">
+                  <span className="font-medium text-secondaryText">Montant total attendu :</span>
+                  <span className="text-base font-bold text-primaryText">
                     {formatPrice(selectedOrder.totalAmount, selectedOrder.currency)}
                   </span>
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
                   <div>
-                    <label className="block font-bold text-gray-900 mb-1">
+                    <label className="block font-semibold text-primaryText mb-1">
                       Montant réellement crédité ({selectedOrder.currency}) :
                     </label>
                     <input
@@ -293,12 +299,12 @@ export default function WireReconciliationPage() {
                       required
                       value={receivedAmount}
                       onChange={(e) => setReceivedAmount(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-none font-bold"
+                      className="input-field font-semibold"
                     />
                   </div>
 
                   <div>
-                    <label className="block font-bold text-gray-900 mb-1">
+                    <label className="block font-semibold text-primaryText mb-1">
                       Date de crédit sur le compte :
                     </label>
                     <input
@@ -306,13 +312,13 @@ export default function WireReconciliationPage() {
                       required
                       value={receiptDate}
                       onChange={(e) => setReceiptDate(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-none"
+                      className="input-field"
                     />
                   </div>
                 </div>
 
                 <div>
-                  <label className="block font-bold text-gray-900 mb-1">
+                  <label className="block font-semibold text-primaryText mb-1">
                     Référence de l'opération sur votre relevé bancaire :
                   </label>
                   <input
@@ -320,38 +326,38 @@ export default function WireReconciliationPage() {
                     required
                     value={bankReference}
                     onChange={(e) => setBankReference(e.target.value)}
-                    placeholder="Ex: VIR SEPA DUPONT JEAN 20261023..."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-none font-mono"
+                    placeholder="Ex: VIR SEPA DUPONT JEAN..."
+                    className="input-field font-mono"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-gray-900 mb-1">
+                  <label className="block font-semibold text-primaryText mb-1">
                     Note interne comptable (facultatif) :
                   </label>
                   <textarea
                     rows={2}
                     value={internalNotes}
                     onChange={(e) => setInternalNotes(e.target.value)}
-                    placeholder="Ex: Virement conforme reçu sur compte BNP Paribas. Commande débloquée."
-                    className="w-full px-3 py-2 border border-gray-300 rounded-xl focus:ring-2 focus:ring-forest-600 focus:outline-none"
+                    placeholder="Ex: Virement conforme reçu sur compte professionnel. Commande débloquée."
+                    className="input-field"
                   />
                 </div>
 
-                <div className="p-3 bg-forest-50 border border-forest-200 rounded-xl">
+                <div className="p-3 bg-forest-50 border border-forest-200 rounded-lg">
                   <label className="flex items-start space-x-2.5 cursor-pointer">
                     <input
                       type="checkbox"
                       checked={isVerified}
                       onChange={(e) => setIsVerified(e.target.checked)}
-                      className="mt-0.5 w-4 h-4 text-forest-700 rounded border-gray-300 focus:ring-forest-600"
+                      className="mt-0.5 w-4 h-4 text-forest-700 rounded border-subtleBorder focus:ring-forest-600"
                     />
                     <div>
-                      <span className="font-extrabold text-forest-950 block">
+                      <span className="font-semibold text-forest-900 block">
                         Certifier la réception des fonds et valider le paiement
                       </span>
                       <span className="text-[11px] text-forest-800 block mt-0.5">
-                        Déclenche immédiatement l'envoi de l'Email n°3 au client et transmet l'ordre en préparation logistique.
+                        Déclenche immédiatement l'envoi de l'email de confirmation au client et transmet l'ordre en préparation logistique.
                       </span>
                     </div>
                   </label>
@@ -361,14 +367,14 @@ export default function WireReconciliationPage() {
                   <button
                     type="button"
                     onClick={() => setSelectedOrder(null)}
-                    className="px-4 py-2 border border-gray-300 rounded-xl text-gray-700 hover:bg-gray-50 font-semibold"
+                    className="btn-secondary"
                   >
                     Annuler
                   </button>
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-xl font-bold shadow transition flex items-center space-x-1.5"
+                    className="btn-primary"
                   >
                     <span>{saving ? 'Enregistrement...' : 'Enregistrer le rapprochement'}</span>
                   </button>

@@ -40,7 +40,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // Load from localStorage on mount
   useEffect(() => {
     try {
-      const stored = localStorage.getItem('allo_maison_cart');
+      const stored = localStorage.getItem('woodmachine_cart');
       if (stored) {
         setItems(JSON.parse(stored));
       }
@@ -53,7 +53,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
   // Save to localStorage
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem('allo_maison_cart', JSON.stringify(items));
+      localStorage.setItem('woodmachine_cart', JSON.stringify(items));
     }
   }, [items, isLoaded]);
 

@@ -26,3 +26,10 @@
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+/freebuff-sites-build/
+/.open-next/
+/.wrangler/
+.neon
+
+.vercel
+.env*
