@@ -66,7 +66,7 @@ export default async function AdminProductsPage() {
                         <tr key={prod.id} className="hover:bg-beige-50/50 transition">
                           <td className="py-3.5 px-4 font-semibold text-primaryText flex items-center space-x-3">
                             <img
-                              src={parsedImages[0] || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=300'}
+                              src={parsedImages[0] || undefined}
                               alt={prod.name}
                               className="w-12 h-12 object-cover rounded-lg border border-subtleBorder shrink-0"
                             />
@@ -166,7 +166,7 @@ export default async function AdminProductsPage() {
                     <tr key={prod.id} className="hover:bg-beige-50/50 transition">
                       <td className="py-3.5 px-4 font-semibold text-primaryText flex items-center space-x-3">
                         <img
-                          src={parsedImages[0] || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=300'}
+                          src={parsedImages[0] || undefined}
                           alt={prod.name}
                           className="w-12 h-12 object-cover rounded-lg border border-subtleBorder shrink-0"
                         />

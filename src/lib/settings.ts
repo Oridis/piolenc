@@ -1,5 +1,11 @@
 import { prisma } from './prisma';
 
+// In-memory cache for site settings - reduces DB queries
+// Settings are relatively static and change only via admin UI
+let siteSettingsCache: any = null;
+let cacheTimestamp = 0;
+const CACHE_TTL = 5 * 60 * 1000; // 5 minutes TTL
+
 export interface SiteSettingsData {
   id: string;
   siteName: string;
@@ -117,7 +123,7 @@ export function applySiteSettingsToText(
 ): string {
   if (!text) return '';
 
-  let result = text.replace(/\{\{\s*([\w]+)\s*\}\}/g, (match, key: string) => {
+  let result = text.replace(/\{\{\s*([\w]+)\s\}\}/g, (match, key: string) => {
     const settingKey = SETTINGS_TEXT_PLACEHOLDERS[key];
     const value = settingKey ? settings[settingKey] : undefined;
     return typeof value === 'string' ? value : match;
@@ -183,12 +189,73 @@ export function syncSettingsTextForUpdate(
   return result;
 }
 
-export async function getSiteSettings(): Promise<SiteSettingsData> {
-  try {
-    const raw = await prisma.siteSetting.findFirst();
-    if (!raw) return DEFAULT_SITE_SETTINGS;
+export async function getSiteSettings(overwriteCache = false): Promise<SiteSettingsData> {
+  // Check in-memory cache first (unless overwritten)
+  const now = Date.now();
+  if (!overwriteCache && siteSettingsCache && now - cacheTimestamp < CACHE_TTL && siteSettingsCache.id) {
+    return siteSettingsCache;
+  }
 
-    return {
+  try {
+    // Use targeted Prisma select to only fetch needed fields
+    const raw = await prisma.siteSetting.findFirst({
+      select: {
+        id: true,
+        siteName: true,
+        slogan: true,
+        logoUrl: true,
+        faviconUrl: true,
+        emailLogoUrl: true,
+        primaryColor: true,
+        secondaryColor: true,
+        accentColor: true,
+        fontFamily: true,
+        companyName: true,
+        companySiret: true,
+        companyVatNumber: true,
+        companyAddress: true,
+        companyPhone: true,
+        companyEmail: true,
+        supportHours: true,
+        deliveryZonesText: true,
+        bankName: true,
+        bankBeneficiary: true,
+        bankIban: true,
+        bankBic: true,
+        bankTransferDeadlineDays: true,
+        bankInstructions: true,
+        supportedCountries: true,
+        supportedCurrencies: true,
+        defaultCurrency: true,
+        activeLanguages: true,
+        cgvText: true,
+        privacyPolicyText: true,
+        cookiePolicyText: true,
+        legalMentionsText: true,
+        deliveryPolicyText: true,
+        seoTitle: true,
+        seoDescription: true,
+        socialLinks: true,
+        freeShippingThreshold: true,
+        emailProvider: true,
+        smtpHost: true,
+        smtpPort: true,
+        smtpUser: true,
+        smtpPassword: true,
+        smtpFrom: true,
+        adminNotificationEmail: true,
+        isPublished: true,
+        updatedAt: true,
+        createdAt: true,
+      },
+    });
+    if (!raw) {
+      siteSettingsCache = DEFAULT_SITE_SETTINGS;
+      cacheTimestamp = now;
+      return siteSettingsCache;
+    }
+
+    const result = {
       ...raw,
       siteName: raw.siteName ?? DEFAULT_SITE_SETTINGS.siteName,
       slogan: raw.slogan ?? DEFAULT_SITE_SETTINGS.slogan,
@@ -231,10 +298,387 @@ export async function getSiteSettings(): Promise<SiteSettingsData> {
       smtpPort: raw.smtpPort ?? DEFAULT_SITE_SETTINGS.smtpPort,
       smtpUser: raw.smtpUser ?? DEFAULT_SITE_SETTINGS.smtpUser,
       smtpPassword: raw.smtpPassword ?? DEFAULT_SITE_SETTINGS.smtpPassword,
+      smtpFrom: raw.smtpFrom ?? DEFAULT_SITE_SETTINGS.smtpFrom,
       adminNotificationEmail: raw.adminNotificationEmail ?? DEFAULT_SITE_SETTINGS.adminNotificationEmail,
       isPublished: raw.isPublished ?? DEFAULT_SITE_SETTINGS.isPublished,
     };
+
+    // Update cache
+    siteSettingsCache = result;
+    cacheTimestamp = now;
+    return result;
   } catch {
+    // Return cached value if available, otherwise default
+    if (siteSettingsCache && siteSettingsCache.id) return siteSettingsCache;
     return DEFAULT_SITE_SETTINGS;
   }
+}
+
+/** 
+ * Clears the in-memory site settings cache. 
+ * Should be called after admin UI updates to force a fresh DB fetch. 
+ */
+export function clearSiteSettingsCache() {
+  siteSettingsCache = null;
+  cacheTimestamp = 0;
+}
+
+/** 
+ * Invalidates the site settings cache and forces a fresh DB fetch on next call. 
+ * Also resets the cache to empty so the next getSiteSettings() call will query the DB. 
+ */
+export function invalidateSiteSettingsCache() {
+  clearSiteSettingsCache();
+  // Force refresh on next call by setting cache to empty object
+  siteSettingsCache = {} as any;
+  cacheTimestamp = 0;
+}
+
+// In-memory cache for products - reduces DB queries
+// Products are relatively static and change only via admin UI
+let productsCache: any = null;
+let productsCacheTimestamp = 0;
+const PRODUCTS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes TTL
+
+// Map Prisma Product fields to cache interface - using priceHT as the base price field
+type ProductPrismaSelect = {
+  id: string;
+  reference: string;
+  slug: string;
+  name: string;
+  shortDescription: string;
+  description: string;
+  images: string;
+  species: string;
+  woodType: string;
+  humidityRate: string;
+  calorificValue: string;
+  logLength: string;
+  unit: string;
+  priceHT: number;
+  priceTTC: number;
+  vatRate: number;
+  promoPrice?: number | null;
+  promoStartDate?: Date | null;
+  promoEndDate?: Date | null;
+  stock: number;
+  reservedStock: number;
+  weightKg: number;
+  volumeM3: number;
+  dimensions: string;
+  packaging: string;
+  isPreorderAllowed: boolean;
+  allowedCountries: string;
+  leadTimeDays: number;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  isActive: boolean;
+  categoryId: string;
+  createdAt: Date;
+  updatedAt: Date;
+};
+
+// Cache interface for products - used for rendering and text replacement
+export interface ProductCacheData {
+  id: string;
+  reference: string;
+  slug: string;
+  name: string;
+  shortDescription: string;
+  description: string | null;
+  images: string[];
+  species: string;
+  woodType: string;
+  humidityRate: string;
+  calorificValue: string;
+  logLength: string;
+  unit: string;
+  priceHT: number;
+  priceTTC: number;
+  vatRate: number;
+  promoPrice?: number | null;
+  promoStartDate?: Date | null;
+  promoEndDate?: Date | null;
+  stock: number;
+  reservedStock: number;
+  weightKg: number;
+  volumeM3: number;
+  dimensions: string;
+  packaging: string;
+  isPreorderAllowed: boolean;
+  allowedCountries: string;
+  leadTimeDays: number;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  isActive: boolean;
+  categoryId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export const DEFAULT_PRODUCT_CACHE: ProductCacheData = {
+  id: 'default-product',
+  reference: '',
+  slug: '',
+  name: '',
+  shortDescription: '',
+  description: null,
+  images: [],
+  species: '',
+  woodType: '',
+  humidityRate: '',
+  calorificValue: '',
+  logLength: '',
+  unit: '',
+  priceHT: 0,
+  priceTTC: 0,
+  vatRate: 5.5,
+  promoPrice: null,
+  promoStartDate: null,
+  promoEndDate: null,
+  stock: 0,
+  reservedStock: 0,
+  weightKg: 900.0,
+  volumeM3: 1.8,
+  dimensions: '100 x 120 x 160 cm',
+  packaging: '',
+  isPreorderAllowed: false,
+  allowedCountries: '[\"FR\",\"DE\",\"BE\",\"CH\"]',
+  leadTimeDays: 4,
+  seoTitle: null,
+  seoDescription: null,
+  isActive: false,
+  categoryId: '',
+  createdAt: new Date(),
+  updatedAt: new Date(),
+};
+
+const PRODUCTS_TEXT_PLACEHOLDERS: Record<string, keyof ProductCacheData> = {
+  name: 'name',
+  slug: 'slug',
+  price: 'priceHT',
+};
+
+export function applyProductTextToText(
+  text: string | null | undefined,
+  product: Partial<ProductCacheData>
+): string {
+  if (!text) return '';
+
+  let result = text.replace(/\{\{\s*([\w]+)\s\}\}/g, (match, key: string) => {
+    const productKey = PRODUCTS_TEXT_PLACEHOLDERS[key];
+    const value = product[productKey];
+    return typeof value === 'string' ? value : match;
+  });
+
+  return result;
+}
+
+// Extended select for getting full product data with relations
+type ProductPrismaSelectFull = {
+  id: true;
+  reference: true;
+  slug: true;
+  name: true;
+  shortDescription: true;
+  description: true;
+  images: true;
+  species: true;
+  woodType: true;
+  humidityRate: true;
+  calorificValue: true;
+  logLength: true;
+  unit: true;
+  priceHT: true;
+  priceTTC: true;
+  vatRate: true;
+  promoPrice: true;
+  promoStartDate: true;
+  promoEndDate: true;
+  stock: true;
+  reservedStock: true;
+  weightKg: true;
+  volumeM3: true;
+  dimensions: true;
+  packaging: true;
+  isPreorderAllowed: true;
+  allowedCountries: true;
+  leadTimeDays: true;
+  seoTitle: true;
+  seoDescription: true;
+  isActive: true;
+  categoryId: true;
+  createdAt: true;
+  updatedAt: true;
+};
+
+export async function getProducts(overwriteCache = false): Promise<ProductCacheData[]> {
+  // Check in-memory cache first (unless overwritten)
+  const now = Date.now();
+  if (!overwriteCache && productsCache && now - productsCacheTimestamp < PRODUCTS_CACHE_TTL && productsCache.length > 0) {
+    return productsCache;
+  }
+
+  try {
+    // Use targeted Prisma findMany to only fetch needed fields
+    const raw = await prisma.product.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        reference: true,
+        slug: true,
+        name: true,
+        shortDescription: true,
+        description: true,
+        images: true,
+        species: true,
+        woodType: true,
+        humidityRate: true,
+        calorificValue: true,
+        logLength: true,
+        unit: true,
+        priceHT: true,
+        priceTTC: true,
+        vatRate: true,
+        promoPrice: true,
+        promoStartDate: true,
+        promoEndDate: true,
+        stock: true,
+        reservedStock: true,
+        weightKg: true,
+        volumeM3: true,
+        dimensions: true,
+        packaging: true,
+        isPreorderAllowed: true,
+        allowedCountries: true,
+        leadTimeDays: true,
+        seoTitle: true,
+        seoDescription: true,
+        isActive: true,
+        categoryId: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+
+    // Transform to cache format - convert images JSON string to array
+    const transformed = raw.map(p => ({
+      ...p,
+      images: p.images ? JSON.parse(p.images) : [],
+    })) as ProductCacheData[];
+
+    // Update cache
+    productsCache = transformed;
+    productsCacheTimestamp = now;
+    return transformed;
+  } catch {
+    // Return cached value if available, otherwise empty array
+    if (productsCache && productsCache.length > 0) return productsCache;
+    return [];
+  }
+}
+
+/** 
+ * Clears the products in-memory cache. 
+ * Should be called after admin UI updates to force a fresh DB fetch. 
+ */
+export function clearProductsCache() {
+  productsCache = null;
+  productsCacheTimestamp = 0;
+}
+
+/** 
+ * Invalidates the products cache and forces a fresh DB fetch on next call. 
+ */
+export function invalidateProductsCache() {
+  clearProductsCache();
+  productsCache = [] as any[];
+  productsCacheTimestamp = 0;
+}
+
+// In-memory cache for categories - reduces DB queries
+// Categories are relatively static and change only via admin UI
+let categoriesCache: any = null;
+let categoriesCacheTimestamp = 0;
+const CATEGORIES_CACHE_TTL = 5 * 60 * 1000; // 5 minutes TTL
+
+// Map Prisma Category fields to cache interface
+type CategoryPrismaSelect = {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+  isActive: boolean;
+};
+
+export interface CategoryCacheData {
+  id: string;
+  slug: string;
+  name: string;
+  description?: string | null;
+  isActive: boolean;
+  lft?: number | null;
+  rgt?: number | null;
+}
+
+export const DEFAULT_CATEGORY_CACHE: CategoryCacheData = {
+  id: 'default-category',
+  slug: '',
+  name: '',
+  description: null,
+  isActive: false,
+  lft: null,
+  rgt: null,
+};
+
+export async function getCategories(overwriteCache = false): Promise<CategoryCacheData[]> {
+  // Check in-memory cache first (unless overwritten)
+  const now = Date.now();
+  if (!overwriteCache && categoriesCache && now - categoriesCacheTimestamp < CATEGORIES_CACHE_TTL && categoriesCache.length > 0) {
+    return categoriesCache;
+  }
+
+  try {
+    // Use targeted Prisma findMany to only fetch needed fields
+    const raw = await prisma.category.findMany({
+      where: { isActive: true },
+      select: {
+        id: true,
+        slug: true,
+        name: true,
+        description: true,
+        isActive: true,
+        displayOrder: true,
+      },
+    });
+
+    // Update cache
+    categoriesCache = raw as CategoryCacheData[];
+
+    // Update cache
+    categoriesCacheTimestamp = now;
+    return raw;
+  } catch {
+    // Return cached value if available, otherwise empty array
+    if (categoriesCache && categoriesCache.length > 0) return categoriesCache;
+    return [];
+  }
+}
+
+/** 
+ * Clears the categories in-memory cache. 
+ * Should be called after admin UI updates to force a fresh DB fetch. 
+ */
+export function clearCategoriesCache() {
+  categoriesCache = null;
+  categoriesCacheTimestamp = 0;
+}
+
+/** 
+ * Invalidates the categories cache and forces a fresh DB fetch on next call. 
+ */
+export function invalidateCategoriesCache() {
+  clearCategoriesCache();
+  categoriesCache = [] as any[];
+  categoriesCacheTimestamp = 0;
 }

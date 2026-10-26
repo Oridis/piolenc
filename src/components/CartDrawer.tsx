@@ -95,7 +95,7 @@ export default function CartDrawer() {
                 >
                   <div className="w-20 h-20 min-w-[5rem] max-w-[5rem] min-h-[5rem] max-h-[5rem] rounded-lg overflow-hidden border border-subtleBorder bg-ivory shrink-0">
                     <img
-                      src={item.imageUrl || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=300'}
+                      src={item.imageUrl || undefined}
                       alt={item.name}
                       className="w-full h-full object-cover"
                     />

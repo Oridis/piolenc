@@ -59,41 +59,35 @@ npm install
 ```
 
 ### 3. Configurer l'environnement
-Copiez `.env.example` vers `.env` (déjà initialisé pour SQLite local) :
+Copiez `.env.example` vers `.env`, puis renseignez `DATABASE_URL` avec une URL **PostgreSQL** (`prisma/schema.prisma` utilise `provider = "postgresql"`) :
 ```bash
 cp .env.example .env
 ```
 
 ### 4. Initialiser la base de données & les données de démonstration
 
-**Important** : Vérifiez que `DATABASE_URL` dans `.env` pointe vers la bonne base de données. Par défaut, il doit être `file:./prisma/dev3.db` (base avec migrations et données.seed).
+**Important** : `DATABASE_URL` doit pointer vers la base PostgreSQL cible (Neon, Supabase, serveur local...). Ce projet n'utilise aucune base SQLite.
 
-Si la base est vide ou si vous démarrez une nouvelle installation :
+Pour une base vide, appliquez la migration versionnée puis le seed :
 ```bash
-# Réinitialiser et recréer la base avec toutes les migrations
-npx prisma migrate reset --force
-npx prisma db push
+# Applique prisma/migrations et crée le schéma complet
+npx prisma migrate deploy
 
-# Réinitialiser les données de démonstration
+# Données de démonstration
 npm run db:seed
 ```
 
-### 4bis. Alternative : procédure d'initialisation complète (recommandée)
+Vérifier l'état du schéma et de l'historique de migration :
 ```bash
-# Cette procédure réinitialise la base et réapplique seed
+npx prisma migrate status
+```
+
+### 4bis. Alternative : procédure d'initialisation complète (destructive)
+```bash
+# ⚠️ Supprime TOUTES les données de la base ciblée, puis réapplique migration + seed
 npm run db:init
 ```
-
-### 4ter. Sauvegarde de la base de données SQLite
-```bash
-# Créer une copie de sauvegarde de la base de données
-copy prisma\dev3.db prisma\dev3.db.backup
-
-# Restaurer depuis une sauvegarde
-copy prisma\dev3.db.backup prisma\dev3.db
-npx prisma migrate reset --force
-npm run db:seed
-```
+Toute sauvegarde/restauration se fait au niveau du serveur PostgreSQL (snapshot du fournisseur, `pg_dump`/`pg_restore`) : il n'y a pas de fichier de base locale à copier.
 
 ### 5. Lancer le serveur de développement
 ```bash

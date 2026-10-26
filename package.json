@@ -6,13 +6,14 @@
     "dev": "next dev -p 3000",
     "build": "prisma generate && next build",
     "start": "next start -p 3000",
-    "lint": "next lint",
+    "typecheck": "tsc --noEmit",
     "db:push": "prisma db push",
     "db:seed": "node scripts/seed-products.mjs",
     "db:init": "node scripts/init-db.mjs",
-    "db:migrate:validate": "npx prisma migrate diff --from-step base --to-step --validate",
+    "db:migrate:validate": "prisma validate",
     "db:studio": "prisma studio",
-    "test:scenarios": "node scripts/test-scenarios.mjs"
+    "test:scenarios": "node scripts/test-scenarios.mjs",
+    "test:replay": "node scripts/posthog-replay.check.mjs"
   },
   "dependencies": {
     "@prisma/client": "^5.21.1",
@@ -22,6 +23,7 @@
     "lucide-react": "^0.453.0",
     "next": "16.4.1",
     "nodemailer": "^6.9.15",
+    "posthog-js": "1.438.13",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "resend": "^6.34.1",

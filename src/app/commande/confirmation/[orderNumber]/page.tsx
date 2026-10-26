@@ -10,14 +10,16 @@ import ConfirmationClientView from './ConfirmationClientView';
 
 export const dynamic = 'force-dynamic';
 
+
 export default async function OrderConfirmationPage({
   params,
 }: {
-  params: { orderNumber: string };
+  params: Promise<{ orderNumber: string }>;
 }) {
+  const { orderNumber } = await params;
   const settings = await getSiteSettings();
   const order = await prisma.order.findUnique({
-    where: { orderNumber: params.orderNumber },
+    where: { orderNumber },
     include: {
       items: true,
       deliveryShipment: { include: { carrier: true } },

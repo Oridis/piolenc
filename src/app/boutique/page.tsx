@@ -9,20 +9,22 @@ import { Filter, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
 
+
 export default async function ShopPage({
   searchParams,
 }: {
-  searchParams: { categorie?: string; longueur?: string };
+  searchParams: Promise<{ categorie?: string; longueur?: string }>;
 }) {
+  const { categorie, longueur } = await searchParams;
   const settings = await getSiteSettings();
   const categories = await prisma.category.findMany();
 
   const whereCondition: any = { isActive: true };
-  if (searchParams.categorie) {
-    whereCondition.category = { slug: searchParams.categorie };
+  if (categorie) {
+    whereCondition.category = { slug: categorie };
   }
-  if (searchParams.longueur) {
-    whereCondition.logLength = { contains: searchParams.longueur };
+  if (longueur) {
+    whereCondition.logLength = { contains: longueur };
   }
 
   const products = await prisma.product.findMany({
@@ -67,7 +69,7 @@ export default async function ShopPage({
                 <Link
                   href="/boutique"
                   className={`block px-3 py-1.5 rounded-md transition-colors ${
-                    !searchParams.categorie
+                    !categorie
                       ? 'bg-forest text-white font-medium'
                       : 'text-secondaryText hover:text-primaryText hover:bg-ivory'
                   }`}
@@ -79,7 +81,7 @@ export default async function ShopPage({
                     key={c.id}
                     href={`/boutique?categorie=${c.slug}`}
                     className={`block px-3 py-1.5 rounded-md transition-colors ${
-                      searchParams.categorie === c.slug
+                      categorie === c.slug
                         ? 'bg-forest text-white font-medium'
                         : 'text-secondaryText hover:text-primaryText hover:bg-ivory'
                     }`}
@@ -99,7 +101,7 @@ export default async function ShopPage({
                     key={len}
                     href={`/boutique?longueur=${len.split(' ')[0]}`}
                     className={`block px-3 py-1.5 rounded-md transition-colors ${
-                      searchParams.longueur === len.split(' ')[0]
+                      longueur === len.split(' ')[0]
                         ? 'bg-forest text-white font-medium'
                         : 'text-secondaryText hover:text-primaryText hover:bg-ivory'
                     }`}
@@ -135,7 +137,7 @@ export default async function ShopPage({
                 {products.map((prod) => {
                   let parsedImages: string[] = [];
                   try {
-                    parsedImages = JSON.parse(prod.images);
+                    parsedImages = typeof prod.images === 'string' ? JSON.parse(prod.images) : prod.images;
                   } catch {
                     parsedImages = [];
                   }
@@ -148,7 +150,7 @@ export default async function ShopPage({
                       <div>
                         <div className="relative h-48 overflow-hidden bg-ivory">
                           <img
-                            src={parsedImages[0] || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600'}
+                            src={parsedImages[0] || undefined}
                             alt={prod.name}
                             className="w-full h-full object-cover"
                           />

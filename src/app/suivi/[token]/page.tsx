@@ -13,17 +13,21 @@ import {
   ExternalLink,
 } from 'lucide-react';
 
+
 export default function PublicTrackingPage({
   params,
 }: {
-  params: { token: string };
+  params: Promise<{ token: string }>;
 }) {
+  // Next.js 15+ hands route params to pages as a promise, including
+  // client components, so it has to be unwrapped with `use()`.
+  const { token } = React.use(params);
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    fetch(`/api/tracking/${params.token}`)
+    fetch(`/api/tracking/${token}`)
       .then(async (res) => {
         if (!res.ok) {
           const err = await res.json();
@@ -39,7 +43,7 @@ export default function PublicTrackingPage({
         setError(err.message);
         setLoading(false);
       });
-  }, [params.token]);
+  }, [token]);
 
   if (loading) {
     return (

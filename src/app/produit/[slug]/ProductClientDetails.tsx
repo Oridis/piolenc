@@ -32,7 +32,7 @@ export default function ProductClientDetails({
   try {
     images = JSON.parse(product.images);
   } catch {
-    images = ['https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=800'];
+    images = [];
   }
   const [activeImage, setActiveImage] = useState(images[0] || '');
 

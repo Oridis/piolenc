@@ -115,7 +115,7 @@ export default function CartPage() {
                     <div className="flex items-center space-x-3.5 min-w-0">
                       <div className="w-16 h-16 sm:w-20 sm:h-20 min-w-[4rem] sm:min-w-[5rem] max-w-[5rem] rounded-md overflow-hidden border border-subtleBorder bg-ivory shrink-0">
                         <img
-                          src={item.imageUrl || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=300'}
+                          src={item.imageUrl || undefined}
                           alt={item.name}
                           className="w-full h-full object-cover"
                         />

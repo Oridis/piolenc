@@ -1,0 +1,12 @@
+{
+  "env": {
+    "NEXTAUTH_URL": "https://piolencboisdirect.com",
+    "NEXT_PUBLIC_APP_URL": "https://piolencboisdirect.com",
+    "EMAIL_PROVIDER": "resend",
+    "SMTP_HOST": "smtp.resend.com",
+    "SMTP_PORT": "587",
+    "SMTP_USER": "contact@piolencboisdirect.fr",
+    "SMTP_FROM": "piolencboisdirect Bois <contact@piolencboisdirect.fr>",
+    "ADMIN_NOTIFICATION_EMAIL": "admin@piolencboisdirect.fr"
+  }
+}

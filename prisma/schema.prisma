@@ -95,7 +95,8 @@ model SiteSetting {
   bankIban                  String   @default("FR76 3000 4012 3400 0123 4567 890")
   bankBic                   String   @default("BNPAFRPP")
   bankTransferDeadlineDays  Int      @default(5)
-  bankInstructions          String   @default("Veuillez indiquer impérativement votre référence de commande dans le libellé de votre virement bancaire pour un traitement sous 24h ouvrées.")
+  bankInstructions          String?
+  deliveryZonesText         String?
   
   // Countries and markets (JSON strings)
   supportedCountries        String   @default("[\"FR\",\"DE\",\"BE\",\"CH\"]")
@@ -104,15 +105,15 @@ model SiteSetting {
   activeLanguages           String   @default("[\"fr\",\"de\",\"nl\"]")
   
   // Legal text defaults
-  cgvText                   String   @default("Conditions Générales de Vente d'Allo Maison...")
-  privacyPolicyText         String   @default("Politique de protection des données personnelles RGPD...")
-  cookiePolicyText          String   @default("Politique de gestion des cookies...")
-  legalMentionsText         String   @default("Mentions légales et informations éditeur...")
-  deliveryPolicyText        String   @default("Modalités de transport et conditions d'accès camion...")
+  cgvText                   String
+  privacyPolicyText         String
+  cookiePolicyText          String
+  legalMentionsText         String
+  deliveryPolicyText        String
   
   // SEO
-  seoTitle                  String   @default("Allo Maison | Bois de chauffage sec, étuvé et certifié livré chez vous")
-  seoDescription            String   @default("Achetez votre bois de chauffage de haute performance : chêne, hêtre, charme séché en étuve <20%. Livraison par camion avec hayon et transpalette tout terrain.")
+  seoTitle                  String
+  seoDescription            String
   socialLinks               String   @default("{\"facebook\":\"https://facebook.com/allomaison\",\"instagram\":\"https://instagram.com/allomaison\"}")
   
   // Free shipping threshold

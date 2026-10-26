@@ -13,7 +13,7 @@ export interface CartItem {
   priceHT: number;
   priceTTC: number;
   quantity: number;
-  imageUrl: string;
+  imageUrl?: string;
   weightKg: number;
 }
 
@@ -67,7 +67,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
       try {
         parsedImages = typeof product.images === 'string' ? JSON.parse(product.images) : product.images;
       } catch {
-        parsedImages = ['/images/chene-33.jpg'];
+        parsedImages = product.images ? (Array.isArray(product.images) ? product.images : [product.images]) : [];
       }
 
       if (existing) {
@@ -91,7 +91,7 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           priceHT: effectivePriceHT,
           priceTTC: effectivePriceTTC,
           quantity,
-          imageUrl: parsedImages?.[0] || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&auto=format&fit=crop&q=80',
+          imageUrl: parsedImages?.[0] || undefined,
           weightKg: product.weightKg || 900,
         },
       ];

@@ -4,19 +4,20 @@ import { prisma } from '@/lib/prisma';
 import { getSiteSettings } from '@/lib/settings';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import TrustBadges from '@/components/TrustBadges';
 import ProductClientDetails from './ProductClientDetails';
 
 export const dynamic = 'force-dynamic';
 
+
 export default async function ProductDetailPage({
   params,
 }: {
-  params: { slug: string };
+  params: Promise<{ slug: string }>;
 }) {
+  const { slug } = await params;
   const settings = await getSiteSettings();
   const product = await prisma.product.findUnique({
-    where: { slug: params.slug },
+    where: { slug },
     include: {
       category: true,
       variants: true,

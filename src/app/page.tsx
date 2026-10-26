@@ -38,9 +38,9 @@ export default async function HomePage() {
 
   return (
     <>
-      <Navbar siteName={settings.siteName} phone={settings.companyPhone} slogan={settings.slogan} />
+      <a href="#main" className="sr-only focus:not-sr-only focus-outline">Skip to main content</a>
 
-      <main className="flex-1 font-sans bg-ivory">
+      <main id="main" className="flex-1 font-sans bg-ivory">
         {/* SECTION 1: HERO PRINCIPAL EDITORIAL */}
         <section className="bg-white border-b border-subtleBorder py-12 lg:py-20">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -100,7 +100,7 @@ export default async function HomePage() {
               <div className="lg:col-span-5">
                 <div className="relative rounded-xl overflow-hidden border border-subtleBorder bg-ivory shadow-subtle">
                   <img
-                    src="https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=900&auto=format&fit=crop&q=80"
+                    src=""
                     alt="Palette de bois de chauffage fendu et empilé proprement"
                     className="w-full h-80 sm:h-96 object-cover"
                   />
@@ -146,8 +146,8 @@ export default async function HomePage() {
               >
                 <div className="h-44 overflow-hidden bg-ivory">
                   <img
-                    src={cat.imageUrl || 'https://images.unsplash.com/photo-1520114878144-6123749968dd?w=600&auto=format&fit=crop&q=80'}
-                    alt={cat.name}
+                    src={cat.imageUrl || undefined}
+                    alt={`Catégorie : ${cat.name}`}
                     className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-200"
                   />
                 </div>
@@ -194,8 +194,15 @@ export default async function HomePage() {
             {/* 4-column desktop / 2-column mobile grid */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {products.map((prod) => {
-                const images = prod.images ? JSON.parse(prod.images) : [];
-                const mainImg = images[0] || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600&auto=format&fit=crop&q=80';
+                let images: string[] = [];
+                if (prod.images) {
+                  try {
+                    images = typeof prod.images === 'string' ? JSON.parse(prod.images) : prod.images;
+                  } catch {
+                    images = [];
+                  }
+                }
+                const mainImg = images[0] || undefined;
 
                 return (
                   <div
@@ -207,7 +214,7 @@ export default async function HomePage() {
                       <Link href={`/produit/${prod.slug}`} className="block relative h-48 bg-ivory overflow-hidden">
                         <img
                           src={mainImg}
-                          alt={prod.name}
+                          alt={`Bûches de ${prod.species} - ${prod.name}`}
                           className="w-full h-full object-cover"
                         />
                         <span className="absolute top-2.5 left-2.5 badge-neutral bg-white/90 backdrop-blur-sm text-[10px]">

@@ -3,25 +3,34 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Cookie } from 'lucide-react';
+import {
+  CONSENT_CHANGE_EVENT,
+  CONSENT_STORAGE_KEY,
+} from '@/lib/posthog-replay.mjs';
 
 export default function CookieBanner() {
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    const consent = localStorage.getItem('woodmachine_cookie_consent');
+    const consent = localStorage.getItem(CONSENT_STORAGE_KEY);
     if (!consent) {
       setIsVisible(true);
     }
   }, []);
 
-  const handleAcceptAll = () => {
-    localStorage.setItem('woodmachine_cookie_consent', 'accepted_all');
+  const storeConsent = (value: string) => {
+    localStorage.setItem(CONSENT_STORAGE_KEY, value);
+    // Lets the replay controller start or stop without a page reload.
+    window.dispatchEvent(new Event(CONSENT_CHANGE_EVENT));
     setIsVisible(false);
   };
 
+  const handleAcceptAll = () => {
+    storeConsent('accepted_all');
+  };
+
   const handleRefuseNonEssential = () => {
-    localStorage.setItem('woodmachine_cookie_consent', 'refused_marketing');
-    setIsVisible(false);
+    storeConsent('refused_marketing');
   };
 
   if (!isVisible) return null;

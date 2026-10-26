@@ -40,7 +40,7 @@ export default async function CategoriesPage() {
             >
               <div className="sm:w-1/2 h-48 sm:h-auto relative overflow-hidden bg-ivory">
                 <img
-                  src={c.imageUrl || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600'}
+                  src={c.imageUrl || undefined}
                   alt={c.name}
                   className="w-full h-full object-cover"
                 />

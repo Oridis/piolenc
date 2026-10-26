@@ -17,8 +17,13 @@
 .DS_Store
 *.pem
 
-# Local env files
-.env*.local
+# Local env files (the .env.example template stays tracked)
+.env
+.env.local
+.env.*.local
+.env.production
+.env.development
+!.env.example
 
 # Vercel
 .vercel
@@ -31,5 +36,11 @@ next-env.d.ts
 /.wrangler/
 .neon
 
-.vercel
-.env*
+# Local tooling leftovers
+*.log
+
+# Freebuff Desktop : métadonnées applicatives et runtime local (jamais du code projet)
+/.freebuff/
+
+# Échafaudages générés par Freebuff Sites, régénérables
+/freebuff-realtime/

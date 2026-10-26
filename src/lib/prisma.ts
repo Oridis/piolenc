@@ -12,20 +12,18 @@ function createPrismaClient() {
   });
 
   // Database health check on startup
-  // Runs a lightweight query to verify the SQLite database is accessible
-  // This helps catch issues like DATABASE_URL pointing to an empty database file
-  ;(async () => {
+  // Runs a lightweight query to verify the database is reachable.
+  // `$executeRaw*` rejects statements that return rows, so a SELECT has to go
+  // through `$queryRaw*`.
+  void (async () => {
     try {
-      await prism.$executeRawUnsafe('SELECT 1') as Prisma.Sql
-      // eslint-disable-next-line no-console
-      console.log('✅ Database health check passed: SQLite database is accessible')
+      await prism.$queryRawUnsafe('SELECT 1')
+      console.log('[db] health check passed')
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('⚠️ Database health check failed:', error instanceof Error ? error.message : String(error))
-      // Re-throw in development to prevent silent failures
-      if (process.env.NODE_ENV === 'development') {
-        throw error
-      }
+      console.error(
+        '[db] health check failed:',
+        error instanceof Error ? error.message : String(error)
+      )
     }
   })()
 

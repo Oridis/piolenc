@@ -41,7 +41,7 @@ export default async function CatalogPage() {
           {products.map((prod) => {
             let parsedImages: string[] = [];
             try {
-              parsedImages = JSON.parse(prod.images);
+              parsedImages = typeof prod.images === 'string' ? JSON.parse(prod.images) : prod.images;
             } catch {
               parsedImages = [];
             }
@@ -54,7 +54,7 @@ export default async function CatalogPage() {
                 <div>
                   <div className="relative h-52 overflow-hidden bg-ivory">
                     <img
-                      src={parsedImages[0] || 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=600'}
+                      src={parsedImages[0] || undefined}
                       alt={prod.name}
                       className="w-full h-full object-cover"
                     />

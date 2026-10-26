@@ -3,7 +3,24 @@ import jwt from 'jsonwebtoken';
 import { cookies } from 'next/headers';
 import { prisma } from './prisma';
 
-const JWT_SECRET = process.env.NEXTAUTH_SECRET || 'woodmachine_production_secure_jwt_secret_firewood_2026_xyz';
+/**
+ * Signing secret. The development fallback is only usable outside production:
+ * verifying or signing with a well-known default would let anyone mint an admin
+ * token, so a production deployment without NEXTAUTH_SECRET fails closed.
+ */
+const DEV_FALLBACK_SECRET = 'dev-only-insecure-jwt-secret';
+const configuredSecret = process.env.NEXTAUTH_SECRET;
+
+function resolveSecret(): string | null {
+  if (configuredSecret) return configuredSecret;
+  if (process.env.NODE_ENV === 'production') {
+    console.error(
+      '[auth] NEXTAUTH_SECRET is not set; refusing to sign or verify session tokens.'
+    );
+    return null;
+  }
+  return DEV_FALLBACK_SECRET;
+}
 
 export interface TokenPayload {
   userId: string;
@@ -22,12 +39,18 @@ export async function verifyPassword(plainText: string, hashed: string): Promise
 }
 
 export function generateToken(payload: TokenPayload): string {
-  return jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' });
+  const secret = resolveSecret();
+  if (!secret) {
+    throw new Error('NEXTAUTH_SECRET is required to issue session tokens');
+  }
+  return jwt.sign(payload, secret, { expiresIn: '7d' });
 }
 
 export function verifyToken(token: string): TokenPayload | null {
+  const secret = resolveSecret();
+  if (!secret) return null;
   try {
-    return jwt.verify(token, JWT_SECRET) as TokenPayload;
+    return jwt.verify(token, secret) as TokenPayload;
   } catch {
     return null;
   }
