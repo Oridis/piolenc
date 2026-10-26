@@ -133,10 +133,13 @@ Résultats testés :
 
 | Rôle | Email | Mot de passe | Accès |
 |---|---|---|---|
-| **Super Administrateur** | `admin@allomaison-bois.fr` | `AdminAlloMaison2026!` | [http://localhost:3000/admin](http://localhost:3000/admin) |
-| **Comptable (Virements)** | `compta@allomaison-bois.fr` | `AdminAlloMaison2026!` | [http://localhost:3000/admin/virements](http://localhost:3000/admin/virements) |
-| **Logistique (Transport)**| `logistique@allomaison-bois.fr` | `AdminAlloMaison2026!` | [http://localhost:3000/admin/livraisons](http://localhost:3000/admin/livraisons) |
-| **Client Démo (Jean Dupont)**| `jean.dupont@example.com` | `Client2026!` | [http://localhost:3000/mon-compte](http://localhost:3000/mon-compte) |
+| **Super Administrateur** | `admin@woodmachine-bois.fr` | `Password123!` | [http://localhost:3000/admin](http://localhost:3000/admin) |
+| **Comptable (Virements)** | `compta@woodmachine-bois.fr` | `Password123!` | [http://localhost:3000/admin/virements](http://localhost:3000/admin/virements) |
+| **Logistique (Transport)**| `logistique@woodmachine-bois.fr` | `Password123!` | [http://localhost:3000/admin/livraisons](http://localhost:3000/admin/livraisons) |
+| **Client Démo (Jean Dupont)**| `jean.dupont@example.com` | `Password123!` | [http://localhost:3000/mon-compte](http://localhost:3000/mon-compte) |
+
+Ces comptes sont créés par `npm run db:seed:accounts` (les emails et mots de passe correspondent exactement aux boutons d'accès rapide de la page de connexion).
+**Ils doivent être remplacés par de vrais comptes munis de mots de passe uniques avant toute mise en production.**
 
 *Astuce : Sur la page de connexion ([/connexion](http://localhost:3000/connexion)), des boutons d'accès rapide 1-clic remplissent et soumettent automatiquement ces identifiants.*
 

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/lib/pricing';
+import { PLACEHOLDER_IMAGE } from '@/lib/images';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import {
@@ -115,16 +116,18 @@ export default function CartPage() {
                     <div className="flex items-center space-x-3.5 min-w-0">
                       <div className="w-16 h-16 sm:w-20 sm:h-20 min-w-[4rem] sm:min-w-[5rem] max-w-[5rem] rounded-md overflow-hidden border border-subtleBorder bg-ivory shrink-0">
                         <img
-                          src={item.imageUrl || undefined}
+                          src={item.imageUrl || PLACEHOLDER_IMAGE}
                           alt={item.name}
                           className="w-full h-full object-cover"
                         />
                       </div>
                       <div className="min-w-0">
                         <h3 className="font-poppins font-medium text-sm text-primaryText truncate">{item.name}</h3>
-                        <p className="text-xs text-secondaryText mt-0.5">
-                          Format : {item.logLength} · {item.packaging}
-                        </p>
+                        {[item.logLength, item.packaging].filter(Boolean).length > 0 && (
+                          <p className="text-xs text-secondaryText mt-0.5">
+                            Format : {[item.logLength, item.packaging].filter(Boolean).join(' · ')}
+                          </p>
+                        )}
                         <p className="text-xs font-semibold text-forest mt-1">
                           {formatPrice(item.priceTTC)} TTC / unité
                         </p>

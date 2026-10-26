@@ -16,10 +16,14 @@ export default async function OrderConfirmationPage({
 }: {
   params: Promise<{ orderNumber: string }>;
 }) {
-  const { orderNumber } = await params;
+  // Le segment d'URL porte le jeton non devinable de la commande (`secureToken`),
+  // pas le numéro de commande : celui-ci est court et énumérable, et cette page
+  // affiche le nom, l'email et l'adresse du client. Le nom du dossier est
+  // historique, le paramètre qu'il reçoit est bien le jeton.
+  const { orderNumber: secureToken } = await params;
   const settings = await getSiteSettings();
   const order = await prisma.order.findUnique({
-    where: { orderNumber },
+    where: { secureToken },
     include: {
       items: true,
       deliveryShipment: { include: { carrier: true } },

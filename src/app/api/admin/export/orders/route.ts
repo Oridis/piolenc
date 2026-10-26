@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getCurrentUser } from '@/lib/auth';
+import { getAdminUser } from '@/lib/auth';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const user = await getCurrentUser();
-  if (user && user.role === 'CUSTOMER') {
-    return NextResponse.json({ error: 'Accès interdit' }, { status: 403 });
+  const user = await getAdminUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Accès interdit : session administrateur requise' }, { status: 401 });
   }
 
   try {

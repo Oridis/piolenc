@@ -5,6 +5,7 @@ import { getSiteSettings } from '@/lib/settings';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { formatPrice } from '@/lib/pricing';
+import { PLACEHOLDER_IMAGE } from '@/lib/images';
 import { Filter, ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -150,13 +151,17 @@ export default async function ShopPage({
                       <div>
                         <div className="relative h-48 overflow-hidden bg-ivory">
                           <img
-                            src={parsedImages[0] || undefined}
+                            src={parsedImages[0] || PLACEHOLDER_IMAGE}
                             alt={prod.name}
                             className="w-full h-full object-cover"
+                            loading="lazy"
+                            decoding="async"
                           />
-                          <div className="absolute top-2.5 left-2.5 badge-neutral bg-white/90 backdrop-blur-sm text-[10px]">
-                            {prod.humidityRate}
-                          </div>
+                          {prod.humidityRate ? (
+                            <div className="absolute top-2.5 left-2.5 badge-neutral bg-white/90 backdrop-blur-sm text-[10px]">
+                              {prod.humidityRate}
+                            </div>
+                          ) : null}
                           {prod.promoPrice && (
                             <div className="absolute top-2.5 right-2.5 badge-warning bg-amber-100 text-amber-900 border-amber-300 text-[10px]">
                               Offre spéciale
@@ -166,7 +171,7 @@ export default async function ShopPage({
 
                         <div className="p-4 space-y-2">
                           <span className="text-[10px] font-medium uppercase tracking-wider text-secondaryText">
-                            {prod.species} · {prod.logLength}
+                            {[prod.species, prod.logLength].filter(Boolean).join(' · ')}
                           </span>
                           <Link href={`/produit/${prod.slug}`}>
                             <h3 className="font-poppins font-medium text-sm text-primaryText hover:text-forest transition-colors line-clamp-2 leading-snug">

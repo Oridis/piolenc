@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 64" role="img" aria-label="Piolenc Bois Direct">
+  <defs>
+    <linearGradient id="flame" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ea580c"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+  </defs>
+  <!-- Bûche / palet stylisé -->
+  <rect x="4" y="34" width="40" height="9" rx="4.5" fill="#7c4a2d"/>
+  <rect x="10" y="25" width="40" height="9" rx="4.5" fill="#14532d"/>
+  <rect x="4" y="16" width="40" height="9" rx="4.5" fill="#7c4a2d"/>
+  <!-- Flamme -->
+  <path d="M26 8c6 7 9 10 9 15a9 9 0 0 1-18 0c0-5 3-8 9-15Z" fill="url(#flame)"/>
+  <!-- Texte -->
+  <text x="56" y="30" font-family="Poppins, Segoe UI, Helvetica, Arial, sans-serif" font-size="19" font-weight="600" fill="#14532d">Piolenc</text>
+  <text x="56" y="50" font-family="Poppins, Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="500" fill="#7c4a2d" letter-spacing="0.5">Bois Direct</text>
+</svg>

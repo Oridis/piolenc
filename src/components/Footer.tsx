@@ -75,7 +75,12 @@ export default function Footer({ settings }: FooterProps) {
             ) : (
               <Flame className="w-6 h-6 text-beige shrink-0 fill-beige/20" />
             )}
-            <span className="font-poppins font-semibold text-lg text-white tracking-tight">{siteName}</span>
+            {/* Le nom n'est affiché à côté du logo que si l'admin le demande.
+                Réglage propre au pied de page (showSiteNameFooter) : on peut
+                garder le logo seul en haut et le texte en bas, ou l'inverse. */}
+            {(!settings?.logoUrl || settings?.showSiteNameFooter !== false) && (
+              <span className="font-poppins font-semibold text-lg text-white tracking-tight">{siteName}</span>
+            )}
           </Link>
           <p className="text-xs text-ivory/80 leading-relaxed max-w-sm">
             {siteName} est spécialisé dans l&apos;approvisionnement et la livraison à domicile de bois de chauffage haute performance et biocombustibles issus de massifs forestiers durables.

@@ -1,0 +1,558 @@
+{
+  "updatedAt": "2026-10-26T15:31:00.760Z",
+  "method": "extraction JSON-LD / microdata / Open Graph",
+  "products": [
+    {
+      "sourceUrl": "https://www.piskorski-bois-energie.fr/bois-de-chauffage-et-bois-buches/61-285-palette-de-2-steres-de-bois-de-chauffage.html",
+      "shop": "www.piskorski-bois-energie.fr",
+      "title": "Palette de 2st de bois de chauffage sec séchoirs - prêt à l'emploi - mélange feuillus",
+      "price": 290,
+      "currency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "extraction": "json-ld",
+      "scrapedAt": "2026-10-26T15:29:56.665Z",
+      "images": [
+        {
+          "file": "/images/products/real/palette-de-2st-de-bois-de-chauffage-sec-sechoirs-pret-a-l-emploi-melange-feuillu-1.webp",
+          "sourceUrl": "https://www.piskorski-bois-energie.fr/655-large_default/palette-de-2-steres-de-bois-de-chauffage.jpg"
+        },
+        {
+          "file": "/images/products/real/palette-de-2st-de-bois-de-chauffage-sec-sechoirs-pret-a-l-emploi-melange-feuillu-2.webp",
+          "sourceUrl": "https://www.piskorski-bois-energie.fr/modules/lf_psk_homereassurance/img/2f692bb6d593b9745236ff4dba4c95c1.png"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://www.piskorski-bois-energie.fr/bois-pour-four-a-bois/165-bois-de-chauffage-bois-de-chauffage-special-pizzerian-sec-n-palette-de-1st-450561839274.html",
+      "shop": "www.piskorski-bois-energie.fr",
+      "title": "Palette de 1st de bois de chauffage pizzeria - sec séchoirs - prêt à l'emploi - mélange feuillus",
+      "price": 185,
+      "currency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "extraction": "json-ld",
+      "scrapedAt": "2026-10-26T15:29:58.901Z",
+      "images": [
+        {
+          "file": "/images/products/real/palette-de-1st-de-bois-de-chauffage-pizzeria-sec-sechoirs-pret-a-l-emploi-melang-1.webp",
+          "sourceUrl": "https://www.piskorski-bois-energie.fr/491-large_default/bois-de-chauffage-bois-de-chauffage-special-pizzerian-sec-n-palette-de-1st.jpg"
+        },
+        {
+          "file": "/images/products/real/palette-de-1st-de-bois-de-chauffage-pizzeria-sec-sechoirs-pret-a-l-emploi-melang-2.webp",
+          "sourceUrl": "https://www.piskorski-bois-energie.fr/modules/lf_psk_homereassurance/img/2f692bb6d593b9745236ff4dba4c95c1.png"
+        },
+        {
+          "file": "/images/products/real/palette-de-1st-de-bois-de-chauffage-pizzeria-sec-sechoirs-pret-a-l-emploi-melang-3.webp",
+          "sourceUrl": "https://www.piskorski-bois-energie.fr/684-large_default/filet-de-bois-allume-feu.jpg"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://www.gardbois.fr/boutique/palette-de-buches-seches-14-steres-33cm/",
+      "shop": "www.gardbois.fr",
+      "title": "Palette de bûches sèches - 1,4 stère - 33cm",
+      "price": 179,
+      "currency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "extraction": "json-ld",
+      "scrapedAt": "2026-10-26T15:30:01.618Z",
+      "images": [
+        {
+          "file": "/images/products/real/palette-de-buches-seches-1-4-stere-33cm-1.webp",
+          "sourceUrl": "https://www.gardbois.fr/wp-content/uploads/2023/11/bois-chauffage-33cm-2.jpg"
+        },
+        {
+          "file": "/images/products/real/palette-de-buches-seches-1-4-stere-33cm-2.webp",
+          "sourceUrl": "https://www.gardbois.fr/wp-content/uploads/2023/11/bois-chauffage-33cm-e1767643197597.jpg"
+        },
+        {
+          "file": "/images/products/real/palette-de-buches-seches-1-4-stere-33cm-3.webp",
+          "sourceUrl": "https://www.gardbois.fr/wp-content/uploads/2021/10/buches-seches-2.jpg"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://www.gardbois.fr/boutique/palette-de-buches-seches-2-stere-33cm/",
+      "shop": "www.gardbois.fr",
+      "title": "Palette de bûches sèches - 2 stères - 33cm",
+      "price": 260,
+      "currency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "extraction": "json-ld",
+      "scrapedAt": "2026-10-26T15:30:03.684Z",
+      "images": [
+        {
+          "file": "/images/products/real/palette-de-buches-seches-2-steres-33cm-1.webp",
+          "sourceUrl": "https://www.gardbois.fr/wp-content/uploads/2023/11/bois-chauffage-33cm-e1767643197597.jpg"
+        },
+        {
+          "file": "/images/products/real/palette-de-buches-seches-2-steres-33cm-2.webp",
+          "sourceUrl": "https://www.gardbois.fr/wp-content/uploads/2021/10/buches-seches-2.jpg"
+        },
+        {
+          "file": "/images/products/real/palette-de-buches-seches-2-steres-33cm-3.webp",
+          "sourceUrl": "https://www.gardbois.fr/wp-content/uploads/2023/11/bois-chauffage-33cm-2.jpg"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://www.gardbois.fr/boutique/palette-de-84-cartons-de-6-buches-jour/",
+      "shop": "www.gardbois.fr",
+      "title": "Bûches de jour - Palette de 84 cartons",
+      "price": 380,
+      "currency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "extraction": "json-ld",
+      "scrapedAt": "2026-10-26T15:30:04.956Z",
+      "images": [
+        {
+          "file": "/images/products/real/buches-de-jour-palette-de-84-cartons-1.webp",
+          "sourceUrl": "https://www.gardbois.fr/wp-content/uploads/2021/09/boutique.jpg"
+        },
+        {
+          "file": "/images/products/real/buches-de-jour-palette-de-84-cartons-2.webp",
+          "sourceUrl": "https://www.gardbois.fr/wp-content/uploads/2021/09/buche-de-jour2.jpg"
+        },
+        {
+          "file": "/images/products/real/buches-de-jour-palette-de-84-cartons-3.webp",
+          "sourceUrl": "https://www.gardbois.fr/wp-content/uploads/2021/09/buche-de-jour.jpg"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://frboischauffage.com/boutique/bois-de-chauffage/bois-de-chauffage-palette/bois-de-chauffage-palette-25-cm-2-steres/",
+      "shop": "frboischauffage.com",
+      "title": "BOIS DE CHAUFFAGE PALETTE 2 STÈRES - 25CM",
+      "price": 276,
+      "currency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "extraction": "json-ld",
+      "scrapedAt": "2026-10-26T15:30:09.134Z",
+      "images": [
+        {
+          "file": "/images/products/real/bois-de-chauffage-palette-2-steres-25cm-1.webp",
+          "sourceUrl": "https://frboischauffage.com/wp-content/uploads/2025/04/bois-de-chauffage-33-cm-sec-melange-de-bois-durs-palette-1-m3-15-steres.jpg"
+        },
+        {
+          "file": "/images/products/real/bois-de-chauffage-palette-2-steres-25cm-2.webp",
+          "sourceUrl": "https://batimaxhdf.fr/wp-content/uploads/2022/08/click-and-collect-batimax-hdf.png"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://chaufobois.fr/product/buches-calorifiques-woodstock-1-palette-104-sacs-de-5-buches/",
+      "shop": "chaufobois.fr",
+      "title": "Bûches calorifiques WOODSTOCK 1 palette, 104 sacs de 5 bûches",
+      "price": 270,
+      "currency": "EUR",
+      "availability": "http://schema.org/InStock",
+      "extraction": "json-ld",
+      "scrapedAt": "2026-10-26T15:30:13.275Z",
+      "images": [
+        {
+          "file": "/images/products/real/buches-calorifiques-woodstock-1-palette-104-sacs-de-5-buches-1.webp",
+          "sourceUrl": "https://chaufobois.fr/wp-content/uploads/2022/11/1-5.png"
+        },
+        {
+          "file": "/images/products/real/buches-calorifiques-woodstock-1-palette-104-sacs-de-5-buches-2.webp",
+          "sourceUrl": "https://chaufobois.fr/wp-content/uploads/2022/12/cropped-chaufobois3.png"
+        },
+        {
+          "file": "/images/products/real/buches-calorifiques-woodstock-1-palette-104-sacs-de-5-buches-3.webp",
+          "sourceUrl": "https://chaufobois.fr/wp-content/uploads/2022/11/Sans-titre-13-copie.png"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://boutique.woodstock-bois.fr/produit/bois-densifie/",
+      "shop": "boutique.woodstock-bois.fr",
+      "title": "Bûches densifiées en palette livrée à domicile",
+      "price": 459,
+      "currency": "EUR",
+      "availability": null,
+      "extraction": "microdata",
+      "scrapedAt": "2026-10-26T15:30:16.524Z",
+      "images": [
+        {
+          "file": "/images/products/real/buches-densifiees-en-palette-livree-a-domicile-1.webp",
+          "sourceUrl": "https://boutique.woodstock-bois.fr/uploads/Palette-buches-densifiees-104-packs-3.jpg"
+        },
+        {
+          "file": "/images/products/real/buches-densifiees-en-palette-livree-a-domicile-2.webp",
+          "sourceUrl": "https://boutique.woodstock-bois.fr/uploads/Sciures-de-fumage-Woodstock-Bois.jpg"
+        },
+        {
+          "file": "/images/products/real/buches-densifiees-en-palette-livree-a-domicile-3.webp",
+          "sourceUrl": "https://boutique.woodstock-bois.fr/uploads/Pelle-Woodstock-Bois.jpg"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://boutique.woodstock-bois.fr/produit/bois-buches-haute-performance/",
+      "shop": "boutique.woodstock-bois.fr",
+      "title": "Bûches haute performance prêt à l'emploi et 100% naturels",
+      "price": 351,
+      "currency": "EUR",
+      "availability": null,
+      "extraction": "microdata",
+      "scrapedAt": "2026-10-26T15:30:18.719Z",
+      "images": [
+        {
+          "file": "/images/products/real/buches-haute-performance-pret-a-l-emploi-et-100-naturels-1.webp",
+          "sourceUrl": "https://boutique.woodstock-bois.fr/uploads/Buches-haute-performance-offre-doctobre.jpg"
+        },
+        {
+          "file": "/images/products/real/buches-haute-performance-pret-a-l-emploi-et-100-naturels-2.webp",
+          "sourceUrl": "https://boutique.woodstock-bois.fr/uploads/Sciures-de-fumage-Woodstock-Bois.jpg"
+        },
+        {
+          "file": "/images/products/real/buches-haute-performance-pret-a-l-emploi-et-100-naturels-3.webp",
+          "sourceUrl": "https://boutique.woodstock-bois.fr/uploads/Copeaux-de-fumage-1.jpg"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://www.boisrosa.fr/product/palette-buches-densifiees-de-jour-eo2",
+      "shop": "www.boisrosa.fr",
+      "title": "Palette bûches densifiées de jour EO2 Pizzeria professionnels",
+      "price": 442,
+      "currency": "EUR",
+      "availability": null,
+      "extraction": "microdata",
+      "scrapedAt": "2026-10-26T15:30:20.910Z",
+      "images": [
+        {
+          "file": "/images/products/real/palette-buches-densifiees-de-jour-eo2-pizzeria-professionnels-1.webp",
+          "sourceUrl": "https://www.boisrosa.fr/pub/.palette_buche_de_jour_MODIF_6_m.png"
+        },
+        {
+          "file": "/images/products/real/palette-buches-densifiees-de-jour-eo2-pizzeria-professionnels-2.webp",
+          "sourceUrl": "https://www.boisrosa.fr/pub/.BUCHES_COMPACTEES_E02_DENSIFIES_3_m.jpg"
+        },
+        {
+          "file": "/images/products/real/palette-buches-densifiees-de-jour-eo2-pizzeria-professionnels-3.webp",
+          "sourceUrl": "https://www.boisrosa.fr/pub/.chariot_embarque_dimensions.odp_m.png"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://www.boisrosa.fr/product/palette-buches-de-nuit-96-paquets-de-6-buches-e02",
+      "shop": "www.boisrosa.fr",
+      "title": "PALETTE BUCHES DENSIFIEES DE NUIT EO2 (104 paquets de 5 bûches)",
+      "price": 468,
+      "currency": "EUR",
+      "availability": null,
+      "extraction": "microdata",
+      "scrapedAt": "2026-10-26T15:30:22.009Z",
+      "images": [
+        {
+          "file": "/images/products/real/palette-buches-densifiees-de-nuit-eo2-104-paquets-de-5-buches-1.webp",
+          "sourceUrl": "https://www.boisrosa.fr/pub/.palette-complete-buches-de-nuit_m.jpg"
+        },
+        {
+          "file": "/images/products/real/palette-buches-densifiees-de-nuit-eo2-104-paquets-de-5-buches-2.webp",
+          "sourceUrl": "https://www.boisrosa.fr/pub/.buche-de-bois-nuit-eo2-1-1_m.jpg"
+        },
+        {
+          "file": "/images/products/real/palette-buches-densifiees-de-nuit-eo2-104-paquets-de-5-buches-3.webp",
+          "sourceUrl": "https://www.boisrosa.fr/pub/.fiche-technique-buche-de-nuit-eo2_m.jpg"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://econobuches.fr/produit/buches-compressees/buches-compressees-nuit/offre-decouverte-de-buches-densifiees-nuit-longue-duree/",
+      "shop": "econobuches.fr",
+      "title": "Bûches densifiées nuit - Longue Durée | Écono’Bûches",
+      "price": 75,
+      "currency": "EUR",
+      "availability": "http://schema.org/InStock",
+      "extraction": "json-ld",
+      "scrapedAt": "2026-10-26T15:30:24.844Z",
+      "images": [
+        {
+          "file": "/images/products/real/buches-densifiees-nuit-longue-duree-econo-buches-1.webp",
+          "sourceUrl": "https://econobuches.fr/wp-content/uploads/2021/04/ECONO-BUCHES_CARTON-NUIT2-buches_fond-blanc_2020.png"
+        },
+        {
+          "file": "/images/products/real/buches-densifiees-nuit-longue-duree-econo-buches-2.webp",
+          "sourceUrl": "https://econobuches.fr/wp-content/uploads/2021/04/ECONO-BUCHES_NUIT-SOLO_%C2%A9Olivier-DETRY.png"
+        },
+        {
+          "file": "/images/products/real/buches-densifiees-nuit-longue-duree-econo-buches-3.webp",
+          "sourceUrl": "https://econobuches.fr/wp-content/uploads/2026/02/buches-compressees-jours-84-cartons.png"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://granuleo.shop/produits/buches-densifiees-48-packs",
+      "shop": "granuleo.shop",
+      "title": "Bûches densifiées 461 kg — 48 packs de bûches compressées chêne et hêtre pour poêle à bois et insert",
+      "price": 179,
+      "currency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "extraction": "json-ld",
+      "scrapedAt": "2026-10-26T15:30:26.360Z",
+      "images": [
+        {
+          "file": "/images/products/real/buches-densifiees-461-kg-48-packs-de-buches-compressees-chene-et-hetre-pour-poel-1.webp",
+          "sourceUrl": "https://granuleo.shop/products/buches-densifiees-bois-compresse-palette-granuleo.jpg"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://chaufobois.fr/product/pellet-limouzi-palette-de-66-sacs-de-15-kg/",
+      "shop": "chaufobois.fr",
+      "title": "PELLET LIMOUZI - PALETTE DE 66 SACS DE 15 KG",
+      "price": 253.9,
+      "currency": "EUR",
+      "availability": "http://schema.org/InStock",
+      "extraction": "json-ld",
+      "scrapedAt": "2026-10-26T15:30:28.017Z",
+      "images": [
+        {
+          "file": "/images/products/real/pellet-limouzi-palette-de-66-sacs-de-15-kg-1.webp",
+          "sourceUrl": "https://chaufobois.fr/wp-content/uploads/2022/11/A-22.jpg"
+        },
+        {
+          "file": "/images/products/real/pellet-limouzi-palette-de-66-sacs-de-15-kg-2.webp",
+          "sourceUrl": "https://chaufobois.fr/wp-content/uploads/2022/12/cropped-chaufobois3.png"
+        },
+        {
+          "file": "/images/products/real/pellet-limouzi-palette-de-66-sacs-de-15-kg-3.webp",
+          "sourceUrl": "https://chaufobois.fr/wp-content/uploads/2022/11/pellets-badger-12-palette-de-35-sacs-de-15-kg-1.jpeg"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://www.pechavy-energie-bois.fr/granule-en-sac/7-3-granules-de-bois-ha-legne-orange-palette-77-sacs.html",
+      "shop": "www.pechavy-energie-bois.fr",
+      "title": "Hà Légne Orange - Palette (77 sacs de 15kg)",
+      "price": 453.92,
+      "currency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "extraction": "json-ld",
+      "scrapedAt": "2026-10-26T15:30:32.976Z",
+      "images": [
+        {
+          "file": "/images/products/real/ha-legne-orange-palette-77-sacs-de-15kg-1.webp",
+          "sourceUrl": "https://www.pechavy-energie-bois.fr/68-large_default/granules-de-bois-ha-legne-orange-palette-77-sacs.jpg"
+        },
+        {
+          "file": "/images/products/real/ha-legne-orange-palette-77-sacs-de-15kg-2.webp",
+          "sourceUrl": "https://www.pechavy-energie-bois.fr/69-large_default/granules-de-bois-ha-legne-orange-palette-77-sacs.jpg"
+        },
+        {
+          "file": "/images/products/real/ha-legne-orange-palette-77-sacs-de-15kg-3.webp",
+          "sourceUrl": "https://www.pechavy-energie-bois.fr/124-large_default/granules-de-bois-ha-legne-orange-palette-77-sacs.jpg"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://www.boisrosa.fr/product/granules-aeb-70-sacs-1",
+      "shop": "www.boisrosa.fr",
+      "title": "Palette 70 Sacs 15 Kg - ALPES ENERGIE BOIS",
+      "price": 466,
+      "currency": "EUR",
+      "availability": null,
+      "extraction": "microdata",
+      "scrapedAt": "2026-10-26T15:30:34.947Z",
+      "images": [
+        {
+          "file": "/images/products/real/palette-70-sacs-15-kg-alpes-energie-bois-1.webp",
+          "sourceUrl": "https://www.boisrosa.fr/pub/.PALETTE_AEB_SAC_NEWW_m.png"
+        },
+        {
+          "file": "/images/products/real/palette-70-sacs-15-kg-alpes-energie-bois-2.webp",
+          "sourceUrl": "https://www.boisrosa.fr/pub/.Fiche_produit_Alpes_Energie_Bois_m.jpg"
+        },
+        {
+          "file": "/images/products/real/palette-70-sacs-15-kg-alpes-energie-bois-3.webp",
+          "sourceUrl": "https://www.boisrosa.fr/pub/.IMG_E0995_m.jpg"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://boutique.woodstock-bois.fr/produit/bois-granules/",
+      "shop": "boutique.woodstock-bois.fr",
+      "title": "Granulés de bois premium livrés à domicile 100% naturels",
+      "price": 479,
+      "currency": "EUR",
+      "availability": null,
+      "extraction": "microdata",
+      "scrapedAt": "2026-10-26T15:30:38.398Z",
+      "images": [
+        {
+          "file": "/images/products/real/granules-de-bois-premium-livres-a-domicile-100-naturels-1.webp",
+          "sourceUrl": "https://boutique.woodstock-bois.fr/uploads/granules-de-bois-woodstock-palette-1.jpg"
+        },
+        {
+          "file": "/images/products/real/granules-de-bois-premium-livres-a-domicile-100-naturels-2.webp",
+          "sourceUrl": "https://boutique.woodstock-bois.fr/uploads/Seau-Woodstock-Bois.jpg"
+        },
+        {
+          "file": "/images/products/real/granules-de-bois-premium-livres-a-domicile-100-naturels-3.webp",
+          "sourceUrl": "https://boutique.woodstock-bois.fr/uploads/Palette-buches-densifiees-104-packs-3.jpg"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://www.phenix-combustibles.fr/produit/granules-wooday-palette-975kg/",
+      "shop": "www.phenix-combustibles.fr",
+      "title": "Granulés de bois premium Wooday - Palette de 65 ou 33 sacs de 15 kg",
+      "price": 192.42,
+      "currency": "EUR",
+      "availability": "https://schema.org/OutOfStock",
+      "extraction": "json-ld",
+      "scrapedAt": "2026-10-26T15:30:43.590Z",
+      "images": [
+        {
+          "file": "/images/products/real/granules-de-bois-premium-wooday-palette-de-65-ou-33-sacs-de-15-kg-1.webp",
+          "sourceUrl": "https://www.phenix-combustibles.fr/wp-content/uploads/2026/06/RUPTURE-DE-STOCK-1.png"
+        },
+        {
+          "file": "/images/products/real/granules-de-bois-premium-wooday-palette-de-65-ou-33-sacs-de-15-kg-2.webp",
+          "sourceUrl": "https://www.phenix-combustibles.fr/wp-content/uploads/2025/09/sac-wooday-2-scaled-e1758905882871.jpg"
+        },
+        {
+          "file": "/images/products/real/granules-de-bois-premium-wooday-palette-de-65-ou-33-sacs-de-15-kg-3.webp",
+          "sourceUrl": "https://www.phenix-combustibles.fr/wp-content/uploads/2025/09/wooday-pictos-qualite.png"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://www.phenix-combustibles.fr/produit/granules-de-bois-premium-eo2-15kg-palette-de-66-ou-33-sacs/",
+      "shop": "www.phenix-combustibles.fr",
+      "title": "Granulés de bois premium EO2 15kg - Palette de 66 ou 33 sacs",
+      "price": 224.5,
+      "currency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "extraction": "json-ld",
+      "scrapedAt": "2026-10-26T15:30:45.652Z",
+      "images": [
+        {
+          "file": "/images/products/real/granules-de-bois-premium-eo2-15kg-palette-de-66-ou-33-sacs-1.webp",
+          "sourceUrl": "https://www.phenix-combustibles.fr/wp-content/uploads/2025/09/PALETTE-EO2-1-2-pellets-granules-bois-chauffage.png"
+        },
+        {
+          "file": "/images/products/real/granules-de-bois-premium-eo2-15kg-palette-de-66-ou-33-sacs-2.webp",
+          "sourceUrl": "https://www.phenix-combustibles.fr/wp-content/uploads/2025/09/IMG_7864-scaled-e1759495579975.png"
+        },
+        {
+          "file": "/images/products/real/granules-de-bois-premium-eo2-15kg-palette-de-66-ou-33-sacs-3.webp",
+          "sourceUrl": "https://www.phenix-combustibles.fr/wp-content/uploads/2025/09/SAC-EO2-scaled-e1758907729204.jpg"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://www.combustibles-gruchy.fr/produits/palette-de-granules-de-bois-premium-gruchy-66-ou-33-sacs-de-15-kgs",
+      "shop": "www.combustibles-gruchy.fr",
+      "title": "Granulés de bois Premium - Gruchy - Palette sacs de 15kg",
+      "price": 455.4,
+      "currency": "EUR",
+      "availability": null,
+      "extraction": "microdata",
+      "scrapedAt": "2026-10-26T15:30:52.707Z",
+      "images": [
+        {
+          "file": "/images/products/real/granules-de-bois-premium-gruchy-palette-sacs-de-15kg-1.webp",
+          "sourceUrl": "https://www.combustibles-gruchy.fr/media/cache/sylius_shop_product_thumbnail/b6/3c/be3b16e3f35fcb6e4e5ddfdc5c5c.png"
+        },
+        {
+          "file": "/images/products/real/granules-de-bois-premium-gruchy-palette-sacs-de-15kg-2.webp",
+          "sourceUrl": "https://www.combustibles-gruchy.fr/media/cache/sylius_shop_product_thumbnail/56/35/ea5e09dca595d84bd1e08033e007.png"
+        },
+        {
+          "file": "/images/products/real/granules-de-bois-premium-gruchy-palette-sacs-de-15kg-3.webp",
+          "sourceUrl": "https://www.combustibles-gruchy.fr/media/cache/sylius_shop_product_thumbnail/4d/ef/52291163335a454a52c7fa0f19e3.png"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://granuleo.shop/produits/granules-bois-palette-66-sacs",
+      "shop": "granuleo.shop",
+      "title": "Granulés de bois palette 66 sacs — 990 kg de pellets 6 mm ENplus A1",
+      "price": 349,
+      "currency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "extraction": "json-ld",
+      "scrapedAt": "2026-10-26T15:30:53.819Z",
+      "images": [
+        {
+          "file": "/images/products/real/granules-de-bois-palette-66-sacs-990-kg-de-pellets-6-mm-enplus-a1-1.webp",
+          "sourceUrl": "https://granuleo.shop/products/granules-bois-palette-66-sacs-enplus-a1-990kg.jpg"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://granuleo.shop/produits/granules-bois-demi-palette-33-sacs",
+      "shop": "granuleo.shop",
+      "title": "Granulés de bois demi-palette 33 sacs — 495 kg de pellets 6 mm ENplus A1",
+      "price": 185,
+      "currency": "EUR",
+      "availability": "https://schema.org/InStock",
+      "extraction": "json-ld",
+      "scrapedAt": "2026-10-26T15:30:54.823Z",
+      "images": [
+        {
+          "file": "/images/products/real/granules-de-bois-demi-palette-33-sacs-495-kg-de-pellets-6-mm-enplus-a1-1.webp",
+          "sourceUrl": "https://granuleo.shop/products/granules-bois-palette-66-sacs-enplus-a1-990kg.jpg"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://delicourt-energies.com/products/granules-de-bois-haut-de-flamme-palette-de-66-sacs-de-15-kg-soit-990-kg",
+      "shop": "delicourt-energies.com",
+      "title": "Granulés de bois Haut-de-Flamme - Palette de 66 sacs de 15 kg",
+      "price": 481.88,
+      "currency": "EUR",
+      "availability": "InStock",
+      "extraction": "shopify-json",
+      "scrapedAt": "2026-10-26T15:30:57.639Z",
+      "images": [
+        {
+          "file": "/images/products/real/granules-de-bois-haut-de-flamme-palette-de-66-sacs-de-15-kg-1.webp",
+          "sourceUrl": "https://cdn.shopify.com/s/files/1/0999/0635/5525/files/ChatGPT_Image_24_aout_2026_15_56_27.png?v=1787579839"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    },
+    {
+      "sourceUrl": "https://delicourt-energies.com/products/granules-de-bois-eden-pellets-premium-palette-de-33-sacs-de-15-kg-soit-495-kg",
+      "shop": "delicourt-energies.com",
+      "title": "Granulés de bois Eden Pellets Premium - Palette de 33 sacs de 15 kg",
+      "price": 285.26,
+      "currency": "EUR",
+      "availability": "InStock",
+      "extraction": "shopify-json",
+      "scrapedAt": "2026-10-26T15:30:59.895Z",
+      "images": [
+        {
+          "file": "/images/products/real/granules-de-bois-eden-pellets-premium-palette-de-33-sacs-de-15-kg-1.webp",
+          "sourceUrl": "https://cdn.shopify.com/s/files/1/0999/0635/5525/files/granules-de-bois-eden-pellets-premium-palette-de-66-sacs-de-15-kg-soit-990-kg_c1baf028-f485-4624-9f16-022bd0b65ec3.jpg?v=1771337596"
+        }
+      ],
+      "notes": "Nom, description, prix, disponibilité et photos lus sur la page produit publiée (JSON-LD schema.org, microdata itemprop ou Open Graph). Le stock affiché (30) est la valeur d’exploitation du site : la disponibilité source est conservée ici."
+    }
+  ]
+}

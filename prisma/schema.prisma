@@ -73,8 +73,30 @@ model SiteSetting {
   siteName                  String   @default("Allo Maison")
   slogan                    String   @default("Votre spécialiste du bois de chauffage de qualité supérieure")
   logoUrl                   String   @default("/logo.svg")
+  showSiteName              Boolean  @default(true) // Afficher le nom du site à côté du logo dans l'en-tête
+  showSiteNameFooter        Boolean  @default(true) // Idem dans le pied de page : l'en-tête et le pied de page se règlent séparément
   faviconUrl                String   @default("/favicon.ico")
   emailLogoUrl              String   @default("/email-logo.png")
+
+  // Hero de la page d'accueil, entièrement pilotable depuis
+  // /admin/personnalisation : accroche, texte, boutons, visuel et chiffres clés.
+  heroBadge                 String   @default("Bois sec étuvé certifié NF H1 · Taux d'humidité inférieur à 20%")
+  heroTitle                 String   @default("Bois de chauffage haute performance livré sur palette à domicile")
+  heroSubtitle              String   @default("Approvisionnement direct en palettes de bois dur (chêne, charme, hêtre) séché en étuve biomasse. Allumage immédiat, haut pouvoir calorifique garanti et livraison par camion avec hayon et transpalette.")
+  heroPrimaryLabel          String   @default("Consulter le catalogue")
+  heroPrimaryHref           String   @default("/boutique")
+  heroSecondaryLabel        String   @default("Calculer les frais de port")
+  heroSecondaryHref         String   @default("/calculateurs/livraison")
+  heroImageUrl              String   @default("/images/hero.webp")
+  heroImageCaption          String   @default("Palettes filmées & cerclées")
+  heroImageCaptionSub       String   @default("Bûches 25 cm, 33 cm et 50 cm disponibles")
+  heroImageBadge            String   @default("Stock disponible")
+  heroFact1Value            String   @default("2 000 kWh")
+  heroFact1Label            String   @default("Énergie par stère")
+  heroFact2Value            String   @default("< 20%")
+  heroFact2Label            String   @default("Humidité contrôlée")
+  heroFact3Value            String   @default("Hayon inclus")
+  heroFact3Label            String   @default("Dépose à votre abri")
   primaryColor              String   @default("#14532d") // Forest 900
   secondaryColor            String   @default("#7c4a2d") // Wood 700
   accentColor               String   @default("#ea580c") // Warm ember
@@ -245,6 +267,10 @@ model Order {
   id                      String    @id @default(uuid())
   orderNumber             String    @unique // e.g. "AM-2026-1001"
   secureToken             String    @unique // unguessable token for tracking link without login
+  // Clé d'idempotence fournie par le tunnel de commande : le même formulaire
+  // validé deux fois (double clic, rechargement, retour navigateur) renvoie la
+  // commande déjà enregistrée au lieu d'en créer une seconde.
+  idempotencyKey          String?   @unique
   userId                  String?
   customerEmail           String
   customerPhone           String
@@ -393,6 +419,7 @@ model EmailLog {
   status          String    @default("QUEUED") // QUEUED, SENT, FAILED, DELIVERED
   idempotencyKey  String    @unique
   errorMessage    String?
+  providerMessageId String? // Identifiant du message chez le fournisseur (Resend), pour retrouver l'envoi dans son tableau de bord
   sentAt          DateTime?
   retryCount      Int       @default(0)
   createdAt       DateTime  @default(now())

@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Lock, Mail, Key, ArrowRight, ShieldCheck, CreditCard, Truck, User } from 'lucide-react';
+import { Lock, Mail, Key, ArrowRight } from 'lucide-react';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -14,18 +14,15 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleLogin = async (loginEmail?: string, loginPassword?: string) => {
+  const handleLogin = async () => {
     setError('');
     setLoading(true);
-
-    const emailToSend = loginEmail || email;
-    const passwordToSend = loginPassword || password;
 
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: emailToSend, password: passwordToSend }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
@@ -118,62 +115,6 @@ export default function LoginPage() {
             </Link>
           </div>
         </form>
-
-        {/* 1-Click Fast Demo Credentials */}
-        <div className="bg-white p-5 rounded-xl border border-subtleBorder text-xs space-y-3">
-          <span className="font-poppins font-medium text-secondaryText uppercase tracking-wider block text-[10px]">
-            Accès de test rapide (1-clic)
-          </span>
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              type="button"
-              onClick={() => handleLogin('admin@woodmachine-bois.fr', 'Password123!')}
-              className="p-2.5 bg-ivory rounded-lg border border-subtleBorder hover:border-forest text-left transition-colors"
-            >
-              <div className="flex items-center gap-1.5 font-medium text-primaryText">
-                <ShieldCheck className="w-3.5 h-3.5 text-forest" />
-                <span>Super Admin</span>
-              </div>
-              <span className="block text-[10px] text-secondaryText mt-0.5">Accès backoffice</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleLogin('compta@woodmachine-bois.fr', 'Password123!')}
-              className="p-2.5 bg-ivory rounded-lg border border-subtleBorder hover:border-forest text-left transition-colors"
-            >
-              <div className="flex items-center gap-1.5 font-medium text-primaryText">
-                <CreditCard className="w-3.5 h-3.5 text-forest" />
-                <span>Comptable</span>
-              </div>
-              <span className="block text-[10px] text-secondaryText mt-0.5">Rapprochement</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleLogin('logistique@woodmachine-bois.fr', 'Password123!')}
-              className="p-2.5 bg-ivory rounded-lg border border-subtleBorder hover:border-forest text-left transition-colors"
-            >
-              <div className="flex items-center gap-1.5 font-medium text-primaryText">
-                <Truck className="w-3.5 h-3.5 text-forest" />
-                <span>Logistique</span>
-              </div>
-              <span className="block text-[10px] text-secondaryText mt-0.5">Jalons &amp; suivi</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={() => handleLogin('jean.dupont@example.com', 'Password123!')}
-              className="p-2.5 bg-ivory rounded-lg border border-subtleBorder hover:border-forest text-left transition-colors"
-            >
-              <div className="flex items-center gap-1.5 font-medium text-primaryText">
-                <User className="w-3.5 h-3.5 text-forest" />
-                <span>Client Démo</span>
-              </div>
-              <span className="block text-[10px] text-secondaryText mt-0.5">Jean Dupont</span>
-            </button>
-          </div>
-        </div>
       </main>
 
       <Footer />

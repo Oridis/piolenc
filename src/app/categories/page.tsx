@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { getSiteSettings } from '@/lib/settings';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
+import { PLACEHOLDER_IMAGE } from '@/lib/images';
 import { ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -40,7 +41,9 @@ export default async function CategoriesPage() {
             >
               <div className="sm:w-1/2 h-48 sm:h-auto relative overflow-hidden bg-ivory">
                 <img
-                  src={c.imageUrl || undefined}
+                  src={c.imageUrl || PLACEHOLDER_IMAGE}
+                  loading="lazy"
+                  decoding="async"
                   alt={c.name}
                   className="w-full h-full object-cover"
                 />

@@ -6,7 +6,7 @@
     "SMTP_HOST": "smtp.resend.com",
     "SMTP_PORT": "587",
     "SMTP_USER": "contact@piolencboisdirect.fr",
-    "SMTP_FROM": "piolencboisdirect Bois <contact@piolencboisdirect.fr>",
-    "ADMIN_NOTIFICATION_EMAIL": "admin@piolencboisdirect.fr"
+    "SMTP_FROM": "piolencboisdirect Bois <serviceclient@piolencboisdirect.fr>",
+    "ADMIN_NOTIFICATION_EMAIL": "serviceclient@piolencboisdirect.fr"
   }
 }

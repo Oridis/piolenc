@@ -14,7 +14,7 @@ async function seed() {
     data: [
       { slug: "bois-chene", name: "Bois de chêne", description: "Chêne français sélectionné" },
       { slug: "bois-premium", name: "Bois premium", description: "Premium sélectionné supérieur" },
-      { slug: "bois-hêtre", name: "Bois d'hêtre", description: "Hêtre français étuvé" }
+      { slug: "bois-hetre", name: "Bois d'hêtre", description: "Hêtre français étuvé" }
     ],
     skipDuplicates: true
   });
@@ -23,7 +23,7 @@ async function seed() {
   const categories = {
     boisChene: await prisma.category.findUnique({ where: { slug: "bois-chene" } }),
     boisPremium: await prisma.category.findUnique({ where: { slug: "bois-premium" } }),
-    boisHêtre: await prisma.category.findUnique({ where: { slug: "bois-hêtre" } }),
+    boisHêtre: await prisma.category.findUnique({ where: { slug: "bois-hetre" } }),
   };
 
   // Step 4: Create products
@@ -34,14 +34,14 @@ async function seed() {
       name: "Bûches de chêne 33 cm - Palette 2 stères",
       shortDescription: "Bûches de chêne sec, étuvé, prêt à brûler",
       description: "Bûches de chêne de haute qualité, sèches sous 20% d'humidité, étuvées et prêtes à brûler. Idéal pour les poêles et cheminées.",
-      images: "/images/bois-chene.jpg",
+      images: "/images/products/bois-chene-33-pal2-1.webp",
       species: "Chêne",
       woodType: "Bois dur (Groupe 1)",
       humidityRate: "< 20% (Bois sec prêt à brûler)",
       calorificValue: "4.2 kWh/kg (env. 2000 kWh/stère)",
       logLength: "33 cm",
       unit: "Palette 2 stères",
-      priceHT: 289.00,
+      priceHT: 327.54,
       priceTTC: 345.55,
       vatRate: 5.5,
       stock: 100,
@@ -63,16 +63,16 @@ async function seed() {
       name: "Bûches Premium 25 cm - Palette 1 stère",
       shortDescription: "Bûches premium sélectionnées",
       description: "Bûches premium sélectionnée supérieure, sèches sous 15% d'humidité, étuvées et prêtes à brûler. Qualité supérieure pour poêles et cheminées.",
-      images: "/images/bois-premium.jpg",
+      images: "/images/products/bois-prem-25-pal1-1.webp",
       species: "Mélange essences",
       woodType: "Bois dur (Groupe 1)",
       humidityRate: "< 15% (Bois sec extra sec)",
       calorificValue: "4.5 kWh/kg (env. 2100 kWh/stère)",
       logLength: "25 cm",
       unit: "Palette 1 stère",
-      priceHT: 419.00,
-      priceTTC: 419.00, // Promo - no VAT
-      vatRate: 0,
+      priceHT: 397.16,
+      priceTTC: 419.00, // Prix public inchangé : TVA bois énergie 5,5 % (art. 278-0 bis du CGI)
+      vatRate: 5.5,
       stock: 50,
       reservedStock: 0,
       weightKg: 900.0,
@@ -88,18 +88,18 @@ async function seed() {
     },
     {
       reference: "BOIS-HETRE-20-PAL2",
-      slug: "bois-hêtre-20-pal2",
+      slug: "bois-hetre-20-pal2",
       name: "Bûches d'hêtre 20 cm - Palette 2 stères",
       shortDescription: "Bûches d'hêtre sec étuvé",
       description: "Bûches d'hêtre de qualité, sèches et étuvées, prêt à brûler.",
-      images: "/images/bois-hêtre.jpg",
+      images: "/images/products/bois-hetre-20-pal2-1.webp",
       species: "Hêtre",
       woodType: "Bois dur (Groupe 1)",
       humidityRate: "< 20%",
       calorificValue: "4.3 kWh/kg",
       logLength: "20 cm",
       unit: "Palette 2 stères",
-      priceHT: 320.00,
+      priceHT: 362.46,
       priceTTC: 382.40,
       vatRate: 5.5,
       stock: 80,
@@ -150,7 +150,7 @@ async function seed() {
       cookiePolicyText: "Politique de Cookies",
       legalMentionsText: "Mentions Légales",
       deliveryPolicyText: "Politique de Livraison",
-      deliveryZonesText: "[\"FR\",\"DE\",\"BE\",\"CH\"]",
+      deliveryZonesText: "France métropolitaine, Belgique, Allemagne, Suisse",
       seoDescription: "Description SEO",
     },
     create: {
@@ -178,7 +178,7 @@ async function seed() {
       cookiePolicyText: "Politique de Cookies",
       legalMentionsText: "Mentions Légales",
       deliveryPolicyText: "Politique de Livraison",
-      deliveryZonesText: "[\"FR\",\"DE\",\"BE\",\"CH\"]",
+      deliveryZonesText: "France métropolitaine, Belgique, Allemagne, Suisse",
       seoDescription: "Description SEO",
     },
   });

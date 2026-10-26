@@ -7,8 +7,13 @@ declare global {
 }
 
 function createPrismaClient() {
+  // Le journal des requêtes SQL est utile ponctuellement mais il noie la sortie
+  // de `next dev` (des centaines de lignes par écran) et fait gonfler la mémoire
+  // du serveur de développement : il est donc désormais opt-in.
+  //   PRISMA_LOG_QUERIES=1 npm run dev
+  const verboseQueries = process.env.PRISMA_LOG_QUERIES === '1' || process.env.PRISMA_LOG_QUERIES === 'true';
   const prism = new PrismaClient({
-    log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    log: process.env.NODE_ENV === 'development' ? (verboseQueries ? ['query', 'error', 'warn'] : ['error', 'warn']) : ['error'],
   });
 
   // Database health check on startup

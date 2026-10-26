@@ -4,6 +4,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/lib/pricing';
+import { PLACEHOLDER_IMAGE } from '@/lib/images';
 import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Truck } from 'lucide-react';
 
 export default function CartDrawer() {
@@ -95,7 +96,7 @@ export default function CartDrawer() {
                 >
                   <div className="w-20 h-20 min-w-[5rem] max-w-[5rem] min-h-[5rem] max-h-[5rem] rounded-lg overflow-hidden border border-subtleBorder bg-ivory shrink-0">
                     <img
-                      src={item.imageUrl || undefined}
+                      src={item.imageUrl || PLACEHOLDER_IMAGE}
                       alt={item.name}
                       className="w-full h-full object-cover"
                     />
@@ -104,9 +105,11 @@ export default function CartDrawer() {
                     <h3 className="font-poppins font-medium text-primaryText text-xs leading-snug line-clamp-2">
                       {item.name}
                     </h3>
-                    <p className="text-[11px] text-secondaryText mt-0.5 truncate">
-                      {item.logLength} · {item.packaging}
-                    </p>
+                    {[item.logLength, item.packaging].filter(Boolean).length > 0 && (
+                      <p className="text-[11px] text-secondaryText mt-0.5 truncate">
+                        {[item.logLength, item.packaging].filter(Boolean).join(' · ')}
+                      </p>
+                    )}
                     <div className="text-xs font-semibold text-forest mt-1">
                       {formatPrice(item.priceTTC)}
                     </div>

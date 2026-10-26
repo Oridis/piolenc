@@ -35,6 +35,41 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'L\'adresse de livraison est incomplète' }, { status: 400 });
     }
 
+    // Idempotence : le tunnel de commande envoie une clé stable par tentative de
+    // validation. Un double clic, une actualisation ou un retour navigateur
+    // renvoient donc la commande déjà enregistrée au lieu d'en créer une seconde
+    // (et de réserver une deuxième fois le stock).
+    const rawIdempotencyKey = typeof body.idempotencyKey === 'string' ? body.idempotencyKey.trim() : '';
+    const idempotencyKey = /^[A-Za-z0-9_-]{8,64}$/.test(rawIdempotencyKey) ? rawIdempotencyKey : null;
+
+    const orderResponse = (order: {
+      orderNumber: string;
+      secureToken: string;
+      totalAmount: number;
+      currency: string;
+    }) => ({
+      success: true,
+      orderNumber: order.orderNumber,
+      secureToken: order.secureToken,
+      totalAmount: order.totalAmount,
+      currency: order.currency,
+      bankDetails: {
+        beneficiary: siteSettings.bankBeneficiary,
+        bankName: siteSettings.bankName,
+        iban: siteSettings.bankIban,
+        bic: siteSettings.bankBic,
+        reference: order.orderNumber,
+        deadlineDays: siteSettings.bankTransferDeadlineDays,
+      },
+    });
+
+    if (idempotencyKey) {
+      const existingOrder = await prisma.order.findUnique({ where: { idempotencyKey } });
+      if (existingOrder) {
+        return NextResponse.json({ ...orderResponse(existingOrder), alreadyCreated: true });
+      }
+    }
+
     // 1. Fetch live product data from database and recalculate server-side
     const productIds = items.map((i: any) => i.productId);
     const dbProducts = await prisma.product.findMany({
@@ -61,8 +96,19 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: `Le produit ${dbProduct.name} n'est plus disponible` }, { status: 400 });
       }
 
+      // Quantité: un entier strictement positif. Sans ce contrôle, une quantité
+      // nulle, négative ou non numérique était silencieusement ramenée à 1 et
+      // créait une commande non voulue.
+      const rawQty = item.quantity;
+      const requestedQty = typeof rawQty === 'number' ? rawQty : Number.parseInt(String(rawQty ?? ''), 10);
+      if (!Number.isInteger(requestedQty) || requestedQty < 1 || requestedQty > 999) {
+        return NextResponse.json(
+          { error: `Quantité invalide pour ${dbProduct.name} (reçu : ${rawQty})` },
+          { status: 400 }
+        );
+      }
+
       // Stock check
-      const requestedQty = Math.max(1, parseInt(item.quantity, 10));
       const availableStock = dbProduct.stock - dbProduct.reservedStock;
 
       if (availableStock < requestedQty && !dbProduct.isPreorderAllowed) {
@@ -116,7 +162,10 @@ export async function POST(request: Request) {
         postalCode: shippingAddress.postalCode,
         itemsCount: totalItemsCount,
         totalWeightKg,
-        difficultAccess: accessibility?.steepSlope || !accessibility?.heavyTruckAccessible,
+        // Le supplément « accès difficile » ne s'applique que si le client a
+        // déclaré explicitement une contrainte (pente ou camion non accessible),
+        // jamais parce que l'information d'accessibilité est absente.
+        difficultAccess: accessibility?.steepSlope === true || accessibility?.heavyTruckAccessible === false,
       },
       calculatedSubtotalTTC,
       siteSettings.freeShippingThreshold
@@ -185,8 +234,12 @@ export async function POST(request: Request) {
     const destinationCountry = shippingAddress.country.toUpperCase();
     const currency = destinationCountry === 'CH' ? 'CHF' : 'EUR';
 
-    // 5. Database transaction to create order, reserve stock and create logistics/payment records
-    const order = await prisma.$transaction(async (tx) => {
+    // 5. Database transaction to create order, reserve stock and create logistics/payment records.
+    // Le délai est élargi (Neon est distant) : sans cela, deux commandes
+    // simultanées dépassaient les 5 s par défaut et la seconde échouait en 500.
+    let order;
+    try {
+      order = await prisma.$transaction(async (tx) => {
       // Reserve stock for products
       for (const item of orderItemsData) {
         await tx.product.update({
@@ -203,6 +256,7 @@ export async function POST(request: Request) {
         data: {
           orderNumber,
           secureToken,
+          idempotencyKey,
           userId: user ? user.id : null,
           customerEmail: customer.email.toLowerCase().trim(),
           customerPhone: customer.phone.trim(),
@@ -257,8 +311,19 @@ export async function POST(request: Request) {
         },
       });
 
-      return newOrder;
-    });
+        return newOrder;
+      }, { maxWait: 15000, timeout: 30000 });
+    } catch (error: any) {
+      // Course entre deux validations identiques : la contrainte d'unicité a
+      // repéré la clé déjà utilisée, on renvoie la commande existante.
+      if (error?.code === 'P2002' && idempotencyKey) {
+        const existingOrder = await prisma.order.findUnique({ where: { idempotencyKey } });
+        if (existingOrder) {
+          return NextResponse.json({ ...orderResponse(existingOrder), alreadyCreated: true });
+        }
+      }
+      throw error;
+    }
 
     // 6. Asynchronously trigger transactional Email 1 (Client Confirmation) and Email 2 (Admin Alert)
     try {
@@ -295,21 +360,7 @@ export async function POST(request: Request) {
       console.error('Email dispatch non-blocking error:', emailErr);
     }
 
-    return NextResponse.json({
-      success: true,
-      orderNumber: order.orderNumber,
-      secureToken: order.secureToken,
-      totalAmount: order.totalAmount,
-      currency: order.currency,
-      bankDetails: {
-        beneficiary: siteSettings.bankBeneficiary,
-        bankName: siteSettings.bankName,
-        iban: siteSettings.bankIban,
-        bic: siteSettings.bankBic,
-        reference: order.orderNumber,
-        deadlineDays: siteSettings.bankTransferDeadlineDays,
-      },
-    });
+    return NextResponse.json(orderResponse(order));
   } catch (error: any) {
     console.error('Checkout error:', error);
     return NextResponse.json({ error: error.message || 'Erreur lors de la validation de commande' }, { status: 500 });

@@ -25,6 +25,9 @@
 .env.development
 !.env.example
 
+# Clé Resend déposée temporairement pour installation dans .env
+.resend-key.txt
+
 # Vercel
 .vercel
 
@@ -38,6 +41,10 @@ next-env.d.ts
 
 # Local tooling leftovers
 *.log
+
+# Sauvegardes locales de la base de données : les exports contiennent des
+# données clients (comptes, commandes) et n'ont pas leur place dans le dépôt.
+/backups/
 
 # Freebuff Desktop : métadonnées applicatives et runtime local (jamais du code projet)
 /.freebuff/

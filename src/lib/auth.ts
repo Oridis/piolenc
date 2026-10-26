@@ -85,6 +85,21 @@ export async function getCurrentUser() {
   }
 }
 
+/**
+ * Session strictement administrative.
+ *
+ * Les routes /api/admin utilisaient auparavant le test inversé
+ * `if (user && user.role === 'CUSTOMER')`, qui laissait passer les requêtes
+ * anonymes (user === null) : n'importe quel visiteur pouvait lire les
+ * commandes, exporter les données clients ou modifier les statuts. Ce test
+ * exige désormais une session et refuse le rôle CUSTOMER.
+ */
+export async function getAdminUser() {
+  const user = await getCurrentUser();
+  if (!user || user.role === 'CUSTOMER') return null;
+  return user;
+}
+
 export type AdminRole =
   | 'SUPER_ADMIN'
   | 'COMMERCIAL_ADMIN'

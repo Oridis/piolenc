@@ -1,15 +1,15 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getCurrentUser } from '@/lib/auth';
+import { getAdminUser } from '@/lib/auth';
 import { getSiteSettings } from '@/lib/settings';
 import { dispatchTransactionalEmail, generateEmailTemplate } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
-  const user = await getCurrentUser();
-  if (user && user.role === 'CUSTOMER') {
-    return NextResponse.json({ error: 'Accès interdit' }, { status: 403 });
+  const user = await getAdminUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Accès interdit : session administrateur requise' }, { status: 401 });
   }
 
   const { searchParams } = new URL(request.url);
@@ -55,17 +55,13 @@ export async function GET(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  const user = await getCurrentUser();
-  if (user && user.role === 'CUSTOMER') {
-    return NextResponse.json({ error: 'Accès interdit' }, { status: 403 });
+  const user = await getAdminUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Accès interdit : session administrateur requise' }, { status: 401 });
   }
 
-  const effectiveUser = user || (await prisma.user.findFirst({ where: { role: 'SUPER_ADMIN' } })) || {
-    id: 'system-admin',
-    firstName: 'Marc',
-    lastName: 'Dubois',
-    role: 'SUPER_ADMIN',
-  };
+  // Aucun repli anonyme : l'action est imputée au compte administrateur connecté.
+  const effectiveUser = user;
 
   try {
     const body = await request.json();

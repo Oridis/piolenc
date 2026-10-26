@@ -206,6 +206,17 @@ export default function AdminEmailsPage() {
                         </td>
                         <td className="py-3.5 px-4 text-secondaryText text-[11px]">
                           {log.sentAt ? new Date(log.sentAt).toLocaleString('fr-FR') : 'Non envoyé'}
+                          {log.providerMessageId && (
+                            <a
+                              href={`https://resend.com/emails/${log.providerMessageId}`}
+                              target="_blank"
+                              rel="noreferrer"
+                              title={`Identifiant fournisseur Resend : ${log.providerMessageId}`}
+                              className="block mt-0.5 font-mono text-[10px] text-forest-700 hover:underline"
+                            >
+                              Resend · {String(log.providerMessageId).slice(0, 8)}…
+                            </a>
+                          )}
                         </td>
                         <td className="py-3.5 px-4 font-mono text-secondaryText">
                           {log.retryCount}

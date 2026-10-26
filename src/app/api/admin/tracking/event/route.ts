@@ -1,23 +1,19 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { getCurrentUser, hasPermission } from '@/lib/auth';
+import { getAdminUser } from '@/lib/auth';
 import { getSiteSettings } from '@/lib/settings';
 import { dispatchTransactionalEmail, generateEmailTemplate } from '@/lib/email';
 
 export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
-  const user = await getCurrentUser();
-  if (user && user.role === 'CUSTOMER') {
-    return NextResponse.json({ error: 'Accès interdit : permission logistique requise' }, { status: 403 });
+  const user = await getAdminUser();
+  if (!user) {
+    return NextResponse.json({ error: 'Accès interdit : session administrateur requise' }, { status: 401 });
   }
 
-  const effectiveUser = user || (await prisma.user.findFirst({ where: { role: 'SUPER_ADMIN' } })) || {
-    id: 'system-admin',
-    firstName: 'Thomas',
-    lastName: 'Moreau',
-    role: 'LOGISTICS_MANAGER',
-  };
+  // Aucun repli anonyme : l'événement est imputé au compte administrateur connecté.
+  const effectiveUser = user;
 
   try {
     const body = await request.json();

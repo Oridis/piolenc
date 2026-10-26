@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/lib/pricing';
+import { PLACEHOLDER_IMAGE } from '@/lib/images';
 import {
   Truck,
   ShieldCheck,
@@ -13,14 +14,25 @@ import {
   Star,
 } from 'lucide-react';
 
+interface ImageCredit {
+  file: string;
+  title: string;
+  creator: string;
+  creatorUrl: string;
+  license: string;
+  licenseUrl: string;
+}
+
 interface ProductClientDetailsProps {
   product: any;
   siteSettings: any;
+  imageCredits?: ImageCredit[];
 }
 
 export default function ProductClientDetails({
   product,
   siteSettings,
+  imageCredits = [],
 }: ProductClientDetailsProps) {
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
@@ -34,7 +46,7 @@ export default function ProductClientDetails({
   } catch {
     images = [];
   }
-  const [activeImage, setActiveImage] = useState(images[0] || '');
+  const [activeImage, setActiveImage] = useState(images[0] || PLACEHOLDER_IMAGE);
 
   const effectivePriceTTC = product.promoPrice && product.promoPrice > 0 ? product.promoPrice : product.priceTTC;
   const isOutOfStock = product.stock <= 0 && !product.isPreorderAllowed;
@@ -45,14 +57,17 @@ export default function ProductClientDetails({
   };
 
   return (
-    <div className="space-y-10 font-sans">
+    <div className="space-y-10 font-sans w-full min-w-0">
       {/* Breadcrumb Navigation */}
-      <nav className="text-xs text-secondaryText flex items-center space-x-2">
-        <Link href="/" className="hover:text-forest transition-colors">Accueil</Link>
-        <span>/</span>
-        <Link href="/boutique" className="hover:text-forest transition-colors">Boutique</Link>
-        <span>/</span>
-        <span className="text-primaryText font-medium truncate">{product.name}</span>
+      {/* Le fil d'Ariane contient un nom de produit long : sans base flexible ni
+          rognage, il imposait sa largeur minimale à toute la page et créait un
+          débordement horizontal sur mobile. */}
+      <nav className="text-xs text-secondaryText flex items-center space-x-2 w-full min-w-0 overflow-hidden">
+        <Link href="/" className="hover:text-forest transition-colors shrink-0">Accueil</Link>
+        <span className="shrink-0">/</span>
+        <Link href="/boutique" className="hover:text-forest transition-colors shrink-0">Boutique</Link>
+        <span className="shrink-0">/</span>
+        <span className="text-primaryText font-medium truncate flex-1 basis-0 min-w-0">{product.name}</span>
       </nav>
 
       {/* Main Product Info: 2 Columns */}
@@ -61,13 +76,17 @@ export default function ProductClientDetails({
         <div className="lg:col-span-6 space-y-4">
           <div className="relative rounded-xl overflow-hidden bg-ivory border border-subtleBorder aspect-[4/3]">
             <img
-              src={activeImage || images[0]}
+              src={activeImage || images[0] || PLACEHOLDER_IMAGE}
               alt={product.name}
               className="w-full h-full object-cover"
+              loading="eager"
+              decoding="async"
             />
-            <div className="absolute top-3 left-3 badge-neutral bg-white/95 text-[11px] font-medium">
-              {product.humidityRate}
-            </div>
+            {product.humidityRate ? (
+              <div className="absolute top-3 left-3 badge-neutral bg-white/95 text-[11px] font-medium">
+                {product.humidityRate}
+              </div>
+            ) : null}
             {product.promoPrice && (
               <div className="absolute top-3 right-3 badge-warning bg-amber-100 text-amber-900 border-amber-300 text-[11px]">
                 Offre spéciale
@@ -82,15 +101,37 @@ export default function ProductClientDetails({
                   key={idx}
                   type="button"
                   onClick={() => setActiveImage(img)}
-                  className={`w-18 h-18 rounded-lg overflow-hidden border transition-colors shrink-0 bg-ivory ${
+                  className={`w-[72px] h-[72px] rounded-lg overflow-hidden border transition-colors shrink-0 bg-ivory ${
                     activeImage === img ? 'border-forest ring-1 ring-forest' : 'border-subtleBorder opacity-80'
                   }`}
                   aria-label={`Afficher la photo ${idx + 1}`}
                 >
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+                  <img src={img} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
                 </button>
               ))}
             </div>
+          )}
+
+          {/* Crédits photo : obligatoires pour les images sous licence CC-BY */}
+          {imageCredits.length > 0 && (
+            <p className="text-[10px] leading-relaxed text-secondaryText">
+              Photos d'illustration :{' '}
+              {imageCredits.map((credit, index) => (
+                <span key={credit.file}>
+                  {index > 0 && ' · '}
+                  <a
+                    href={credit.creatorUrl || credit.licenseUrl || '#'}
+                    target="_blank"
+                    rel="noopener noreferrer nofollow"
+                    className="underline hover:text-forest"
+                  >
+                    {credit.creator || 'Wikimedia Commons'}
+                  </a>
+                  {credit.license ? ` (${credit.license})` : ''}
+                </span>
+              ))}{' '}
+              — via Wikimedia Commons.
+            </p>
           )}
 
           {/* Delivery & Logistics Specification Box */}
@@ -111,7 +152,8 @@ export default function ProductClientDetails({
         <div className="lg:col-span-6 space-y-5">
           <div>
             <span className="text-[11px] font-medium uppercase tracking-wider text-secondaryText">
-              Réf : {product.reference} · {product.species}
+              Réf : {product.reference}
+              {product.species ? ` · ${product.species}` : ''}
             </span>
             <h1 className="font-poppins font-semibold text-2xl sm:text-3xl text-primaryText tracking-tight mt-1">
               {product.name}
@@ -136,7 +178,7 @@ export default function ProductClientDetails({
                 <span className="text-xs text-secondaryText font-medium">TTC</span>
               </div>
               <span className="text-[11px] text-secondaryText block mt-0.5">
-                Dont TVA {product.vatRate}% ({formatPrice(product.priceHT)} HT) · {product.unit}
+                Dont TVA {String(product.vatRate).replace('.', ',')}% ({formatPrice(product.priceHT)} HT) · {product.unit}
               </span>
             </div>
 
@@ -217,36 +259,34 @@ export default function ProductClientDetails({
             </div>
           </div>
 
-          {/* Technical Specs Summary */}
-          <div className="border-t border-subtleBorder pt-5 space-y-3 text-xs">
-            <h3 className="font-poppins font-medium text-primaryText text-sm">Caractéristiques certifiées</h3>
-            <div className="grid grid-cols-2 gap-2.5">
-              <div className="p-2.5 bg-white border border-subtleBorder rounded-md">
-                <span className="text-secondaryText block text-[10px] uppercase font-medium">Essences</span>
-                <span className="font-medium text-primaryText">{product.species}</span>
+          {/* Technical Specs Summary — seules les informations réellement
+              connues sont affichées, aucune ligne « non communiqué ». */}
+          {(() => {
+            const specs = [
+              { label: 'Essences', value: product.species },
+              { label: 'Humidité', value: product.humidityRate, accent: true },
+              { label: 'Longueur bûches', value: product.logLength },
+              { label: 'Pouvoir calorifique', value: product.calorificValue },
+              { label: 'Conditionnement', value: product.packaging },
+              { label: 'Délai indicatif', value: `${product.leadTimeDays} à ${product.leadTimeDays + 2} jours` },
+            ].filter((entry) => Boolean(entry.value && String(entry.value).trim()));
+
+            if (!specs.length) return null;
+
+            return (
+              <div className="border-t border-subtleBorder pt-5 space-y-3 text-xs">
+                <h3 className="font-poppins font-medium text-primaryText text-sm">Caractéristiques du lot</h3>
+                <div className="grid grid-cols-2 gap-2.5">
+                  {specs.map((entry) => (
+                    <div key={entry.label} className="p-2.5 bg-white border border-subtleBorder rounded-md">
+                      <span className="text-secondaryText block text-[10px] uppercase font-medium">{entry.label}</span>
+                      <span className={`font-medium ${entry.accent ? 'text-forest' : 'text-primaryText'}`}>{entry.value}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
-              <div className="p-2.5 bg-white border border-subtleBorder rounded-md">
-                <span className="text-secondaryText block text-[10px] uppercase font-medium">Humidité étuvée</span>
-                <span className="font-medium text-forest">{product.humidityRate}</span>
-              </div>
-              <div className="p-2.5 bg-white border border-subtleBorder rounded-md">
-                <span className="text-secondaryText block text-[10px] uppercase font-medium">Longueur bûches</span>
-                <span className="font-medium text-primaryText">{product.logLength}</span>
-              </div>
-              <div className="p-2.5 bg-white border border-subtleBorder rounded-md">
-                <span className="text-secondaryText block text-[10px] uppercase font-medium">Pouvoir calorifique</span>
-                <span className="font-medium text-primaryText">{product.calorificValue}</span>
-              </div>
-              <div className="p-2.5 bg-white border border-subtleBorder rounded-md">
-                <span className="text-secondaryText block text-[10px] uppercase font-medium">Dimensions palette</span>
-                <span className="font-medium text-primaryText">{product.dimensions}</span>
-              </div>
-              <div className="p-2.5 bg-white border border-subtleBorder rounded-md">
-                <span className="text-secondaryText block text-[10px] uppercase font-medium">Délai indicatif</span>
-                <span className="font-medium text-primaryText">{product.leadTimeDays} à {product.leadTimeDays + 2} jours</span>
-              </div>
-            </div>
-          </div>
+            );
+          })()}
         </div>
       </div>
 

@@ -12,6 +12,25 @@ export interface EmailPayload {
   idempotencyKey?: string;
 }
 
+/**
+ * Journalise un échec d'envoi avec le message exact renvoyé par le
+ * fournisseur : l'exploitant peut ainsi savoir pourquoi l'e-mail n'est pas
+ * parti sans avoir à fouiller les journaux du serveur.
+ */
+async function recordFailure(logId: string, errorMessage: string) {
+  await prisma.emailLog.update({
+    where: { id: logId },
+    data: {
+      status: 'FAILED',
+      errorMessage,
+      retryCount: { increment: 1 },
+      // Un échec après une relance ne doit pas laisser traîner l'identifiant
+      // d'un envoi précédent : il ne correspond plus à ce message.
+      providerMessageId: null,
+    },
+  });
+}
+
 export interface EmailDispatchResult {
   success: boolean;
   logId: string;
@@ -58,6 +77,100 @@ export async function dispatchTransactionalEmail(payload: EmailPayload): Promise
   // 3. Dispatch based on configured provider
   const provider = settings.emailProvider || 'log';
 
+  // Fournisseur Resend : envoi par API HTTPS. La clé reste hors du site et de
+  // la base : elle est lue dans l'environnement (RESEND_API_KEY).
+  if (provider === 'resend') {
+    const apiKey = process.env.RESEND_API_KEY?.trim();
+    if (!apiKey) {
+      const message = "RESEND_API_KEY absente de l'environnement : renseignez la clé dans .env pour activer l'envoi par Resend.";
+      await recordFailure(logEntry.id, message);
+      return {
+        success: false,
+        logId: logEntry.id,
+        status: 'FAILED' as const,
+        message,
+        error: message,
+      };
+    }
+
+    const from =
+      process.env.RESEND_FROM?.trim() || settings.smtpFrom || `${settings.siteName} <onboarding@resend.dev>`;
+
+    try {
+      const response = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          from,
+          to: [payload.recipientEmail],
+          subject: payload.subject,
+          html: payload.htmlContent,
+          text: payload.textContent,
+        }),
+        signal: AbortSignal.timeout(20000),
+      });
+
+      const rawBody = await response.text();
+      let parsed: any = null;
+      try {
+        parsed = JSON.parse(rawBody);
+      } catch {
+        // réponse non JSON : on garde le texte brut pour le diagnostic
+      }
+
+      if (!response.ok) {
+        const apiMessage =
+          parsed?.message || parsed?.error?.message || rawBody.slice(0, 300) || `HTTP ${response.status}`;
+        const message = `Resend (HTTP ${response.status}) : ${apiMessage}`;
+        await recordFailure(logEntry.id, message);
+        return {
+          success: false,
+          logId: logEntry.id,
+          status: 'FAILED' as const,
+          message,
+          error: message,
+        };
+      }
+
+      const providerMessageId = parsed?.id ? String(parsed.id) : '';
+      await prisma.emailLog.update({
+        where: { id: logEntry.id },
+        data: {
+          status: 'SENT',
+          sentAt: new Date(),
+          errorMessage: null,
+          // Conservé pour retrouver l'envoi dans le tableau de bord Resend.
+          providerMessageId: providerMessageId || null,
+        },
+      });
+
+      return {
+        success: true,
+        logId: logEntry.id,
+        status: 'SENT' as const,
+        message: `Email accepté par Resend${providerMessageId ? ` (id ${providerMessageId})` : ''}.`,
+      };
+    } catch (err: unknown) {
+      const message =
+        err instanceof Error
+          ? err.name === 'TimeoutError'
+            ? "Délai dépassé (20 s) lors de l'appel à l'API Resend."
+            : err.message
+          : 'Erreur Resend inconnue';
+      await recordFailure(logEntry.id, message);
+      return {
+        success: false,
+        logId: logEntry.id,
+        status: 'FAILED' as const,
+        message: `Envoi Resend impossible : ${message}`,
+        error: message,
+      };
+    }
+  }
+
   if (provider === 'smtp') {
     try {
       const transporter = nodemailer.createTransport({
@@ -94,19 +207,12 @@ export async function dispatchTransactionalEmail(payload: EmailPayload): Promise
       };
     } catch (err: unknown) {
       const errorMessage = err instanceof Error ? err.message : 'Unknown SMTP error';
-      await prisma.emailLog.update({
-        where: { id: logEntry.id },
-        data: {
-          status: 'FAILED',
-          errorMessage,
-          retryCount: { increment: 1 },
-        },
-      });
+      await recordFailure(logEntry.id, errorMessage);
 
       return {
         success: false,
         logId: logEntry.id,
-        status: 'FAILED',
+        status: 'FAILED' as const,
         message: `SMTP dispatch failed: ${errorMessage}`,
         error: errorMessage,
       };

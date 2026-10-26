@@ -1,18 +1,45 @@
 import { prisma } from './prisma';
 
-// In-memory cache for site settings - reduces DB queries
-// Settings are relatively static and change only via admin UI
-let siteSettingsCache: any = null;
-let cacheTimestamp = 0;
-const CACHE_TTL = 5 * 60 * 1000; // 5 minutes TTL
+// Dernière copie lue des réglages : elle sert UNIQUEMENT de secours si la base
+// est injoignable, jamais de source fraîche. Le cache à durée de vie (5 minutes)
+// a été retiré : Turbopack exécute les routes API et le rendu des pages dans des
+// processus distincts, donc vider un cache en mémoire après un enregistrement ne
+// touchait pas le processus qui affiche le site. L'exploitant continuait de voir
+// l'ancien nom, l'ancien logo ou l'ancien texte jusqu'à 5 minutes.
+let siteSettingsFallback: SiteSettingsData | null = null;
 
 export interface SiteSettingsData {
   id: string;
   siteName: string;
   slogan: string;
   logoUrl: string;
+  /** Afficher le nom du site à côté du logo dans l'en-tête (quand un logo est défini). */
+  showSiteName: boolean;
+  /**
+   * Même réglage, mais pour le pied de page : l'exploitant peut ne garder que
+   * le logo image en haut et le texte seul en bas (ou l'inverse).
+   */
+  showSiteNameFooter: boolean;
   faviconUrl: string;
   emailLogoUrl: string;
+  /** Contenu du hero de la page d'accueil, éditable depuis l'administration. */
+  heroBadge: string;
+  heroTitle: string;
+  heroSubtitle: string;
+  heroPrimaryLabel: string;
+  heroPrimaryHref: string;
+  heroSecondaryLabel: string;
+  heroSecondaryHref: string;
+  heroImageUrl: string;
+  heroImageCaption: string;
+  heroImageCaptionSub: string;
+  heroImageBadge: string;
+  heroFact1Value: string;
+  heroFact1Label: string;
+  heroFact2Value: string;
+  heroFact2Label: string;
+  heroFact3Value: string;
+  heroFact3Label: string;
   primaryColor: string;
   secondaryColor: string;
   accentColor: string;
@@ -59,8 +86,28 @@ export const DEFAULT_SITE_SETTINGS: SiteSettingsData = {
   siteName: 'piolencboisdirect',
   slogan: 'Votre spécialiste du bois de chauffage premium',
   logoUrl: '/logo.svg',
+  showSiteName: true,
+  showSiteNameFooter: true,
   faviconUrl: '/favicon.ico',
   emailLogoUrl: '/email-logo.png',
+  heroBadge: "Bois sec étuvé certifié NF H1 · Taux d'humidité inférieur à 20%",
+  heroTitle: 'Bois de chauffage haute performance livré sur palette à domicile',
+  heroSubtitle:
+    'Approvisionnement direct en palettes de bois dur (chêne, charme, hêtre) séché en étuve biomasse. Allumage immédiat, haut pouvoir calorifique garanti et livraison par camion avec hayon et transpalette.',
+  heroPrimaryLabel: 'Consulter le catalogue',
+  heroPrimaryHref: '/boutique',
+  heroSecondaryLabel: 'Calculer les frais de port',
+  heroSecondaryHref: '/calculateurs/livraison',
+  heroImageUrl: '/images/hero.webp',
+  heroImageCaption: 'Palettes filmées & cerclées',
+  heroImageCaptionSub: 'Bûches 25 cm, 33 cm et 50 cm disponibles',
+  heroImageBadge: 'Stock disponible',
+  heroFact1Value: '2 000 kWh',
+  heroFact1Label: 'Énergie par stère',
+  heroFact2Value: '< 20%',
+  heroFact2Label: 'Humidité contrôlée',
+  heroFact3Value: 'Hayon inclus',
+  heroFact3Label: 'Dépose à votre abri',
   primaryColor: '#14532d',
   secondaryColor: '#7c4a2d',
   accentColor: '#ea580c',
@@ -154,6 +201,40 @@ export function applySiteSettingsToText(
     .join(settings.companyName || DEFAULT_SITE_SETTINGS.companyName);
 }
 
+/**
+ * Les zones de livraison peuvent être saisies/libellisées soit en texte libre,
+ * soit sous la forme d'une liste de pays (["FR","DE",...]) héritée des
+ * enregistrements d'amorçage. On restitue toujours une phrase lisible: sans
+ * cela, un tableau JSON brut s'affichait tel quel aux visiteurs du site.
+ */
+const COUNTRY_LABELS: Record<string, string> = {
+  FR: 'France métropolitaine',
+  BE: 'Belgique',
+  DE: 'Allemagne',
+  CH: 'Suisse',
+  LU: 'Luxembourg',
+  NL: 'Pays-Bas',
+  IT: 'Italie',
+  ES: 'Espagne',
+};
+
+export function formatDeliveryZones(value: string | null | undefined): string {
+  const raw = (value ?? '').trim();
+  if (!raw) return DEFAULT_SITE_SETTINGS.deliveryZonesText;
+  if (raw.startsWith('[')) {
+    try {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        const labels = parsed.map((code) => COUNTRY_LABELS[String(code).toUpperCase()] ?? String(code));
+        return labels.join(', ');
+      }
+    } catch {
+      // valeur texte qui commence par un crochet: on la garde telle quelle
+    }
+  }
+  return raw;
+}
+
 export function syncSettingsTextForUpdate(
   text: string | null | undefined,
   previousSettings: Partial<SiteSettingsData> | null | undefined,
@@ -189,13 +270,37 @@ export function syncSettingsTextForUpdate(
   return result;
 }
 
-export async function getSiteSettings(overwriteCache = false): Promise<SiteSettingsData> {
-  // Check in-memory cache first (unless overwritten)
-  const now = Date.now();
-  if (!overwriteCache && siteSettingsCache && now - cacheTimestamp < CACHE_TTL && siteSettingsCache.id) {
-    return siteSettingsCache;
-  }
+/**
+ * La configuration d'envoi d'e-mails peut être fournie par l'environnement
+ * (.env). Elle est prioritaire sur la base, car les valeurs enregistrées ne
+ * contiennent souvent que des exemples (smtp.example.com) : sans cela, un
+ * réglage réel présent dans .env était ignoré et chaque envoi partait en
+ * délai d'attente.
+ */
+function applyEmailEnvOverrides(settings: SiteSettingsData): SiteSettingsData {
+  const pick = (fromEnv: string | undefined, fallback: string) => {
+    const trimmed = fromEnv?.trim();
+    return trimmed ? trimmed : fallback;
+  };
 
+  const envPort = Number(process.env.SMTP_PORT);
+
+  return {
+    ...settings,
+    emailProvider: pick(process.env.EMAIL_PROVIDER, settings.emailProvider),
+    smtpHost: pick(process.env.SMTP_HOST, settings.smtpHost),
+    smtpPort: Number.isInteger(envPort) && envPort > 0 ? envPort : settings.smtpPort,
+    smtpUser: pick(process.env.SMTP_USER, settings.smtpUser),
+    smtpPassword: pick(process.env.SMTP_PASSWORD, settings.smtpPassword || ''),
+    smtpFrom: pick(process.env.SMTP_FROM, settings.smtpFrom),
+    adminNotificationEmail: pick(process.env.ADMIN_NOTIFICATION_EMAIL, settings.adminNotificationEmail),
+  };
+}
+
+export async function getSiteSettings(_overwriteCache = false): Promise<SiteSettingsData> {
+  // Relecture systématique : la table ne contient qu'une ligne et la recherche
+  // se fait par clé primaire. Un enregistrement dans l'administration doit être
+  // visible immédiatement sur le site.
   try {
     // Use targeted Prisma select to only fetch needed fields
     const raw = await prisma.siteSetting.findFirst({
@@ -204,8 +309,27 @@ export async function getSiteSettings(overwriteCache = false): Promise<SiteSetti
         siteName: true,
         slogan: true,
         logoUrl: true,
+        showSiteName: true,
+        showSiteNameFooter: true,
         faviconUrl: true,
         emailLogoUrl: true,
+        heroBadge: true,
+        heroTitle: true,
+        heroSubtitle: true,
+        heroPrimaryLabel: true,
+        heroPrimaryHref: true,
+        heroSecondaryLabel: true,
+        heroSecondaryHref: true,
+        heroImageUrl: true,
+        heroImageCaption: true,
+        heroImageCaptionSub: true,
+        heroImageBadge: true,
+        heroFact1Value: true,
+        heroFact1Label: true,
+        heroFact2Value: true,
+        heroFact2Label: true,
+        heroFact3Value: true,
+        heroFact3Label: true,
         primaryColor: true,
         secondaryColor: true,
         accentColor: true,
@@ -250,9 +374,9 @@ export async function getSiteSettings(overwriteCache = false): Promise<SiteSetti
       },
     });
     if (!raw) {
-      siteSettingsCache = DEFAULT_SITE_SETTINGS;
-      cacheTimestamp = now;
-      return siteSettingsCache;
+      const defaults = applyEmailEnvOverrides(DEFAULT_SITE_SETTINGS);
+      siteSettingsFallback = defaults;
+      return defaults;
     }
 
     const result = {
@@ -260,8 +384,27 @@ export async function getSiteSettings(overwriteCache = false): Promise<SiteSetti
       siteName: raw.siteName ?? DEFAULT_SITE_SETTINGS.siteName,
       slogan: raw.slogan ?? DEFAULT_SITE_SETTINGS.slogan,
       logoUrl: raw.logoUrl ?? DEFAULT_SITE_SETTINGS.logoUrl,
+      showSiteName: raw.showSiteName ?? DEFAULT_SITE_SETTINGS.showSiteName,
+      showSiteNameFooter: raw.showSiteNameFooter ?? DEFAULT_SITE_SETTINGS.showSiteNameFooter,
       faviconUrl: raw.faviconUrl ?? DEFAULT_SITE_SETTINGS.faviconUrl,
       emailLogoUrl: raw.emailLogoUrl ?? DEFAULT_SITE_SETTINGS.emailLogoUrl,
+      heroBadge: raw.heroBadge ?? DEFAULT_SITE_SETTINGS.heroBadge,
+      heroTitle: raw.heroTitle ?? DEFAULT_SITE_SETTINGS.heroTitle,
+      heroSubtitle: raw.heroSubtitle ?? DEFAULT_SITE_SETTINGS.heroSubtitle,
+      heroPrimaryLabel: raw.heroPrimaryLabel ?? DEFAULT_SITE_SETTINGS.heroPrimaryLabel,
+      heroPrimaryHref: raw.heroPrimaryHref ?? DEFAULT_SITE_SETTINGS.heroPrimaryHref,
+      heroSecondaryLabel: raw.heroSecondaryLabel ?? DEFAULT_SITE_SETTINGS.heroSecondaryLabel,
+      heroSecondaryHref: raw.heroSecondaryHref ?? DEFAULT_SITE_SETTINGS.heroSecondaryHref,
+      heroImageUrl: raw.heroImageUrl ?? DEFAULT_SITE_SETTINGS.heroImageUrl,
+      heroImageCaption: raw.heroImageCaption ?? DEFAULT_SITE_SETTINGS.heroImageCaption,
+      heroImageCaptionSub: raw.heroImageCaptionSub ?? DEFAULT_SITE_SETTINGS.heroImageCaptionSub,
+      heroImageBadge: raw.heroImageBadge ?? DEFAULT_SITE_SETTINGS.heroImageBadge,
+      heroFact1Value: raw.heroFact1Value ?? DEFAULT_SITE_SETTINGS.heroFact1Value,
+      heroFact1Label: raw.heroFact1Label ?? DEFAULT_SITE_SETTINGS.heroFact1Label,
+      heroFact2Value: raw.heroFact2Value ?? DEFAULT_SITE_SETTINGS.heroFact2Value,
+      heroFact2Label: raw.heroFact2Label ?? DEFAULT_SITE_SETTINGS.heroFact2Label,
+      heroFact3Value: raw.heroFact3Value ?? DEFAULT_SITE_SETTINGS.heroFact3Value,
+      heroFact3Label: raw.heroFact3Label ?? DEFAULT_SITE_SETTINGS.heroFact3Label,
       primaryColor: raw.primaryColor ?? DEFAULT_SITE_SETTINGS.primaryColor,
       secondaryColor: raw.secondaryColor ?? DEFAULT_SITE_SETTINGS.secondaryColor,
       accentColor: raw.accentColor ?? DEFAULT_SITE_SETTINGS.accentColor,
@@ -273,7 +416,7 @@ export async function getSiteSettings(overwriteCache = false): Promise<SiteSetti
       companyPhone: raw.companyPhone ?? DEFAULT_SITE_SETTINGS.companyPhone,
       companyEmail: raw.companyEmail ?? DEFAULT_SITE_SETTINGS.companyEmail,
       supportHours: raw.supportHours ?? DEFAULT_SITE_SETTINGS.supportHours,
-      deliveryZonesText: raw.deliveryZonesText ?? DEFAULT_SITE_SETTINGS.deliveryZonesText,
+      deliveryZonesText: formatDeliveryZones(raw.deliveryZonesText),
       bankName: raw.bankName ?? DEFAULT_SITE_SETTINGS.bankName,
       bankBeneficiary: raw.bankBeneficiary ?? DEFAULT_SITE_SETTINGS.bankBeneficiary,
       bankIban: raw.bankIban ?? DEFAULT_SITE_SETTINGS.bankIban,
@@ -303,42 +446,35 @@ export async function getSiteSettings(overwriteCache = false): Promise<SiteSetti
       isPublished: raw.isPublished ?? DEFAULT_SITE_SETTINGS.isPublished,
     };
 
-    // Update cache
-    siteSettingsCache = result;
-    cacheTimestamp = now;
-    return result;
+    const resolved = applyEmailEnvOverrides(result);
+    // Conservé uniquement comme secours en cas de panne de la base.
+    siteSettingsFallback = resolved;
+    return resolved;
   } catch {
-    // Return cached value if available, otherwise default
-    if (siteSettingsCache && siteSettingsCache.id) return siteSettingsCache;
+    // Base injoignable : mieux vaut la dernière copie connue que les valeurs par défaut.
+    if (siteSettingsFallback && siteSettingsFallback.id) return siteSettingsFallback;
     return DEFAULT_SITE_SETTINGS;
   }
 }
 
-/** 
- * Clears the in-memory site settings cache. 
- * Should be called after admin UI updates to force a fresh DB fetch. 
+/**
+ * Les réglages ne sont plus mis en cache : chaque lecture interroge la base.
+ * Ces deux fonctions restent exposées (elles sont appelées après un
+ * enregistrement depuis l'administration) et se contentent d'oublier la copie de
+ * secours conservée pour le cas de panne.
  */
 export function clearSiteSettingsCache() {
-  siteSettingsCache = null;
-  cacheTimestamp = 0;
+  siteSettingsFallback = null;
 }
 
-/** 
- * Invalidates the site settings cache and forces a fresh DB fetch on next call. 
- * Also resets the cache to empty so the next getSiteSettings() call will query the DB. 
- */
 export function invalidateSiteSettingsCache() {
   clearSiteSettingsCache();
-  // Force refresh on next call by setting cache to empty object
-  siteSettingsCache = {} as any;
-  cacheTimestamp = 0;
 }
 
-// In-memory cache for products - reduces DB queries
-// Products are relatively static and change only via admin UI
+// Dernière copie lue des produits : secours si la base est injoignable.
+// Aucune durée de vie : une modification faite dans l'administration (prix,
+// stock, disponibilité) doit apparaître immédiatement sur la boutique.
 let productsCache: any = null;
-let productsCacheTimestamp = 0;
-const PRODUCTS_CACHE_TTL = 5 * 60 * 1000; // 5 minutes TTL
 
 // Map Prisma Product fields to cache interface - using priceHT as the base price field
 type ProductPrismaSelect = {
@@ -512,13 +648,7 @@ type ProductPrismaSelectFull = {
   updatedAt: true;
 };
 
-export async function getProducts(overwriteCache = false): Promise<ProductCacheData[]> {
-  // Check in-memory cache first (unless overwritten)
-  const now = Date.now();
-  if (!overwriteCache && productsCache && now - productsCacheTimestamp < PRODUCTS_CACHE_TTL && productsCache.length > 0) {
-    return productsCache;
-  }
-
+export async function getProducts(_overwriteCache = false): Promise<ProductCacheData[]> {
   try {
     // Use targeted Prisma findMany to only fetch needed fields
     const raw = await prisma.product.findMany({
@@ -567,40 +697,31 @@ export async function getProducts(overwriteCache = false): Promise<ProductCacheD
       images: p.images ? JSON.parse(p.images) : [],
     })) as ProductCacheData[];
 
-    // Update cache
     productsCache = transformed;
-    productsCacheTimestamp = now;
     return transformed;
   } catch {
-    // Return cached value if available, otherwise empty array
+    // Base injoignable : mieux vaut la dernière copie connue qu'un catalogue vide.
     if (productsCache && productsCache.length > 0) return productsCache;
     return [];
   }
 }
 
-/** 
- * Clears the products in-memory cache. 
- * Should be called after admin UI updates to force a fresh DB fetch. 
+/**
+ * Les produits ne sont plus mis en cache : chaque lecture interroge la base.
+ * Conservé pour les appels existants après un enregistrement dans l'administration.
  */
 export function clearProductsCache() {
   productsCache = null;
-  productsCacheTimestamp = 0;
 }
 
-/** 
- * Invalidates the products cache and forces a fresh DB fetch on next call. 
- */
 export function invalidateProductsCache() {
   clearProductsCache();
-  productsCache = [] as any[];
-  productsCacheTimestamp = 0;
 }
 
-// In-memory cache for categories - reduces DB queries
-// Categories are relatively static and change only via admin UI
+// Dernière copie lue des catégories : secours si la base est injoignable.
+// Aucune durée de vie, pour que les changements faits dans l'administration
+// s'affichent immédiatement sur la boutique.
 let categoriesCache: any = null;
-let categoriesCacheTimestamp = 0;
-const CATEGORIES_CACHE_TTL = 5 * 60 * 1000; // 5 minutes TTL
 
 // Map Prisma Category fields to cache interface
 type CategoryPrismaSelect = {
@@ -631,13 +752,7 @@ export const DEFAULT_CATEGORY_CACHE: CategoryCacheData = {
   rgt: null,
 };
 
-export async function getCategories(overwriteCache = false): Promise<CategoryCacheData[]> {
-  // Check in-memory cache first (unless overwritten)
-  const now = Date.now();
-  if (!overwriteCache && categoriesCache && now - categoriesCacheTimestamp < CATEGORIES_CACHE_TTL && categoriesCache.length > 0) {
-    return categoriesCache;
-  }
-
+export async function getCategories(_overwriteCache = false): Promise<CategoryCacheData[]> {
   try {
     // Use targeted Prisma findMany to only fetch needed fields
     const raw = await prisma.category.findMany({
@@ -652,33 +767,23 @@ export async function getCategories(overwriteCache = false): Promise<CategoryCac
       },
     });
 
-    // Update cache
+    // Conservé uniquement comme secours en cas de panne de la base.
     categoriesCache = raw as CategoryCacheData[];
-
-    // Update cache
-    categoriesCacheTimestamp = now;
     return raw;
   } catch {
-    // Return cached value if available, otherwise empty array
     if (categoriesCache && categoriesCache.length > 0) return categoriesCache;
     return [];
   }
 }
 
-/** 
- * Clears the categories in-memory cache. 
- * Should be called after admin UI updates to force a fresh DB fetch. 
+/**
+ * Les catégories ne sont plus mises en cache : chaque lecture interroge la base.
+ * Conservé pour les appels existants après un enregistrement dans l'administration.
  */
 export function clearCategoriesCache() {
   categoriesCache = null;
-  categoriesCacheTimestamp = 0;
 }
 
-/** 
- * Invalidates the categories cache and forces a fresh DB fetch on next call. 
- */
 export function invalidateCategoriesCache() {
   clearCategoriesCache();
-  categoriesCache = [] as any[];
-  categoriesCacheTimestamp = 0;
 }

@@ -8,6 +8,7 @@ import TrustBadges from '@/components/TrustBadges';
 import QuantityCalculator from '@/components/QuantityCalculator';
 import ShippingEstimator from '@/components/ShippingEstimator';
 import { formatPrice } from '@/lib/pricing';
+import { PLACEHOLDER_IMAGE } from '@/lib/images';
 import {
   Truck,
   ShieldCheck,
@@ -36,6 +37,13 @@ export default async function HomePage() {
     take: 4,
   });
 
+  // Chiffres clés du hero : chacun est masquable depuis l'administration.
+  const heroFacts = [
+    { value: settings.heroFact1Value, label: settings.heroFact1Label },
+    { value: settings.heroFact2Value, label: settings.heroFact2Label },
+    { value: settings.heroFact3Value, label: settings.heroFact3Label },
+  ].filter((fact) => (fact.value || '').trim() || (fact.label || '').trim());
+
   return (
     <>
       <a href="#main" className="sr-only focus:not-sr-only focus-outline">Skip to main content</a>
@@ -47,70 +55,89 @@ export default async function HomePage() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-center">
               {/* Left Column: Commercial message & CTAs */}
               <div className="lg:col-span-7 space-y-6">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-forest-50 border border-forest-100 text-forest text-xs font-medium">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Bois sec étuvé certifié NF H1 · Taux d&apos;humidité inférieur à 20%</span>
-                </div>
+                {settings.heroBadge && (
+                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-forest-50 border border-forest-100 text-forest text-xs font-medium">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>{settings.heroBadge}</span>
+                  </div>
+                )}
 
                 <h1 className="font-poppins font-semibold text-3xl sm:text-4xl lg:text-5xl text-primaryText leading-tight">
-                  Bois de chauffage haute performance livré sur palette à domicile
+                  {settings.heroTitle}
                 </h1>
 
-                <p className="text-secondaryText text-sm sm:text-base leading-relaxed max-w-xl">
-                  Approvisionnement direct en palettes de bois dur (chêne, charme, hêtre) séché en étuve biomasse. Allumage immédiat, haut pouvoir calorifique garanti et livraison par camion avec hayon et transpalette.
-                </p>
+                {settings.heroSubtitle && (
+                  <p className="text-secondaryText text-sm sm:text-base leading-relaxed max-w-xl">
+                    {settings.heroSubtitle}
+                  </p>
+                )}
 
                 {/* Primary & Secondary Action Buttons */}
                 <div className="flex flex-col sm:flex-row gap-3 pt-2">
-                  <Link
-                    href="/boutique"
-                    className="btn-primary text-sm py-3 px-6 inline-flex items-center justify-center gap-2"
-                  >
-                    <span>Consulter le catalogue</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  {settings.heroPrimaryLabel && (
+                    <Link
+                      href={settings.heroPrimaryHref || '/boutique'}
+                      className="btn-primary text-sm py-3 px-6 inline-flex items-center justify-center gap-2"
+                    >
+                      <span>{settings.heroPrimaryLabel}</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  )}
 
-                  <Link
-                    href="/calculateurs/livraison"
-                    className="btn-secondary text-sm py-3 px-5 inline-flex items-center justify-center gap-2"
-                  >
-                    <Truck className="w-4 h-4 text-forest" />
-                    <span>Calculer les frais de port</span>
-                  </Link>
+                  {settings.heroSecondaryLabel && (
+                    <Link
+                      href={settings.heroSecondaryHref || '/calculateurs/livraison'}
+                      className="btn-secondary text-sm py-3 px-5 inline-flex items-center justify-center gap-2"
+                    >
+                      <Truck className="w-4 h-4 text-forest" />
+                      <span>{settings.heroSecondaryLabel}</span>
+                    </Link>
+                  )}
                 </div>
 
                 {/* Key Facts */}
-                <div className="pt-4 border-t border-subtleBorder grid grid-cols-3 gap-4 text-xs">
-                  <div>
-                    <span className="font-poppins font-semibold text-primaryText block text-sm">2 000 kWh</span>
-                    <span className="text-secondaryText text-[11px]">Énergie par stère</span>
+                {heroFacts.length > 0 && (
+                  <div className="pt-4 border-t border-subtleBorder grid grid-cols-3 gap-4 text-xs">
+                    {heroFacts.map((fact, index) => (
+                      <div key={index}>
+                        {fact.value && (
+                          <span className="font-poppins font-semibold text-primaryText block text-sm">
+                            {fact.value}
+                          </span>
+                        )}
+                        {fact.label && (
+                          <span className="text-secondaryText text-[11px]">{fact.label}</span>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                  <div>
-                    <span className="font-poppins font-semibold text-primaryText block text-sm">&lt; 20%</span>
-                    <span className="text-secondaryText text-[11px]">Humidité contrôlée</span>
-                  </div>
-                  <div>
-                    <span className="font-poppins font-semibold text-primaryText block text-sm">Hayon inclus</span>
-                    <span className="text-secondaryText text-[11px]">Dépose à votre abri</span>
-                  </div>
-                </div>
+                )}
               </div>
 
               {/* Right Column: Authentic Photography */}
               <div className="lg:col-span-5">
                 <div className="relative rounded-xl overflow-hidden border border-subtleBorder bg-ivory shadow-subtle">
                   <img
-                    src=""
-                    alt="Palette de bois de chauffage fendu et empilé proprement"
+                    src={settings.heroImageUrl}
+                    alt={settings.heroImageCaption || 'Bois de chauffage livré sur palette'}
                     className="w-full h-80 sm:h-96 object-cover"
+                    loading="eager"
                   />
-                  <div className="p-4 bg-white border-t border-subtleBorder flex items-center justify-between text-xs">
-                    <div>
-                      <p className="font-medium text-primaryText">Palettes filmées &amp; cerclées</p>
-                      <p className="text-[11px] text-secondaryText">Bûches 25 cm, 33 cm et 50 cm disponibles</p>
+                  {(settings.heroImageCaption || settings.heroImageCaptionSub || settings.heroImageBadge) && (
+                    <div className="p-4 bg-white border-t border-subtleBorder flex items-center justify-between text-xs">
+                      <div>
+                        {settings.heroImageCaption && (
+                          <p className="font-medium text-primaryText">{settings.heroImageCaption}</p>
+                        )}
+                        {settings.heroImageCaptionSub && (
+                          <p className="text-[11px] text-secondaryText">{settings.heroImageCaptionSub}</p>
+                        )}
+                      </div>
+                      {settings.heroImageBadge && (
+                        <span className="badge-success">{settings.heroImageBadge}</span>
+                      )}
                     </div>
-                    <span className="badge-success">Stock disponible</span>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -141,14 +168,16 @@ export default async function HomePage() {
             {categories.map((cat) => (
               <Link
                 key={cat.id}
-                href={`/boutique?category=${cat.slug}`}
+                href={`/boutique?categorie=${cat.slug}`}
                 className="group bg-white rounded-xl border border-subtleBorder overflow-hidden hover:border-forest transition-colors duration-150 flex flex-col"
               >
                 <div className="h-44 overflow-hidden bg-ivory">
                   <img
-                    src={cat.imageUrl || undefined}
+                    src={cat.imageUrl || PLACEHOLDER_IMAGE}
                     alt={`Catégorie : ${cat.name}`}
-                    className="w-full h-full object-cover group-hover:scale-102 transition-transform duration-200"
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
                 <div className="p-4 flex-1 flex flex-col justify-between">
@@ -202,7 +231,7 @@ export default async function HomePage() {
                     images = [];
                   }
                 }
-                const mainImg = images[0] || undefined;
+                const mainImg = images[0] || PLACEHOLDER_IMAGE;
 
                 return (
                   <div
@@ -214,12 +243,16 @@ export default async function HomePage() {
                       <Link href={`/produit/${prod.slug}`} className="block relative h-48 bg-ivory overflow-hidden">
                         <img
                           src={mainImg}
-                          alt={`Bûches de ${prod.species} - ${prod.name}`}
+                          alt={prod.species ? `Bûches de ${prod.species} - ${prod.name}` : prod.name}
                           className="w-full h-full object-cover"
+                          loading="lazy"
+                          decoding="async"
                         />
-                        <span className="absolute top-2.5 left-2.5 badge-neutral bg-white/90 backdrop-blur-sm text-[10px]">
-                          {prod.logLength}
-                        </span>
+                        {prod.logLength ? (
+                          <span className="absolute top-2.5 left-2.5 badge-neutral bg-white/90 backdrop-blur-sm text-[10px]">
+                            {prod.logLength}
+                          </span>
+                        ) : null}
                       </Link>
 
                       {/* Product Content */}
@@ -234,8 +267,12 @@ export default async function HomePage() {
                         </Link>
 
                         <div className="mt-3 space-y-1 text-xs text-secondaryText">
-                          <p>Conditionnement : <span className="text-primaryText font-medium">{prod.packaging}</span></p>
-                          <p>Humidité : <span className="text-forest font-medium">{prod.humidityRate}</span></p>
+                          {prod.packaging ? (
+                            <p>Conditionnement : <span className="text-primaryText font-medium">{prod.packaging}</span></p>
+                          ) : null}
+                          {prod.humidityRate ? (
+                            <p>Humidité : <span className="text-forest font-medium">{prod.humidityRate}</span></p>
+                          ) : null}
                         </div>
                       </div>
                     </div>
@@ -266,7 +303,7 @@ export default async function HomePage() {
         <TrustBadges />
 
         {/* SECTION 5: EXPLICATION DE LA LIVRAISON (4 ETAPES) */}
-        <section className="py-14 sm:py-18 bg-white border-b border-subtleBorder">
+        <section className="py-14 sm:py-[72px] bg-white border-b border-subtleBorder">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center max-w-2xl mx-auto mb-10">
               <span className="text-xs font-medium uppercase tracking-wider text-secondaryText block mb-1">

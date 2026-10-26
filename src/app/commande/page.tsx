@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
@@ -34,7 +34,9 @@ export default function CheckoutPage() {
   // Shipping Address
   const [street, setStreet] = useState('');
   const [additional, setAdditional] = useState('');
-  const [postalCode, setPostalCode] = useState('75008');
+  // Le code postal doit rester vide : une valeur par défaut (« 75008 »)
+  // était livrée au client, qui pouvait valider une commande expédiée à Paris.
+  const [postalCode, setPostalCode] = useState('');
   const [city, setCity] = useState('');
   const [country, setCountry] = useState('FR');
 
@@ -64,6 +66,20 @@ export default function CheckoutPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
 
+  // Clé d'idempotence : stable pour toutes les validations du même formulaire.
+  // Le serveur renvoie alors la commande déjà créée au lieu d'en créer une
+  // seconde (double clic, actualisation, retour navigateur).
+  const idempotencyKeyRef = useRef<string | null>(null);
+  const getIdempotencyKey = () => {
+    if (!idempotencyKeyRef.current) {
+      idempotencyKeyRef.current =
+        typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : `cmd-${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+    }
+    return idempotencyKeyRef.current;
+  };
+
   // Server-like shipping estimation preview
   const shippingPreview = calculateShippingFee(
     {
@@ -77,6 +93,11 @@ export default function CheckoutPage() {
   );
 
   const estimatedTotal = Number((subtotalTTC + shippingPreview.shippingFeeTTC).toFixed(2));
+
+  // Taux de TVA réellement appliqué aux articles du panier (5,5 % pour le bois
+  // de chauffage, 0 % sur certaines offres). Afficher le taux de TVA de la
+  // livraison (20 %) à côté du montant de TVA des articles était trompeur.
+  const itemsVatRate = subtotalHT > 0 ? Number((((subtotalTTC - subtotalHT) / subtotalHT) * 100).toFixed(2)) : 0;
 
   const handleSubmitOrder = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,6 +161,7 @@ export default function CheckoutPage() {
         accessibility,
         requestedDeliverySlot: requestedSlot,
         customerNotes,
+        idempotencyKey: getIdempotencyKey(),
       };
 
       const res = await fetch('/api/checkout', {
@@ -155,7 +177,10 @@ export default function CheckoutPage() {
       }
 
       clearCart();
-      router.push(`/commande/confirmation/${data.orderNumber}`);
+      // On navigue avec le jeton non devinable : la page de confirmation contient
+      // des données personnelles et ne doit pas être accessible via un numéro
+      // de commande court et énumérable.
+      router.push(`/commande/confirmation/${encodeURIComponent(data.secureToken)}`);
     } catch (err: any) {
       console.error(err);
       setErrorMessage(err.message || 'Une erreur est survenue lors de la validation.');
@@ -430,7 +455,7 @@ export default function CheckoutPage() {
                 <span className="font-medium text-primaryText">{formatPrice(subtotalTTC, country === 'CH' ? 'CHF' : 'EUR')}</span>
               </div>
               <div className="flex justify-between items-center">
-                <span>TVA ({shippingPreview.vatRate}%)</span>
+                <span>TVA ({String(itemsVatRate).replace('.', ',')}%)</span>
                 <span className="font-medium text-primaryText">{formatPrice(subtotalTTC - subtotalHT, country === 'CH' ? 'CHF' : 'EUR')}</span>
               </div>
               <div className="flex justify-between items-center text-forest">

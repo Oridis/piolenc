@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300" role="img" aria-label="Photo produit en cours de préparation">
+  <rect width="400" height="300" fill="#f6f2ea"/>
+  <g stroke="#c9b79c" stroke-width="2" fill="none">
+    <rect x="86" y="120" width="228" height="34" rx="17" fill="#e6d9c6"/>
+    <rect x="104" y="164" width="192" height="34" rx="17" fill="#dccbb2"/>
+    <rect x="86" y="208" width="228" height="34" rx="17" fill="#e6d9c6"/>
+  </g>
+  <g fill="#8a7157">
+    <circle cx="120" cy="137" r="7"/>
+    <circle cx="150" cy="137" r="5" opacity="0.7"/>
+    <circle cx="140" cy="181" r="6"/>
+    <circle cx="184" cy="181" r="4" opacity="0.7"/>
+    <circle cx="120" cy="225" r="6"/>
+    <circle cx="264" cy="225" r="5" opacity="0.7"/>
+  </g>
+  <text x="200" y="70" text-anchor="middle" font-family="Poppins, Segoe UI, Helvetica, Arial, sans-serif" font-size="20" font-weight="600" fill="#14532d">Photo produit</text>
+  <text x="200" y="96" text-anchor="middle" font-family="Poppins, Segoe UI, Helvetica, Arial, sans-serif" font-size="14" fill="#6b6b6b">en cours de préparation</text>
+</svg>

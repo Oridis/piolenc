@@ -6,6 +6,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import TrustBadges from '@/components/TrustBadges';
 import { formatPrice } from '@/lib/pricing';
+import { PLACEHOLDER_IMAGE } from '@/lib/images';
 import { ArrowRight } from 'lucide-react';
 
 export const dynamic = 'force-dynamic';
@@ -54,18 +55,22 @@ export default async function CatalogPage() {
                 <div>
                   <div className="relative h-52 overflow-hidden bg-ivory">
                     <img
-                      src={parsedImages[0] || undefined}
+                      src={parsedImages[0] || PLACEHOLDER_IMAGE}
+                      loading="lazy"
+                      decoding="async"
                       alt={prod.name}
                       className="w-full h-full object-cover"
                     />
-                    <div className="absolute top-2.5 left-2.5 badge-neutral bg-white/90 backdrop-blur-sm text-[10px]">
-                      {prod.humidityRate}
-                    </div>
+                    {prod.humidityRate ? (
+                      <div className="absolute top-2.5 left-2.5 badge-neutral bg-white/90 backdrop-blur-sm text-[10px]">
+                        {prod.humidityRate}
+                      </div>
+                    ) : null}
                   </div>
 
                   <div className="p-5 space-y-2.5">
                     <span className="text-[10px] font-medium uppercase tracking-wider text-secondaryText">
-                      {prod.category?.name} · Bûches {prod.logLength}
+                      {[prod.category?.name, prod.logLength ? `Bûches ${prod.logLength}` : null].filter(Boolean).join(' · ')}
                     </span>
                     <h3 className="font-poppins font-medium text-base text-primaryText">
                       <Link href={`/produit/${prod.slug}`} className="hover:text-forest transition-colors">
@@ -77,9 +82,15 @@ export default async function CatalogPage() {
                     </p>
 
                     <div className="pt-2 text-xs text-secondaryText space-y-1">
-                      <p>Essences : <span className="font-medium text-primaryText">{prod.species}</span></p>
-                      <p>Pouvoir calorifique : <span className="font-medium text-primaryText">{prod.calorificValue}</span></p>
-                      <p>Conditionnement : <span className="font-medium text-primaryText">{prod.unit}</span></p>
+                      {prod.species ? (
+                        <p>Essences : <span className="font-medium text-primaryText">{prod.species}</span></p>
+                      ) : null}
+                      {prod.calorificValue ? (
+                        <p>Pouvoir calorifique : <span className="font-medium text-primaryText">{prod.calorificValue}</span></p>
+                      ) : null}
+                      {prod.unit ? (
+                        <p>Conditionnement : <span className="font-medium text-primaryText">{prod.unit}</span></p>
+                      ) : null}
                     </div>
                   </div>
                 </div>

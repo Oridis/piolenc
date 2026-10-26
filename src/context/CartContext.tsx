@@ -61,7 +61,10 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
     setItems((prev) => {
       const existing = prev.find((item) => item.productId === product.id);
       const effectivePriceTTC = product.promoPrice && product.promoPrice > 0 ? product.promoPrice : product.priceTTC;
-      const effectivePriceHT = Number((effectivePriceTTC / 1.055).toFixed(2));
+      // Le taux de TVA dépend du produit (5,5 % bois en France, 0 % sur certaines
+      // offres) : un taux codé en dur faussait l'affichage du sous-total HT.
+      const vatRate = typeof product.vatRate === 'number' ? product.vatRate : 5.5;
+      const effectivePriceHT = Number((effectivePriceTTC / (1 + vatRate / 100)).toFixed(2));
       
       let parsedImages: string[] = [];
       try {

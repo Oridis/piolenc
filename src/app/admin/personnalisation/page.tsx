@@ -17,6 +17,8 @@ import {
   Upload,
   Trash2,
   Image as ImageIcon,
+  Home,
+  ArrowRight,
 } from 'lucide-react';
 
 export default function SiteCustomizationPage() {
@@ -24,7 +26,7 @@ export default function SiteCustomizationPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [activeTab, setActiveTab] = useState<'brand' | 'bank' | 'company' | 'legal' | 'email'>('brand');
+  const [activeTab, setActiveTab] = useState<'brand' | 'hero' | 'bank' | 'company' | 'legal' | 'email'>('brand');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const faviconInputRef = useRef<HTMLInputElement>(null);
 
@@ -250,9 +252,13 @@ export default function SiteCustomizationPage() {
                 ) : (
                   <Flame className="w-8 h-8 text-forest shrink-0 fill-forest/15" />
                 )}
-                <span className="text-lg font-bold font-heading text-primaryText block leading-tight">
-                  {settings.siteName}
-                </span>
+                {/* Aperçu fidèle de l'en-tête : le nom en texte n'apparaît que
+                    si le réglage « En-tête » est actif (ou sans logo). */}
+                {(!settings.logoUrl || settings.showSiteName !== false) && (
+                  <span className="text-lg font-bold font-heading text-primaryText block leading-tight">
+                    {settings.siteName}
+                  </span>
+                )}
               </div>
 
               <div className="flex items-center space-x-2">
@@ -272,6 +278,25 @@ export default function SiteCustomizationPage() {
                 </button>
               </div>
             </div>
+
+            {/* Aperçu du pied de page : son réglage est indépendant de
+                l'en-tête, on peut donc y garder le texte seul. */}
+            <div className="bg-forest-dark px-4 py-3 flex items-center space-x-2.5">
+              {settings.logoUrl ? (
+                <img
+                  src={settings.logoUrl}
+                  alt={settings.siteName}
+                  className="h-7 w-auto max-w-[140px] object-contain shrink-0"
+                />
+              ) : (
+                <Flame className="w-6 h-6 text-beige shrink-0 fill-beige/20" />
+              )}
+              {(!settings.logoUrl || settings.showSiteNameFooter !== false) && (
+                <span className="text-sm font-semibold font-poppins text-white tracking-tight">
+                  {settings.siteName}
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
@@ -279,6 +304,7 @@ export default function SiteCustomizationPage() {
         <div className="flex border-b border-subtleBorder space-x-2">
           {[
             { id: 'brand', label: 'Marque & Nom du site', icon: Paintbrush },
+            { id: 'hero', label: "Hero d'accueil", icon: Home },
             { id: 'bank', label: 'Coordonnées Bancaires', icon: CreditCard },
             { id: 'company', label: 'Entreprise & Contact', icon: Building2 },
             { id: 'legal', label: 'Textes Juridiques & CGV', icon: ShieldCheck },
@@ -386,6 +412,55 @@ export default function SiteCustomizationPage() {
                   onChange={(e) => setSettings({ ...settings, logoUrl: e.target.value })}
                   className="input-field text-xs font-mono"
                 />
+              </div>
+
+              {/* Affichage du nom du site : deux réglages indépendants, un pour
+                  l'en-tête, un pour le pied de page. Le choix n'a de sens
+                  qu'avec un logo image ; sinon le nom reste affiché. */}
+              <div className="p-3.5 bg-beige-50/70 border border-subtleBorder rounded-xl space-y-3">
+                <span className="font-semibold block text-xs text-primaryText">
+                  Afficher le nom du site en texte à côté du logo
+                </span>
+
+                <div className="flex items-start gap-3">
+                  <input
+                    id="showSiteName"
+                    type="checkbox"
+                    checked={settings.showSiteName !== false}
+                    disabled={!settings.logoUrl}
+                    onChange={(e) => setSettings({ ...settings, showSiteName: e.target.checked })}
+                    className="mt-0.5 w-4 h-4 accent-forest-700 disabled:opacity-40"
+                  />
+                  <label
+                    htmlFor="showSiteName"
+                    className={`text-[11px] leading-relaxed ${settings.logoUrl ? 'text-primaryText cursor-pointer' : 'text-secondaryText'}`}
+                  >
+                    <span className="font-semibold block text-xs">En-tête (barre de navigation)</span>
+                    {settings.logoUrl
+                      ? "Décochez pour n'afficher que le logo image en haut du site."
+                      : "Définissez d'abord un logo : sans logo, le nom du site reste affiché."}
+                  </label>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <input
+                    id="showSiteNameFooter"
+                    type="checkbox"
+                    checked={settings.showSiteNameFooter !== false}
+                    disabled={!settings.logoUrl}
+                    onChange={(e) => setSettings({ ...settings, showSiteNameFooter: e.target.checked })}
+                    className="mt-0.5 w-4 h-4 accent-forest-700 disabled:opacity-40"
+                  />
+                  <label
+                    htmlFor="showSiteNameFooter"
+                    className={`text-[11px] leading-relaxed ${settings.logoUrl ? 'text-primaryText cursor-pointer' : 'text-secondaryText'}`}
+                  >
+                    <span className="font-semibold block text-xs">Pied de page</span>
+                    {settings.logoUrl
+                      ? "Décochez pour n'afficher que le logo image en bas du site. Indépendant de l'en-tête : vous pouvez garder le logo seul en haut et le texte seul en bas, ou l'inverse."
+                      : "Définissez d'abord un logo : sans logo, le nom du site reste affiché."}
+                  </label>
+                </div>
               </div>
             </div>
 
@@ -550,7 +625,245 @@ export default function SiteCustomizationPage() {
           </div>
         )}
 
-        {/* Tab 2: Bank details */}
+        {/* Tab 2: Hero de la page d'accueil */}
+        {activeTab === 'hero' && (
+          <div className="bg-white p-6 rounded-xl border border-subtleBorder shadow-subtle space-y-6 text-xs">
+            <h2 className="text-sm font-bold font-heading text-primaryText border-b border-subtleBorder pb-2">
+              Hero de la page d&apos;accueil (première section du site)
+            </h2>
+
+            <div className="p-3 bg-beige-50 border border-subtleBorder rounded-lg text-secondaryText leading-relaxed flex items-start space-x-2">
+              <Info className="w-4 h-4 text-forest-700 shrink-0 mt-0.5" />
+              <span>
+                Tout ce qui s&apos;affiche en haut de la page d&apos;accueil se règle ici. Laisser un champ vide masque
+                l&apos;élément correspondant sur le site ; le titre et l&apos;image reprennent leur valeur par défaut
+                s&apos;ils sont vidés. Les autres sections de la page d&apos;accueil ne sont pas concernées.
+              </span>
+            </div>
+
+            {/* Aperçu en direct */}
+            <div>
+              <label className="block font-bold text-primaryText text-xs mb-2">Aperçu en direct :</label>
+              <div className="rounded-xl border border-subtleBorder bg-white p-4 space-y-3">
+                {settings.heroBadge && (
+                  <span className="inline-flex items-center gap-2 px-3 py-1 rounded-md bg-forest-50 border border-forest-100 text-forest text-[11px] font-medium">
+                    {settings.heroBadge}
+                  </span>
+                )}
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+                  <div className="sm:col-span-2 space-y-2">
+                    <p className="font-poppins font-semibold text-lg text-primaryText leading-tight">
+                      {settings.heroTitle || '(titre par défaut)'}
+                    </p>
+                    {settings.heroSubtitle && (
+                      <p className="text-secondaryText text-[11px] leading-relaxed">{settings.heroSubtitle}</p>
+                    )}
+                    <div className="flex flex-wrap gap-2 pt-1">
+                      {settings.heroPrimaryLabel && (
+                        <span className="px-3 py-1.5 rounded-md bg-forest-700 text-white text-[11px] font-semibold">
+                          {settings.heroPrimaryLabel}
+                        </span>
+                      )}
+                      {settings.heroSecondaryLabel && (
+                        <span className="px-3 py-1.5 rounded-md border border-subtleBorder text-primaryText text-[11px] font-semibold">
+                          {settings.heroSecondaryLabel}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-4 pt-2 border-t border-subtleBorder text-[11px]">
+                      {[
+                        { v: settings.heroFact1Value, l: settings.heroFact1Label },
+                        { v: settings.heroFact2Value, l: settings.heroFact2Label },
+                        { v: settings.heroFact3Value, l: settings.heroFact3Label },
+                      ]
+                        .filter((f) => (f.v || '').trim() || (f.l || '').trim())
+                        .map((f, i) => (
+                          <span key={i} className="leading-tight">
+                            <span className="block font-semibold text-primaryText">{f.v}</span>
+                            <span className="text-secondaryText">{f.l}</span>
+                          </span>
+                        ))}
+                    </div>
+                  </div>
+                  <div className="rounded-lg overflow-hidden border border-subtleBorder">
+                    {settings.heroImageUrl ? (
+                      <img
+                        src={settings.heroImageUrl}
+                        alt={settings.heroImageCaption || 'Visuel du hero'}
+                        className="w-full h-32 object-cover"
+                      />
+                    ) : (
+                      <div className="h-32 flex items-center justify-center text-secondaryText italic text-[11px]">
+                        Aucun visuel
+                      </div>
+                    )}
+                    {(settings.heroImageCaption || settings.heroImageBadge) && (
+                      <div className="p-2 bg-white border-t border-subtleBorder flex items-center justify-between gap-2 text-[10px]">
+                        <span className="text-primaryText">{settings.heroImageCaption}</span>
+                        {settings.heroImageBadge && <span className="badge-success">{settings.heroImageBadge}</span>}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Textes */}
+            <div className="space-y-4">
+              <div>
+                <label className="block font-semibold text-primaryText mb-1">
+                  Accroche (petit bandeau au-dessus du titre) :
+                </label>
+                <input
+                  value={settings.heroBadge ?? ''}
+                  onChange={(e) => setSettings({ ...settings, heroBadge: e.target.value })}
+                  className="input-field text-xs"
+                  placeholder="Bois sec étuvé certifié NF H1"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-primaryText mb-1">Titre principal (H1) *</label>
+                <textarea
+                  rows={2}
+                  value={settings.heroTitle ?? ''}
+                  onChange={(e) => setSettings({ ...settings, heroTitle: e.target.value })}
+                  className="input-field text-xs"
+                />
+              </div>
+
+              <div>
+                <label className="block font-semibold text-primaryText mb-1">Texte d&apos;introduction :</label>
+                <textarea
+                  rows={3}
+                  value={settings.heroSubtitle ?? ''}
+                  onChange={(e) => setSettings({ ...settings, heroSubtitle: e.target.value })}
+                  className="input-field text-xs"
+                />
+              </div>
+            </div>
+
+            {/* Boutons */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label className="block font-semibold text-primaryText mb-1">Bouton principal — libellé :</label>
+                <input
+                  value={settings.heroPrimaryLabel ?? ''}
+                  onChange={(e) => setSettings({ ...settings, heroPrimaryLabel: e.target.value })}
+                  className="input-field text-xs"
+                  placeholder="Consulter le catalogue"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold text-primaryText mb-1">Bouton principal — lien :</label>
+                <input
+                  value={settings.heroPrimaryHref ?? ''}
+                  onChange={(e) => setSettings({ ...settings, heroPrimaryHref: e.target.value })}
+                  className="input-field text-xs font-mono"
+                  placeholder="/boutique"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold text-primaryText mb-1">Bouton secondaire — libellé :</label>
+                <input
+                  value={settings.heroSecondaryLabel ?? ''}
+                  onChange={(e) => setSettings({ ...settings, heroSecondaryLabel: e.target.value })}
+                  className="input-field text-xs"
+                  placeholder="Calculer les frais de port"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold text-primaryText mb-1">Bouton secondaire — lien :</label>
+                <input
+                  value={settings.heroSecondaryHref ?? ''}
+                  onChange={(e) => setSettings({ ...settings, heroSecondaryHref: e.target.value })}
+                  className="input-field text-xs font-mono"
+                  placeholder="/calculateurs/livraison"
+                />
+              </div>
+            </div>
+
+            {/* Visuel */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-4 bg-beige-50/70 border border-subtleBorder rounded-xl">
+              <div className="sm:col-span-2">
+                <label className="block font-semibold text-primaryText mb-1">
+                  Visuel — URL de l&apos;image (ou téléversez-la puis copiez son chemin) :
+                </label>
+                <input
+                  value={settings.heroImageUrl ?? ''}
+                  onChange={(e) => setSettings({ ...settings, heroImageUrl: e.target.value })}
+                  className="input-field text-xs font-mono"
+                  placeholder="/images/hero.webp"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold text-primaryText mb-1">Légende du visuel :</label>
+                <input
+                  value={settings.heroImageCaption ?? ''}
+                  onChange={(e) => setSettings({ ...settings, heroImageCaption: e.target.value })}
+                  className="input-field text-xs"
+                  placeholder="Palettes filmées &amp; cerclées"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold text-primaryText mb-1">Sous-légende du visuel :</label>
+                <input
+                  value={settings.heroImageCaptionSub ?? ''}
+                  onChange={(e) => setSettings({ ...settings, heroImageCaptionSub: e.target.value })}
+                  className="input-field text-xs"
+                  placeholder="Bûches 25 cm, 33 cm et 50 cm disponibles"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold text-primaryText mb-1">Pastille du visuel :</label>
+                <input
+                  value={settings.heroImageBadge ?? ''}
+                  onChange={(e) => setSettings({ ...settings, heroImageBadge: e.target.value })}
+                  className="input-field text-xs"
+                  placeholder="Stock disponible"
+                />
+              </div>
+            </div>
+
+            {/* Chiffres clés */}
+            <div className="space-y-3">
+              <h3 className="font-bold text-primaryText uppercase tracking-wider text-[11px]">
+                Chiffres clés sous le hero
+              </h3>
+              {[
+                { value: 'heroFact1Value', label: 'heroFact1Label', titre: 'Chiffre 1' },
+                { value: 'heroFact2Value', label: 'heroFact2Label', titre: 'Chiffre 2' },
+                { value: 'heroFact3Value', label: 'heroFact3Label', titre: 'Chiffre 3' },
+              ].map((fact) => (
+                <div key={fact.value} className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-semibold text-primaryText mb-1">{fact.titre} — valeur :</label>
+                    <input
+                      value={settings[fact.value] ?? ''}
+                      onChange={(e) => setSettings({ ...settings, [fact.value]: e.target.value })}
+                      className="input-field text-xs"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-primaryText mb-1">{fact.titre} — légende :</label>
+                    <input
+                      value={settings[fact.label] ?? ''}
+                      onChange={(e) => setSettings({ ...settings, [fact.label]: e.target.value })}
+                      className="input-field text-xs"
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="flex items-center gap-2 text-[11px] text-secondaryText">
+              <ArrowRight className="w-3.5 h-3.5" />
+              <span>Enregistrez puis ouvrez la page d&apos;accueil du site pour vérifier le rendu réel.</span>
+            </div>
+          </div>
+        )}
+
+        {/* Tab 3: Bank details */}
         {activeTab === 'bank' && (
           <div className="bg-white p-6 rounded-xl border border-subtleBorder shadow-subtle space-y-5 text-xs">
             <h2 className="text-sm font-bold font-heading text-primaryText border-b border-subtleBorder pb-2">
@@ -767,7 +1080,9 @@ export default function SiteCustomizationPage() {
               <span>
                 {settings.emailProvider === 'log'
                   ? 'Mode actuel : Journal d\'audit interne (Sandbox). Les emails sont générés, tracés en base de données et consultables dans l\'onglet "Emails & Notifications" sans nécessiter de serveur SMTP.'
-                  : 'Mode SMTP Actif : Les emails sont délivrés par votre serveur de messagerie externe.'}
+                  : settings.emailProvider === 'resend'
+                    ? 'Mode Resend actif : les emails sont réellement délivrés par l\'API HTTPS de Resend. La clé se trouve dans le fichier .env du serveur (RESEND_API_KEY), jamais en base ni dans le navigateur.'
+                    : 'Mode SMTP Actif : Les emails sont délivrés par votre serveur de messagerie externe.'}
               </span>
             </div>
 
@@ -780,6 +1095,7 @@ export default function SiteCustomizationPage() {
                   className="input-field bg-white"
                 >
                   <option value="log">Journal d'audit sécurisé (Par défaut / Recette)</option>
+                  <option value="resend">Resend — API HTTPS (recommandé)</option>
                   <option value="smtp">Serveur SMTP externe (Production)</option>
                 </select>
               </div>
@@ -793,6 +1109,19 @@ export default function SiteCustomizationPage() {
                   className="input-field"
                 />
               </div>
+
+              {settings.emailProvider === 'resend' && (
+                <div className="sm:col-span-2 p-3 bg-beige-50 border border-subtleBorder rounded-lg text-primaryText space-y-1">
+                  <p className="font-semibold">Configuration Resend (côté serveur)</p>
+                  <p className="font-mono text-[11px] text-secondaryText">
+                    RESEND_API_KEY=re_... &nbsp;·&nbsp; RESEND_FROM="Votre société &lt;contact@votre-domaine.fr&gt;"
+                  </p>
+                  <p className="text-secondaryText">
+                    Adresse d'expédition utilisée : <span className="font-mono">{settings.smtpFrom || '(non définie)'}</span>. Le domaine de
+                    cette adresse doit être vérifié dans votre compte Resend. La clé n'est ni stockée en base ni transmise au navigateur.
+                  </p>
+                </div>
+              )}
 
               {settings.emailProvider === 'smtp' && (
                 <>
