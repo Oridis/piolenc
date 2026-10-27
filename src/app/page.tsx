@@ -48,6 +48,8 @@ export default async function HomePage() {
     <>
       <a href="#main" className="sr-only focus:not-sr-only focus-outline">Skip to main content</a>
 
+      <Navbar siteName={settings.siteName} phone={settings.companyPhone} slogan={settings.slogan} />
+
       <main id="main" className="flex-1 font-sans bg-ivory">
         {/* SECTION 1: HERO PRINCIPAL EDITORIAL */}
         <section className="bg-white border-b border-subtleBorder py-12 lg:py-20">
