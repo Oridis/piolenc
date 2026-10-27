@@ -1,7 +1,7 @@
 {
   "env": {
-    "NEXTAUTH_URL": "https://piolencboisdirect.com",
-    "NEXT_PUBLIC_APP_URL": "https://piolencboisdirect.com",
+    "NEXTAUTH_URL": "https://piolencboisdirect.fr",
+    "NEXT_PUBLIC_APP_URL": "https://piolencboisdirect.fr",
     "EMAIL_PROVIDER": "resend",
     "SMTP_HOST": "smtp.resend.com",
     "SMTP_PORT": "587",
