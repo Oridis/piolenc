@@ -1,10 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/context/CartContext';
 import { formatPrice } from '@/lib/pricing';
 import { PLACEHOLDER_IMAGE } from '@/lib/images';
+import { describeAvailabilityIssue, fetchCartAvailability, type CartAvailabilityEntry } from '@/lib/cart-availability';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import {
@@ -15,6 +16,7 @@ import {
   ArrowRight,
   ShieldCheck,
   Truck,
+  AlertTriangle,
 } from 'lucide-react';
 
 export default function CartPage() {
@@ -31,6 +33,40 @@ export default function CartPage() {
   const [discountInput, setDiscountInput] = useState('');
   const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; amount: number } | null>(null);
   const [discountError, setDiscountError] = useState('');
+  const [issues, setIssues] = useState<Map<string, CartAvailabilityEntry>>(new Map());
+
+  // Le panier est conservé dans le navigateur : on redemande l'état réel du
+  // catalogue dès qu'une ligne change, pour signaler un produit retiré ou un
+  // stock épuisé avant l'étape de paiement.
+  const cartSignature = items.map((item) => `${item.productId}:${item.quantity}`).join('|');
+
+  useEffect(() => {
+    if (items.length === 0) {
+      setIssues(new Map());
+      return;
+    }
+    let cancelled = false;
+    fetchCartAvailability(items.map((item) => ({ id: item.productId, quantity: item.quantity })))
+      .then((entries) => {
+        if (!cancelled) setIssues(entries);
+      })
+      .catch(() => {
+        // Vérification indisponible : on n'affiche pas de faux positif, le
+        // tunnel de commande revalide tout côté serveur.
+        if (!cancelled) setIssues(new Map());
+      });
+    return () => {
+      cancelled = true;
+    };
+    // Le contenu du panier est résumé par `cartSignature`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cartSignature]);
+
+  const blockedItems = items.filter((item) => describeAvailabilityIssue(issues.get(item.productId)) !== null);
+
+  const removeUnavailable = () => {
+    blockedItems.forEach((item) => removeFromCart(item.productId));
+  };
 
   const freeShippingThreshold = 650;
   const remainingForFree = Math.max(0, freeShippingThreshold - subtotalTTC);
@@ -95,6 +131,36 @@ export default function CartPage() {
             </div>
           </div>
         ) : (
+          <>
+          {blockedItems.length > 0 && (
+            <div
+              role="alert"
+              className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-4 rounded-xl border border-red-200 bg-red-50"
+            >
+              <div className="flex items-start gap-2.5">
+                <AlertTriangle className="w-4 h-4 text-statusError shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-xs font-semibold text-statusError">
+                    {blockedItems.length === 1
+                      ? '1 article de votre panier n’est plus disponible'
+                      : `${blockedItems.length} articles de votre panier ne sont plus disponibles`}
+                  </p>
+                  <p className="text-[11px] text-statusError mt-0.5">
+                    Retirez-les pour poursuivre : la commande les refuserait.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={removeUnavailable}
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-semibold text-white bg-statusError hover:bg-red-800 transition shrink-0"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Retirer les articles indisponibles</span>
+              </button>
+            </div>
+          )}
+
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
             {/* Items List (8 cols) */}
             <div className="lg:col-span-8 bg-white rounded-xl border border-subtleBorder shadow-subtle overflow-hidden p-6 space-y-4">
@@ -111,8 +177,15 @@ export default function CartPage() {
               </div>
 
               <div className="divide-y divide-subtleBorder/60">
-                {items.map((item) => (
-                  <div key={item.productId} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                {items.map((item) => {
+                  const issue = describeAvailabilityIssue(issues.get(item.productId));
+                  return (
+                  <div
+                    key={item.productId}
+                    className={`py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 ${
+                      issue ? '-mx-3 px-3 rounded-lg bg-red-50/50' : ''
+                    }`}
+                  >
                     <div className="flex items-center space-x-3.5 min-w-0">
                       <div className="w-16 h-16 sm:w-20 sm:h-20 min-w-[4rem] sm:min-w-[5rem] max-w-[5rem] rounded-md overflow-hidden border border-subtleBorder bg-ivory shrink-0">
                         <img
@@ -131,6 +204,21 @@ export default function CartPage() {
                         <p className="text-xs font-semibold text-forest mt-1">
                           {formatPrice(item.priceTTC)} TTC / unité
                         </p>
+                        {issue && (
+                          <div className="mt-1.5 space-y-1">
+                            <p className="flex items-start gap-1.5 text-[11px] font-medium text-statusError leading-relaxed">
+                              <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5" />
+                              <span>{issue}</span>
+                            </p>
+                            <button
+                              type="button"
+                              onClick={() => removeFromCart(item.productId)}
+                              className="text-[11px] font-semibold text-statusError underline underline-offset-2 hover:text-red-800 transition-colors"
+                            >
+                              Retirer du panier
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
 
@@ -169,7 +257,8 @@ export default function CartPage() {
                       </div>
                     </div>
                   </div>
-                ))}
+                  );
+                })}
               </div>
 
               {/* Free delivery incentive bar */}
@@ -254,14 +343,30 @@ export default function CartPage() {
                 {appliedDiscount && <p className="text-statusSuccess text-[11px] font-medium">Code appliqué avec succès</p>}
               </div>
 
-              {/* Proceed to checkout CTA */}
-              <Link
-                href="/commande"
-                className="btn-primary w-full py-3 text-xs inline-flex items-center justify-center gap-2"
-              >
-                <span>Valider le panier et continuer</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
+              {/* Proceed to checkout CTA — bloqué tant qu'un article est indisponible */}
+              {blockedItems.length > 0 ? (
+                <div className="space-y-1.5">
+                  <button
+                    type="button"
+                    disabled
+                    className="btn-primary w-full py-3 text-xs inline-flex items-center justify-center gap-2 opacity-50 cursor-not-allowed"
+                  >
+                    <span>Valider le panier et continuer</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                  <p className="text-[11px] text-statusError text-center">
+                    Retirez les articles indisponibles pour poursuivre.
+                  </p>
+                </div>
+              ) : (
+                <Link
+                  href="/commande"
+                  className="btn-primary w-full py-3 text-xs inline-flex items-center justify-center gap-2"
+                >
+                  <span>Valider le panier et continuer</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              )}
 
               <div className="text-[11px] text-secondaryText space-y-1 text-center pt-1">
                 <p className="flex items-center justify-center gap-1.5">
@@ -272,6 +377,7 @@ export default function CartPage() {
               </div>
             </div>
           </div>
+          </>
         )}
       </main>
 
