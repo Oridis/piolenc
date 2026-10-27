@@ -51,7 +51,11 @@ export default async function ProductDetailPage({
     },
   });
 
-  if (!product) {
+  // Une fiche retirée du catalogue (désactivée) n'est plus consultable, même
+  // par son URL directe : les listes publiques filtrent déjà sur `isActive`, un
+  // lien partagé ou indexé ne doit donc pas ressusciter un produit retiré. Le
+  // tunnel de commande refuse lui aussi ces fiches, l'ensemble reste cohérent.
+  if (!product || !product.isActive) {
     notFound();
   }
 
