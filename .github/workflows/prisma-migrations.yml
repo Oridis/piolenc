@@ -8,10 +8,30 @@ on:
 
 jobs:
   validate-migrations:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         node-version: [20]
+
+    # Mot de passe et base jetables : le service ci-dessous vit le temps du job.
+    # `prisma validate` exige la variable même sans connexion, d'où le env global.
+    env:
+      DATABASE_URL: postgresql://prisma:prisma@localhost:5432/migrations?schema=public
+
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: prisma
+          POSTGRES_PASSWORD: prisma
+          POSTGRES_DB: migrations
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
 
     steps:
       - name: Checkout repository
@@ -23,32 +43,34 @@ jobs:
           node-version: ${{ matrix.node-version }}
           cache: 'npm'
 
+      # `npm ci` installe exactement le package-lock.json versionné : pas de
+      # résolution flottante entre deux exécutions.
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Validate Prisma schema
-        run: |
-          npx prisma validate
+        run: npx prisma validate
 
       - name: Generate Prisma client
-        run: |
-          npx prisma generate
+        run: npx prisma generate
 
       # `--from-step` / `--to-step` do not exist in the Prisma CLI; compare the
       # empty datamodel with the schema instead so the step still proves the
       # schema renders a valid migration script.
       - name: Render schema migration script
-        run: |
-          npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > /dev/null
+        run: npx prisma migrate diff --from-empty --to-schema-datamodel prisma/schema.prisma --script > /dev/null
 
-      - name: Run test scenarios
-        run: |
-          npm run test:scenarios
+      # Vérification décisive : toutes les migrations versionnées doivent
+      # s'appliquer, dans l'ordre, sur une base vierge. C'est ce qui casserait
+      # en production si une migration manquait ou était incohérente.
+      - name: Apply migrations to an empty database
+        run: npx prisma migrate deploy
 
+      - name: Assert database matches migrations
+        run: npx prisma migrate status
+
+      # `npm run test:scenarios` n'est pas exécuté ici : il lui faut une base
+      # déjà peuplée (produits, réglages) et l'application en marche, ce qui
+      # relève d'un test local, pas d'un contrôle de migrations.
       - name: Report success
-        if: success()
         run: echo "✅ All Prisma migration validations passed"
-
-      - name: Report failure
-        if: failure()
-        run: echo "❌ Prisma migration validation failed" && exit 1
