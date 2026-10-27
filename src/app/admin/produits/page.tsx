@@ -11,6 +11,7 @@ import {
   Pencil,
   Trash2,
   Upload,
+  Download,
   X,
   RefreshCw,
   CheckCircle2,
@@ -150,6 +151,8 @@ export default function AdminProductsPage() {
   const [form, setForm] = useState<FormState | null>(null);
   const [saving, setSaving] = useState(false);
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string[]>([]);
+  const [bulkBusy, setBulkBusy] = useState(false);
   const [status, setStatus] = useState<{ kind: 'ok' | 'error'; message: string } | null>(null);
 
   const load = useCallback(async () => {
@@ -160,6 +163,11 @@ export default function AdminProductsPage() {
       if (!res.ok) throw new Error(data.error || 'Chargement impossible');
       setProducts(data.products || []);
       setCategories(data.categories || []);
+      // Une sélection ne survit pas à la disparition des fiches concernées.
+      setSelected((prev) => {
+        const alive = new Set<string>((data.products || []).map((product: Product) => product.id));
+        return prev.filter((id) => alive.has(id));
+      });
     } catch (error: any) {
       setStatus({ kind: 'error', message: error?.message || 'Chargement impossible' });
     } finally {
@@ -280,6 +288,61 @@ export default function AdminProductsPage() {
     }
   };
 
+  const toggleSelect = (id: string) =>
+    setSelected((prev) => (prev.includes(id) ? prev.filter((value) => value !== id) : [...prev, id]));
+
+  const allSelected = products.length > 0 && selected.length === products.length;
+
+  const toggleSelectAll = () =>
+    setSelected(allSelected ? [] : products.map((product) => product.id));
+
+  /**
+   * Suppression groupée : l'API écarte les produits déjà commandés (historique
+   * comptable) et renvoie le détail de ce qui a été supprimé ou écarté.
+   */
+  const removeSelected = async () => {
+    if (selected.length === 0) return;
+    const chosen = products.filter((product) => selected.includes(product.id));
+    const names = chosen.slice(0, 6).map((product) => `« ${product.name} »`).join('\n');
+    const more = chosen.length > 6 ? `\n… et ${chosen.length - 6} autre(s)` : '';
+    const confirmed = window.confirm(
+      `Supprimer définitivement ${chosen.length} produit(s) ?\n\n${names}${more}\n\nLes produits déjà commandés seront écartés automatiquement.`
+    );
+    if (!confirmed) return;
+
+    setBulkBusy(true);
+    setStatus(null);
+    try {
+      const res = await fetch('/api/admin/products', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ids: selected }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Suppression impossible');
+
+      const deleted = data.deleted?.length ?? 0;
+      const skipped = data.skipped?.length ?? 0;
+      setStatus({
+        kind: skipped > 0 ? 'error' : 'ok',
+        message:
+          `${deleted} produit(s) supprimé(s).` +
+          (skipped > 0
+            ? `\n${skipped} fiche(s) conservée(s) :\n` +
+              (data.skipped as { name?: string; reason: string }[])
+                .map((entry) => `• ${entry.reason}`)
+                .join('\n')
+            : ''),
+      });
+      setSelected([]);
+      await load();
+    } catch (error: any) {
+      setStatus({ kind: 'error', message: error?.message || 'Suppression impossible' });
+    } finally {
+      setBulkBusy(false);
+    }
+  };
+
   const input = 'input-field text-xs';
   const label = 'block font-semibold text-primaryText mb-1';
 
@@ -309,6 +372,14 @@ export default function AdminProductsPage() {
               <RefreshCw className="w-3.5 h-3.5" />
               <span>Actualiser</span>
             </button>
+            <a
+              href="/api/admin/products-export"
+              className="flex items-center space-x-1.5 px-3 py-2 bg-white border border-subtleBorder rounded-lg text-xs font-semibold text-primaryText hover:bg-beige-50 transition shadow-subtle"
+              title="Exporter tout le catalogue (contenus, images, tarifs) dans un fichier CSV réimportable"
+            >
+              <Download className="w-3.5 h-3.5" />
+              <span>Exporter en CSV</span>
+            </a>
             <button onClick={openCreate} className="btn-primary inline-flex items-center gap-1.5 text-xs py-2">
               <Plus className="w-4 h-4" />
               <span>Ajouter un produit</span>
@@ -333,6 +404,30 @@ export default function AdminProductsPage() {
           </div>
         )}
 
+        {selected.length > 0 && (
+          <div className="flex flex-wrap items-center justify-between gap-3 p-3 rounded-lg border border-red-200 bg-red-50">
+            <span className="text-xs font-semibold text-statusError">
+              {selected.length} produit(s) sélectionné(s)
+            </span>
+            <div className="flex flex-wrap items-center gap-2">
+              <button
+                onClick={() => setSelected([])}
+                className="px-3 py-1.5 bg-white border border-subtleBorder rounded-lg text-[11px] font-semibold text-secondaryText hover:bg-beige-50 transition"
+              >
+                Tout désélectionner
+              </button>
+              <button
+                onClick={removeSelected}
+                disabled={bulkBusy}
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-semibold text-white bg-statusError hover:bg-red-800 transition disabled:opacity-50"
+              >
+                {bulkBusy ? <RefreshCw className="w-3 h-3 animate-spin" /> : <Trash2 className="w-3 h-3" />}
+                <span>Supprimer la sélection</span>
+              </button>
+            </div>
+          </div>
+        )}
+
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
           <div className="xl:col-span-3 bg-white rounded-xl border border-subtleBorder shadow-subtle overflow-hidden">
             {loading ? (
@@ -346,6 +441,16 @@ export default function AdminProductsPage() {
                 <table className="w-full text-left text-xs">
                   <thead className="bg-beige-50 text-secondaryText font-semibold uppercase tracking-wider text-[11px] border-b border-subtleBorder">
                     <tr>
+                      <th className="py-3 px-4 w-10">
+                        <input
+                          type="checkbox"
+                          checked={allSelected}
+                          onChange={toggleSelectAll}
+                          aria-label="Tout sélectionner"
+                          title="Tout sélectionner"
+                          className="w-4 h-4 accent-forest align-middle cursor-pointer"
+                        />
+                      </th>
                       <th className="py-3 px-4">Produit</th>
                       <th className="py-3 px-4">Catégorie</th>
                       <th className="py-3 px-4">Essence &amp; Coupe</th>
@@ -359,7 +464,19 @@ export default function AdminProductsPage() {
                     {products.map((prod) => {
                       const isLowStock = Number(prod.stock) <= 30;
                       return (
-                        <tr key={prod.id} className="hover:bg-beige-50/50 transition">
+                        <tr
+                          key={prod.id}
+                          className={`transition ${selected.includes(prod.id) ? 'bg-red-50/60' : 'hover:bg-beige-50/50'}`}
+                        >
+                          <td className="py-3.5 px-4">
+                            <input
+                              type="checkbox"
+                              checked={selected.includes(prod.id)}
+                              onChange={() => toggleSelect(prod.id)}
+                              aria-label={`Sélectionner ${prod.name}`}
+                              className="w-4 h-4 accent-forest cursor-pointer"
+                            />
+                          </td>
                           <td className="py-3.5 px-4 font-semibold text-primaryText">
                             <div className="flex items-center space-x-3">
                               <img
@@ -450,7 +567,8 @@ export default function AdminProductsPage() {
               Import de produits
             </h2>
             <p className="text-xs text-secondaryText mb-4">
-              Récupère une fiche distante ou colle un payload JSON et importe les produits dans le catalogue.
+              Réimportez le fichier CSV exporté (ou collez un CSV / un payload JSON) pour restaurer le catalogue :
+              les fiches existantes sont mises à jour, les autres sont créées.
             </p>
             <ProductImportTool onStatus={(m, t) => setStatus({ kind: t === 'error' ? 'error' : 'ok', message: m })} />
           </div>

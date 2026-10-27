@@ -310,30 +310,83 @@ export async function DELETE(request: Request) {
 
   try {
     const { searchParams } = new URL(request.url);
-    const id = searchParams.get('id') || toText((await request.json().catch(() => ({}))).id);
-    if (!id) return NextResponse.json({ error: 'Produit non précisé' }, { status: 400 });
+    const body = await request.json().catch(() => ({}));
 
-    const existing = await prisma.product.findUnique({ where: { id }, select: { id: true, name: true } });
-    if (!existing) return NextResponse.json({ error: 'Produit introuvable' }, { status: 404 });
+    // Un produit (`id`) ou une sélection (`ids`), en paramètre d'URL ou dans le
+    // corps JSON : la suppression groupée sert au nettoyage du catalogue.
+    const requested = [
+      searchParams.get('id') || '',
+      ...(searchParams.get('ids') || '').split(','),
+      ...(body?.id ? [body.id] : []),
+      ...(Array.isArray(body?.ids) ? body.ids : []),
+    ]
+      .map((value) => toText(value))
+      .filter(Boolean);
 
-    // Un produit déjà commandé doit rester dans l'historique comptable : on
-    // refuse la suppression et on propose la désactivation.
-    const orderLines = await prisma.orderItem.count({ where: { productId: id } });
-    if (orderLines > 0) {
-      return NextResponse.json(
-        {
-          error:
-            `« ${existing.name} » apparaît dans ${orderLines} ligne(s) de commande : ` +
-            'désactivez-le (Désactivé) pour le retirer de la boutique sans casser l’historique.',
-        },
-        { status: 409 }
-      );
+    const ids = [...new Set(requested)];
+    if (ids.length === 0) return NextResponse.json({ error: 'Produit non précisé' }, { status: 400 });
+    if (ids.length > 500) {
+      return NextResponse.json({ error: 'Suppression limitée à 500 produits par envoi' }, { status: 400 });
     }
 
-    await prisma.product.delete({ where: { id } });
+    const known = await prisma.product.findMany({
+      where: { id: { in: ids } },
+      select: { id: true, name: true, reference: true },
+    });
+
+    const skipped: { id: string; name?: string; reason: string }[] = ids
+      .filter((id) => !known.some((product) => product.id === id))
+      .map((id) => ({ id, reason: 'Produit introuvable' }));
+
+    // Un produit déjà commandé doit rester dans l'historique comptable : il est
+    // écarté de la suppression, l'exploitant le désactive pour le retirer de la
+    // boutique sans casser les commandes passées.
+    const linked = known.length
+      ? await prisma.orderItem.groupBy({
+          by: ['productId'],
+          where: { productId: { in: known.map((product) => product.id) } },
+          _count: { _all: true },
+        })
+      : [];
+    const linkedCount = new Map(linked.map((entry) => [entry.productId, entry._count._all]));
+
+    const deletable: { id: string; name: string; reference: string }[] = [];
+    for (const product of known) {
+      const orderLines = linkedCount.get(product.id) || 0;
+      if (orderLines > 0) {
+        skipped.push({
+          id: product.id,
+          name: product.name,
+          reason:
+            `« ${product.name} » apparaît dans ${orderLines} ligne(s) de commande : ` +
+            'désactivez-le (Désactivé) pour le retirer de la boutique sans casser l’historique.',
+        });
+      } else {
+        deletable.push({ id: product.id, name: product.name, reference: product.reference });
+      }
+    }
+
+    if (deletable.length === 0) {
+      if (skipped.length > 0) {
+        return NextResponse.json(
+          { error: skipped.map((item) => item.reason).join('\n'), skipped },
+          { status: skipped.some((item) => item.reason.startsWith('«')) ? 409 : 404 }
+        );
+      }
+      return NextResponse.json({ error: 'Produit introuvable' }, { status: 404 });
+    }
+
+    await prisma.product.deleteMany({ where: { id: { in: deletable.map((product) => product.id) } } });
     invalidateProductsCache();
     invalidateCategoriesCache();
-    return NextResponse.json({ success: true, deletedId: id });
+
+    return NextResponse.json({
+      success: true,
+      deleted: deletable,
+      deletedIds: deletable.map((product) => product.id),
+      deletedId: deletable.length === 1 ? deletable[0].id : undefined,
+      skipped,
+    });
   } catch (error: any) {
     return NextResponse.json({ error: error.message || 'Suppression impossible' }, { status: 500 });
   }
