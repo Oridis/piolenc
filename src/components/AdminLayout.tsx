@@ -15,6 +15,7 @@ import {
   Users,
   ShieldAlert,
   FileText,
+  UserCog,
   LogOut,
   ExternalLink,
   Menu,
@@ -50,6 +51,7 @@ export default function AdminLayout({
     { name: 'Comptes clients', href: '/admin/clients', icon: Users },
     { name: 'Équipe & Permissions', href: '/admin/utilisateurs', icon: ShieldAlert },
     { name: 'Journal d\'audit', href: '/admin/audit', icon: FileText },
+    { name: 'Mon compte', href: '/admin/mon-compte', icon: UserCog },
   ];
 
   const handleLogout = async () => {
@@ -132,10 +134,15 @@ export default function AdminLayout({
           </Link>
 
           <div className="flex items-center justify-between pt-1">
-            <div className="text-xs truncate mr-2">
+            <Link
+              href="/admin/mon-compte"
+              onClick={() => setSidebarOpen(false)}
+              className="text-xs truncate mr-2 hover:opacity-80 transition-opacity"
+              title="Modifier mon e-mail et mon mot de passe"
+            >
               <p className="font-medium text-white truncate">{userName}</p>
               <p className="text-[10px] text-ivory/60 truncate">{userRole}</p>
-            </div>
+            </Link>
             <button
               onClick={handleLogout}
               className="p-1.5 text-ivory/70 hover:text-statusError rounded-md transition-colors"
