@@ -5,6 +5,7 @@ import AdminLayout from '@/components/AdminLayout';
 import ProductImportTool from '@/components/ProductImportTool';
 import { formatPrice } from '@/lib/pricing';
 import { PLACEHOLDER_IMAGE } from '@/lib/images';
+import { buildCatalogueBackup, type CatalogueBackupProgress } from '@/lib/catalogue-backup';
 import {
   Package,
   Plus,
@@ -12,6 +13,7 @@ import {
   Trash2,
   Upload,
   Download,
+  Archive,
   X,
   RefreshCw,
   CheckCircle2,
@@ -86,6 +88,11 @@ const emptyForm = (categoryId = ''): FormState => ({
 
 const text = (value: unknown) => (value === null || value === undefined ? '' : String(value));
 
+const formatBytes = (bytes: number) =>
+  bytes >= 1024 * 1024
+    ? `${(bytes / (1024 * 1024)).toFixed(1).replace('.', ',')} Mo`
+    : `${Math.max(1, Math.round(bytes / 1024))} Ko`;
+
 function toForm(product: Product): FormState {
   return {
     id: product.id,
@@ -153,6 +160,8 @@ export default function AdminProductsPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [selected, setSelected] = useState<string[]>([]);
   const [bulkBusy, setBulkBusy] = useState(false);
+  const [backupBusy, setBackupBusy] = useState(false);
+  const [backupProgress, setBackupProgress] = useState<CatalogueBackupProgress | null>(null);
   const [status, setStatus] = useState<{ kind: 'ok' | 'error'; message: string } | null>(null);
 
   const load = useCallback(async () => {
@@ -343,6 +352,64 @@ export default function AdminProductsPage() {
     }
   };
 
+  /**
+   * Sauvegarde complète : le CSV réimportable **et** les fichiers d'images, dans
+   * une archive ZIP. Les images sont demandées une par une à leurs adresses
+   * publiques, d'où l'indicateur de progression.
+   */
+  const downloadBackup = async () => {
+    setBackupBusy(true);
+    setBackupProgress(null);
+    setStatus(null);
+    try {
+      const res = await fetch('/api/admin/products-export');
+      if (!res.ok) throw new Error(`Export du catalogue refusé (HTTP ${res.status})`);
+      const csv = await res.text();
+
+      const imageUrls = products.flatMap((product) => {
+        try {
+          const parsed = JSON.parse(text(product.images) || '[]');
+          return Array.isArray(parsed) ? parsed.map((value) => String(value)) : [];
+        } catch {
+          return [];
+        }
+      });
+
+      const backup = await buildCatalogueBackup({ csv, imageUrls, onProgress: setBackupProgress });
+
+      const blob = new Blob([backup.archive.buffer as ArrayBuffer], { type: 'application/zip' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = backup.fileName;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+
+      const warnings: string[] = [];
+      if (backup.missingImages.length > 0) {
+        warnings.push(`${backup.missingImages.length} image(s) locale(s) illisible(s)`);
+      }
+      if (backup.remoteImages.length > 0) {
+        warnings.push(`${backup.remoteImages.length} image(s) hébergée(s) ailleurs, non incluse(s)`);
+      }
+
+      setStatus({
+        kind: warnings.length > 0 ? 'error' : 'ok',
+        message:
+          `Sauvegarde « ${backup.fileName} » téléchargée : ${backup.storedImages} fichier(s) d'images, ` +
+          `le CSV du catalogue et un LISEZ-MOI explicatif (${formatBytes(backup.bytes)}).` +
+          (warnings.length > 0 ? `\n${warnings.join(' · ')}` : ''),
+      });
+    } catch (error: any) {
+      setStatus({ kind: 'error', message: error?.message || 'Sauvegarde impossible' });
+    } finally {
+      setBackupBusy(false);
+      setBackupProgress(null);
+    }
+  };
+
   const input = 'input-field text-xs';
   const label = 'block font-semibold text-primaryText mb-1';
 
@@ -380,6 +447,19 @@ export default function AdminProductsPage() {
               <Download className="w-3.5 h-3.5" />
               <span>Exporter en CSV</span>
             </a>
+            <button
+              onClick={downloadBackup}
+              disabled={backupBusy || loading}
+              className="flex items-center space-x-1.5 px-3 py-2 bg-white border border-subtleBorder rounded-lg text-xs font-semibold text-primaryText hover:bg-beige-50 transition shadow-subtle disabled:opacity-60"
+              title="Télécharger une archive ZIP contenant le CSV du catalogue et les fichiers d'images"
+            >
+              {backupBusy ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Archive className="w-3.5 h-3.5" />}
+              <span>
+                {backupBusy && backupProgress
+                  ? `Sauvegarde… ${backupProgress.done}/${backupProgress.total}`
+                  : 'Sauvegarde complète (.zip)'}
+              </span>
+            </button>
             <button onClick={openCreate} className="btn-primary inline-flex items-center gap-1.5 text-xs py-2">
               <Plus className="w-4 h-4" />
               <span>Ajouter un produit</span>
