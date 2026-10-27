@@ -8,7 +8,9 @@ on:
 
 jobs:
   validate-migrations:
-    runs-on: ubuntu-latest
+    # Épinglé plutôt que `ubuntu-latest` : le label doit basculer vers Ubuntu 26
+    # et déclenche sinon un avertissement à chaque exécution.
+    runs-on: ubuntu-24.04
     strategy:
       matrix:
         node-version: [20]
